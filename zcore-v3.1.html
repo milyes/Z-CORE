@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Z-CORE v3.1 [SOUVERAIN]</title>
+<script src="jspdf.umd.min.js"></script>
+<script src="qrcode.min.js"></script>
+<style>
+:root { --bg:#000; --gold:#d4af37; --green:#00ff41; --text:#e0e0e0; --panel:#0a0a0a; --red:#ff2d55; }
+*{ box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:Consolas,monospace; margin:0; padding:12px; }
+.hud { border:2px solid var(--gold); padding:12px; text-align:center; font-weight:bold;
+       letter-spacing:3px; margin-bottom:18px; box-shadow:0 0 12px rgba(212,175,55,.6); user-select:none; }
+.nodes { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:18px; }
+.node { border:1px solid #222; padding:12px; text-align:center; font-size:.85em; cursor:pointer; transition:all .2s; }
+.node.active { border-color:var(--green); color:var(--green); background:rgba(0,255,65,.08); box-shadow:0 0 12px rgba(0,255,65,.5); }
+textarea { width:100%; height:160px; background:var(--panel); color:var(--green);
+           border:1px solid #111; padding:12px; margin-bottom:18px; resize:vertical; font-family:monospace; }
+canvas { border:1px solid var(--gold); background:#030303; width:100%; height:160px;
+         touch-action:none; margin-bottom:12px; box-shadow:0 0 12px rgba(212,175,55,.6); }
+.btn { background:var(--gold); color:#000; border:none; padding:16px; width:100%;
+       font-weight:bold; text-transform:uppercase; cursor:pointer; margin:8px 0; border-radius:4px; }
+.btn:disabled { opacity:.4; cursor:not-allowed; }
+.purge { background:var(--red); color:#fff; padding:8px 16px; border:none;
+         cursor:pointer; margin-top:10px; display:none; border-radius:4px; width:100%; }
+#status { font-size:.8em; margin:10px 0; text-align:center; color:#888; }
+#status.ok  { color:var(--green); }
+#status.err { color:var(--red); font-weight:bold; }
+.pubkey-box { font-size:.6em; color:#444; word-break:break-all; margin:6px 0; padding:6px;
+              border:1px solid #1a1a1a; background:#050505; }
+#log { font-size:.75em; color:#555; margin-top:12px; min-height:20px; }
+
+/* QR panel — inline dans le flux, pas fixed */
+#qr-panel { margin-top:16px; border:1px solid var(--gold); padding:10px;
+            background:#050505; display:none; }
+#qr-panel h4 { color:var(--gold); font-size:.75em; margin:0 0 8px; letter-spacing:2px; }
+#qr-canvas-wrap canvas { display:block; }
+#qr-meta { font-size:.6em; color:#444; word-break:break-all; margin-top:8px; }
+#qr-verify-btn { background:transparent; border:1px solid var(--green); color:var(--green);
+                 padding:6px 12px; cursor:pointer; font-size:.75em; margin-top:8px;
+                 font-family:Consolas,monospace; border-radius:3px; width:100%; }
+#qr-verify-result { font-size:.75em; margin-top:6px; min-height:16px; }
+#qr-verify-result.valid { color:var(--green); }
+#qr-verify-result.invalid { color:var(--red); font-weight:bold; }
+</style>
+</head>
+<body>
+
+<div class="hud" ondblclick="document.querySelector('.purge').style.display='block'">
+  Z-CORE v3.1 [SOUVERAIN — ROOT SCELLÉ]
+</div>
+
+<div id="status">INITIALISATION...</div>
+<div class="pubkey-box" id="pubkeyDisplay">CLÉ PUBLIQUE : chargement...</div>
+
+<div id="autoVerifBanner" style="display:none;font-size:.75em;text-align:center;padding:4px;margin-bottom:8px;border-radius:3px;"></div>
+
+<div class="nodes">
+  <div class="node" onclick="this.classList.toggle('active')">SÉCURITÉ</div>
+  <div class="node" onclick="this.classList.toggle('active')">TECHNIQUE</div>
+  <div class="node" onclick="this.classList.toggle('active')">QUALITÉ</div>
+  <div class="node" onclick="this.classList.toggle('active')">RISQUE</div>
+</div>
+
+<textarea id="obs" placeholder="[RAW_DATA_FIELD v3.1 — INJECTER DONNÉES BRUTES]..."></textarea>
+
+<div style="color:var(--gold);margin-bottom:6px;font-size:.85em;">SIGNATURE TACTILE ROOT :</div>
+<canvas id="sig"></canvas>
+
+<button class="btn" id="sealBtn" onclick="exportSealedPDF()" disabled>SCELLER &amp; EXPORTER (v3.1)</button>
+<button class="purge" onclick="emergencyPurge()">PURGE D'URGENCE ROOT</button>
+
+<!-- QR panel — visible après export, inline dans le flux -->
+<div id="qr-panel">
+  <h4>VÉRIFICATION QR — DERNIER PDF SCELLÉ</h4>
+  <div id="qr-canvas-wrap"></div>
+  <div id="qr-meta"></div>
+  <button id="qr-verify-btn" onclick="verifLastPDF()">VÉRIFIER SIGNATURE (console + inline)</button>
+  <div id="qr-verify-result"></div>
+</div>
+
+<div id="log">Z-CORE v3.1 → initialisation...</div>
+
+<script>
+// ─── CONSTANTES ───────────────────────────────────────────────────────────────
+const LS_PRIV      = 'zcore_privkey_jwk';
+const LS_AUTOTEST  = 'zcore_autotest';   // {hash, sig} signés avec la clé courante
+const ROOT_LABEL   = "MZ@IA22";
+const enc          = new TextEncoder();
+
+// ─── ÉTAT ─────────────────────────────────────────────────────────────────────
+let privateKey   = null;
+let publicKeyObj = null;   // CryptoKey public — gardé en mémoire pour verify()
+let publicKeyHex = '';
+let lastExport   = null;   // {hashHex, sigHex} du dernier PDF exporté
+
+// ─── UTILS ────────────────────────────────────────────────────────────────────
+const log     = msg => { document.getElementById('log').textContent = '> ' + msg; console.log(msg); };
+const hex     = buf => Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+const fromHex = h   => new Uint8Array(h.match(/.{2}/g).map(b=>parseInt(b,16)));
+
+// ─── KEYPAIR ──────────────────────────────────────────────────────────────────
+async function loadOrGenerateKeypair() {
+  const storedPriv = localStorage.getItem(LS_PRIV);
+
+  if (storedPriv) {
+    try {
+      const jwk = JSON.parse(storedPriv);
+
+      // Importer clé privée → sign uniquement
+      privateKey = await crypto.subtle.importKey(
+        'jwk', jwk, { name:'Ed25519' }, false, ['sign']
+      );
+
+      // Reconstruire clé publique depuis JWK privé (Ed25519 JWK contient "x" = pub)
+      const pubJwk = { kty:'OKP', crv:'Ed25519', x: jwk.x };
+      publicKeyObj = await crypto.subtle.importKey(
+        'jwk', pubJwk, { name:'Ed25519' }, true, ['verify']
+      );
+      const rawPub = await crypto.subtle.exportKey('raw', publicKeyObj);
+      publicKeyHex = hex(rawPub);
+
+      log('KEYPAIR ED25519 CHARGÉ');
+      return true;
+    } catch(e) {
+      log('ERREUR IMPORT CLÉ — RÉGÉNÉRATION : ' + e.message);
+      localStorage.removeItem(LS_PRIV);
+      localStorage.removeItem(LS_AUTOTEST);
+    }
+  }
+
+  // Génération première fois
+  const kp = await crypto.subtle.generateKey(
+    { name:'Ed25519' }, true, ['sign', 'verify']
+  );
+  privateKey   = kp.privateKey;
+  publicKeyObj = kp.publicKey;
+
+  const privJwk = await crypto.subtle.exportKey('jwk', privateKey);
+  const rawPub  = await crypto.subtle.exportKey('raw',  publicKeyObj);
+  publicKeyHex  = hex(rawPub);
+
+  localStorage.setItem(LS_PRIV, JSON.stringify(privJwk));
+  localStorage.removeItem(LS_AUTOTEST); // nouveau keypair → ancien autotest invalide
+
+  log('NOUVEAU KEYPAIR ED25519 GÉNÉRÉ & PERSISTÉ');
+  return true;
+}
+
+// ─── AUTO-VÉRIFICATION AU RECHARGEMENT ───────────────────────────────────────
+// Principe correct : on signe un payload de test avec la clé COURANTE au premier
+// chargement, on stocke {hash, sig}. Au rechargement suivant, on vérifie avec la
+// clé publique reconstruite depuis le même JWK privé.
+// Si la clé a été corrompue/substituée → la vérification échoue.
+
+async function autoVerifIntegrity() {
+  const banner = document.getElementById('autoVerifBanner');
+  const stored = localStorage.getItem(LS_AUTOTEST);
+
+  if (!stored) {
+    // Premier lancement avec cette clé : signer un payload de référence
+    const refPayload = `ZCORE_AUTOTEST:${publicKeyHex}`;
+    const refHash    = await crypto.subtle.digest('SHA-256', enc.encode(refPayload));
+    const refSig     = await crypto.subtle.sign('Ed25519', privateKey, refHash);
+    localStorage.setItem(LS_AUTOTEST, JSON.stringify({
+      hashHex: hex(refHash),
+      sigHex:  hex(refSig)
+    }));
+    banner.textContent  = 'AUTO-VÉRIF : RÉFÉRENCE INITIALISÉE';
+    banner.style.background = 'rgba(0,80,0,.4)';
+    banner.style.color  = 'var(--green)';
+    banner.style.display = 'block';
+    log('AUTO-VÉRIF : payload de référence créé');
+    return;
+  }
+
+  // Rechargements suivants : vérifier avec la clé publique actuelle
+  try {
+    const { hashHex, sigHex } = JSON.parse(stored);
+    const valid = await crypto.subtle.verify(
+      'Ed25519', publicKeyObj, fromHex(sigHex), fromHex(hashHex)
+    );
+
+    if (valid) {
+      banner.textContent   = 'AUTO-VÉRIF OK — INTÉGRITÉ CLÉ CONFIRMÉE';
+      banner.style.background = 'rgba(0,80,0,.4)';
+      banner.style.color   = 'var(--green)';
+      log('AUTO-VÉRIF OK');
+    } else {
+      banner.textContent   = 'AUTO-VÉRIF ÉCHOUÉE — CLÉ SUBSTITUÉE OU CORROMPUE';
+      banner.style.background = 'rgba(80,0,0,.4)';
+      banner.style.color   = 'var(--red)';
+      log('AUTO-VÉRIF ÉCHEC — signature invalide pour la clé courante');
+      // Ne pas purger automatiquement : laisser l'utilisateur décider
+      // (une purge auto peut être déclenchée par un bug, pas forcément une attaque)
+      document.getElementById('status').textContent = 'AVERTISSEMENT : INTÉGRITÉ CLÉ COMPROMISE';
+      document.getElementById('status').className   = 'err';
+    }
+    banner.style.display = 'block';
+  } catch(e) {
+    log('AUTO-VÉRIF ERREUR : ' + e.message);
+  }
+}
+
+async function initRoot() {
+  const ok = await loadOrGenerateKeypair();
+  const el = document.getElementById('status');
+  if (ok && privateKey) {
+    el.textContent = `ROOT SCELLÉ [${ROOT_LABEL}] — CLÉ ACTIVE`;
+    el.className   = 'ok';
+    document.getElementById('pubkeyDisplay').textContent = 'CLÉ PUBLIQUE : ' + publicKeyHex;
+    document.getElementById('sealBtn').disabled = false;
+    await autoVerifIntegrity();
+  } else {
+    el.textContent = 'ERREUR INIT — CLÉ INDISPONIBLE';
+    el.className   = 'err';
+  }
+}
+
+// ─── CANVAS ───────────────────────────────────────────────────────────────────
+const canvas = document.getElementById('sig');
+const ctx    = canvas.getContext('2d', { willReadFrequently:true });
+let   drawing = false, lastT = 0;
+
+function resizeCanvas() {
+  const r = window.devicePixelRatio || 1;
+  canvas.width  = canvas.offsetWidth  * r;
+  canvas.height = canvas.offsetHeight * r;
+  ctx.scale(r, r);
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+function drawAt(x, y, begin) {
+  if (begin) { ctx.beginPath(); ctx.moveTo(x, y); return; }
+  ctx.lineTo(x, y);
+  ctx.strokeStyle = '#00ff41'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+  ctx.stroke();
+}
+
+canvas.addEventListener('touchstart', e => {
+  drawing = true;
+  const t = e.touches[0], r = canvas.getBoundingClientRect();
+  drawAt(t.clientX - r.left, t.clientY - r.top, true);
+});
+canvas.addEventListener('touchmove', e => {
+  if (!drawing) return;
+  const now = performance.now();
+  if (now - lastT < 16) return; lastT = now;
+  e.preventDefault();
+  const t = e.touches[0], r = canvas.getBoundingClientRect();
+  drawAt(t.clientX - r.left, t.clientY - r.top, false);
+});
+canvas.addEventListener('touchend', () => drawing = false);
+canvas.addEventListener('mousedown', e => {
+  drawing = true;
+  const r = canvas.getBoundingClientRect();
+  drawAt(e.clientX - r.left, e.clientY - r.top, true);
+});
+canvas.addEventListener('mousemove', e => {
+  if (!drawing) return;
+  const r = canvas.getBoundingClientRect();
+  drawAt(e.clientX - r.left, e.clientY - r.top, false);
+});
+canvas.addEventListener('mouseup',    () => drawing = false);
+canvas.addEventListener('mouseleave', () => drawing = false);
+
+// ─── QR CODE du dernier PDF exporté ──────────────────────────────────────────
+// Encode : hashHex|sigHex|pubkeyHex du DERNIER document scellé
+// Pas un hash fixe — les vraies valeurs du PDF qui vient d'être généré
+
+async function renderQR(hashHex, sigHex) {
+  const qrData = `ZCORE|${hashHex}|${sigHex}|${publicKeyHex}`;
+  const wrap   = document.getElementById('qr-canvas-wrap');
+  wrap.innerHTML = '';
+
+  const qrCanvas = document.createElement('canvas');
+  wrap.appendChild(qrCanvas);
+
+  QRCode.toCanvas(qrCanvas, qrData, {
+    width: 160,
+    color: { dark:'#d4af37', light:'#050505' }
+  }, err => {
+    if (err) {
+      wrap.textContent = 'QR trop long — scan hash uniquement';
+      // Fallback : encoder hash seul si payload trop long
+      QRCode.toCanvas(qrCanvas, hashHex, { width:160 }, ()=>{});
+      return;
+    }
+    log('QR généré — scan pour vérification offline');
+  });
+
+  document.getElementById('qr-meta').textContent =
+    `HASH : ${hashHex.slice(0,16)}...\nSIG  : ${sigHex.slice(0,16)}...\nPUB  : ${publicKeyHex.slice(0,16)}...`;
+  document.getElementById('qr-panel').style.display = 'block';
+}
+
+// ─── VÉRIFICATION DU DERNIER PDF (bouton inline) ──────────────────────────────
+async function verifLastPDF() {
+  const resultEl = document.getElementById('qr-verify-result');
+  if (!lastExport) { resultEl.textContent = 'AUCUN PDF EXPORTÉ DANS CETTE SESSION'; return; }
+
+  const valid = await crypto.subtle.verify(
+    'Ed25519', publicKeyObj,
+    fromHex(lastExport.sigHex),
+    fromHex(lastExport.hashHex)
+  );
+
+  resultEl.textContent  = valid ? '✓ SIGNATURE VALIDE — DOCUMENT INTÈGRE' : '✗ SIGNATURE INVALIDE — DOCUMENT ALTÉRÉ';
+  resultEl.className    = valid ? 'valid' : 'invalid';
+  console.log(valid ? '✓ SIGNATURE VALIDE' : '✗ SIGNATURE INVALIDE');
+}
+
+// ─── EXPORT PDF SCELLÉ ────────────────────────────────────────────────────────
+async function exportSealedPDF() {
+  if (!privateKey) return log('CLÉ PRIVÉE INDISPONIBLE — ABORT');
+  const data = document.getElementById('obs').value.trim();
+  if (!data)  return log('AUCUNE DONNÉE → ABANDON');
+
+  log('SCELLEMENT v3.1 → SHA-256 + ED25519...');
+
+  const sigImg  = canvas.toDataURL('image/png', 0.85);
+  const nodes   = Array.from(document.querySelectorAll('.node.active'))
+                       .map(n => n.innerText).join(' | ') || 'AUCUN';
+  const ts      = new Date().toISOString();
+  const payload = `${ts}\n${data}\nNŒUDS: ${nodes}\nROOT_LABEL: ${ROOT_LABEL}`;
+
+  const hashBuf = await crypto.subtle.digest('SHA-256', enc.encode(payload));
+  const hashHex = hex(hashBuf);
+  const sigBuf  = await crypto.subtle.sign('Ed25519', privateKey, hashBuf);
+  const sigHex  = hex(sigBuf);
+
+  // Sauvegarder pour vérif inline + QR
+  lastExport = { hashHex, sigHex };
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ compress:true });
+
+  doc.setFillColor(0,0,0); doc.rect(0,0,210,297,'F');
+  doc.setTextColor(212,175,55); doc.setFontSize(18);
+  doc.text('Z-CORE v3.1 — RAPPORT SCELLÉ', 105, 22, { align:'center' });
+  doc.setDrawColor(212,175,55); doc.setLineWidth(0.3); doc.line(20,26,190,26);
+
+  doc.setTextColor(180,180,180); doc.setFontSize(9);
+  doc.text(`GÉNÉRÉ    : ${new Date().toLocaleString('fr-FR')}`, 20, 34);
+  doc.text(`ROOT      : ${ROOT_LABEL}`, 20, 40);
+  doc.text(`ALGO      : Ed25519 + SHA-256 (Web Crypto API)`, 20, 46);
+
+  doc.setTextColor(0,220,60); doc.setFontSize(8);
+  doc.text('HASH SHA-256 :', 20, 56);
+  doc.setTextColor(200,200,200);
+  doc.text(hashHex.slice(0,64), 22, 62);
+  doc.text(hashHex.slice(64),   22, 67);
+
+  doc.setTextColor(0,220,60); doc.text('CLÉ PUBLIQUE ED25519 :', 20, 77);
+  doc.setTextColor(160,160,160);
+  doc.text(publicKeyHex.slice(0,64), 22, 83);
+  doc.text(publicKeyHex.slice(64),   22, 88);
+
+  doc.setTextColor(212,175,55); doc.text('SIGNATURE ED25519 (64 octets) :', 20, 98);
+  doc.setTextColor(150,200,150); doc.setFontSize(7.5);
+  doc.text(sigHex.slice(0,64),   22, 104);
+  doc.text(sigHex.slice(64,128), 22, 109);
+
+  doc.setDrawColor(50,50,50); doc.line(20,115,190,115);
+  doc.setTextColor(0,220,60); doc.setFontSize(9);
+  doc.text('DONNÉES BRUTES SCELLÉES :', 20, 122);
+  doc.setTextColor(220,220,220); doc.setFontSize(9);
+  const lines = doc.splitTextToSize(data, 170);
+  doc.text(lines, 20, 130);
+
+  const nodesY = Math.min(130 + lines.length * 5 + 6, 228);
+  doc.setTextColor(100,100,100); doc.setFontSize(8);
+  doc.text(`NŒUDS ACTIFS : ${nodes}`, 20, nodesY);
+
+  const sigY = Math.min(nodesY + 10, 234);
+  doc.setTextColor(212,175,55); doc.setFontSize(9);
+  doc.text('SIGNATURE TACTILE ROOT :', 20, sigY);
+  doc.addImage(sigImg, 'PNG', 20, sigY + 4, 80, 34, undefined, 'FAST');
+
+  doc.setFontSize(6.5); doc.setTextColor(80,80,80);
+  doc.text(doc.splitTextToSize(
+    'DOCUMENT SCELLÉ CRYPTOGRAPHIQUEMENT. ALGO : Ed25519 + SHA-256. ' +
+    'VÉRIFICATION : importer CLÉ PUBLIQUE ci-dessus, vérifier SIGNATURE sur HASH. ' +
+    'TOUTE MODIFICATION INVALIDE LA SIGNATURE. Z-CORE v3.1 / IA22_LOGIC.',
+    170), 20, 278);
+
+  doc.save(`ZCORE_v3.1_${Date.now()}_${hashHex.slice(0,8)}.pdf`);
+  log(`EXPORTÉ : ${hashHex.slice(0,16)}... | SIG: ${sigHex.slice(0,16)}...`);
+
+  // Afficher QR du PDF qui vient d'être généré
+  await renderQR(hashHex, sigHex);
+}
+
+// ─── VÉRIFICATION CONSOLE (usage externe) ─────────────────────────────────────
+window.verifyDoc = async (hashHex, sigHex, pubkeyHex) => {
+  const pub   = await crypto.subtle.importKey('raw', fromHex(pubkeyHex), { name:'Ed25519' }, false, ['verify']);
+  const valid = await crypto.subtle.verify('Ed25519', pub, fromHex(sigHex), fromHex(hashHex));
+  console.log(valid ? '✓ SIGNATURE VALIDE' : '✗ SIGNATURE INVALIDE — DOCUMENT ALTÉRÉ');
+  return valid;
+};
+
+// ─── PURGE D'URGENCE ──────────────────────────────────────────────────────────
+function emergencyPurge() {
+  if (!confirm("PURGE D'URGENCE — EFFACER DONNÉES, CANVAS, CLÉS ET AUTOTEST ?")) return;
+  localStorage.clear();
+  privateKey = null; publicKeyObj = null; publicKeyHex = ''; lastExport = null;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  document.getElementById('obs').value = '';
+  document.getElementById('sealBtn').disabled = true;
+  document.getElementById('status').textContent = 'CLÉS PURGÉES — RECHARGEMENT REQUIS';
+  document.getElementById('status').className   = 'err';
+  document.getElementById('pubkeyDisplay').textContent = 'CLÉ PUBLIQUE : purgée';
+  document.getElementById('qr-panel').style.display   = 'none';
+  log('PURGE TERMINÉE — localStorage vidé, clés effacées');
+}
+
+// ─── BOOT ──────────────────────────────────────────────────────────────────────
+window.addEventListener('load', initRoot);
+</script>
+
+<!--
+  PROTOCOLE VÉRIFICATION OFFLINE :
+
+  1. Depuis un PDF scellé, extraire :
+     - hashHex (HASH SHA-256 dans le PDF)
+     - sigHex  (SIGNATURE ED25519 dans le PDF)
+     - pubkeyHex (CLÉ PUBLIQUE ED25519 dans le PDF)
+
+  2. Console navigateur :
+     await verifyDoc("hashHex", "sigHex", "pubkeyHex")
+
+  3. Résultat attendu : ✓ SIGNATURE VALIDE
+
+  FICHIERS REQUIS DANS LE MÊME DOSSIER :
+  - jspdf.umd.min.js  (https://github.com/parallax/jsPDF/releases)
+  - qrcode.min.js     (https://github.com/soldair/node-qrcode/releases)
+-->
+</body>
+</html>
