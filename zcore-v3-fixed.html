@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- 
+        Z-CORE v3.1 - Sovereign Document Sealing System
+        Copyright (C) 2025-2026 Mohammed Ilyes Zoubirou (@MZoubirou)
+        
+        This program is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Affero General Public License as published
+        by the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Affero General Public License for more details.
+
+        You should have received a copy of the GNU Affero General Public License
+        along with this program. If not, see <https://www.gnu.org/licenses/>.
+        
+        Root Identity : MZ@IA22
+        Project : Z-CORE v3.1 - Souveraineté active
+        Philosophy : Local-first • Cryptographically sealed • Offline capable
+    -->
+
+    <title>Z-CORE v3.1 [SOUVERAIN - ROOT SCELLÉ]</title>
+    <script src="jspdf.umd.min.js"></script>
+    <script src="qrcode.min.js"></script>
+    <style>
+        :root {
+            --bg:#000; --gold:#d4af37; --green:#00ff41;
+            --text:#e0e0e0; --panel:#0a0a0a; --red:#ff2d55;
+        }
+        body { background:var(--bg); color:var(--text); font-family:Consolas,monospace; margin:0; padding:12px; }
+        .hud-header { border:2px solid var(--gold); padding:12px; text-align:center; letter-spacing:3px; margin-bottom:18px; box-shadow:0 0 12px rgba(212,175,55,0.6); }
+        .node-container { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:18px; }
+        .node { border:1px solid #222; padding:12px; text-align:center; font-size:0.85em; cursor:pointer; transition:all .2s; }
+        .node.active { border-color:var(--green); color:var(--green); background:rgba(0,255,65,0.08); box-shadow:0 0 12px rgba(0,255,65,0.5); }
+        textarea { width:100%; height:160px; background:var(--panel); color:var(--green); border:1px solid #111; padding:12px; margin-bottom:18px; resize:vertical; font-family:monospace; }
+        canvas { border:1px solid var(--gold); background:#030303; width:100%; height:160px; touch-action:none; margin-bottom:12px; box-shadow:0 0 12px rgba(212,175,55,0.6); }
+        .btn-action { background:var(--gold); color:#000; border:none; padding:16px; width:100%; font-weight:bold; text-transform:uppercase; cursor:pointer; margin:8px 0; border-radius:4px; }
+        .btn-action:disabled { opacity:0.4; cursor:not-allowed; }
+        .purge-btn { background:var(--red); color:white; padding:8px 16px; border:none; cursor:pointer; margin-top:10px; display:none; border-radius:4px; }
+        #root-status { font-size:0.8em; margin:10px 0; text-align:center; }
+        #root-status.valid { color:var(--green); }
+        #root-status.invalid { color:var(--red); font-weight:bold; }
+        #pubkey-box { font-size:0.7em; color:#444; word-break:break-all; margin:6px 0; padding:6px; border:1px solid #1a1a1a; background:#050505; }
+        #qr-verif { margin:15px 0; text-align:center; }
+    </style>
+</head>
+<body>
+
+    <div class="hud-header">Z-CORE v3.1 [SOUVERAIN - ROOT SCELLÉ]</div>
+
+    <div id="root-status">VÉRIFICATION ROOT...</div>
+    <div id="pubkey-box">CLÉ PUBLIQUE : chargement...</div>
+
+    <div class="node-container">
+        <div class="node" onclick="this.classList.toggle('active')">SÉCURITÉ</div>
+        <div class="node" onclick="this.classList.toggle('active')">TECHNIQUE</div>
+        <div class="node" onclick="this.classList.toggle('active')">QUALITÉ</div>
+        <div class="node" onclick="this.classList.toggle('active')">RISQUE</div>
+    </div>
+
+    <textarea id="obs" placeholder="[RAW_DATA_FIELD v3 — INJECTER DONNÉES BRUTES]..."></textarea>
+
+    <div style="color:var(--gold);margin-bottom:6px;">SIGNATURE TACTILE ROOT :</div>
+    <canvas id="sig"></canvas>
+
+    <button class="btn-action" id="sealBtn" onclick="exportSealedPDF()" disabled>SCELLER & EXPORTER (v3.1)</button>
+    <button class="purge-btn" onclick="emergencyPurge()">PURGE D'URGENCE ROOT</button>
+
+    <div id="log">Z-CORE v3.1 → initialisation...</div>
+    <div id="qr-verif"></div>
+
+    <script>
+        const LS_PRIV = 'zcore_privkey_jwk';
+        const ROOT_LABEL = "MZ@IA22";
+        let privateKey = null;
+        let publicKeyHex = '';
+
+        const log = msg => { document.getElementById('log').textContent = '> ' + msg; console.log(msg); };
+        const hex = buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+
+        // ====================== KEYPAIR ======================
+        async function loadOrGenerateKeypair() {
+            const storedPriv = localStorage.getItem(LS_PRIV);
+
+            if (storedPriv) {
+                try {
+                    const jwk = JSON.parse(storedPriv);
+                    privateKey = await crypto.subtle.importKey(
+                        'jwk', jwk, { name: 'Ed25519' }, false, ['sign']
+                    );
+                    const pubRaw = await crypto.subtle.exportKey('raw', await crypto.subtle.importKey('jwk', jwk, { name: 'Ed25519' }, true, ['verify']));
+                    publicKeyHex = hex(pubRaw);
+                    document.getElementById('pubkey-box').textContent = 'CLÉ PUBLIQUE : ' + publicKeyHex;
+                    log('KEYPAIR ED25519 CHARGÉ DEPUIS STOCKAGE LOCAL');
+                    return true;
+                } catch (e) {
+                    log('ERREUR IMPORT CLÉ — RÉGÉNÉRATION');
+                    localStorage.removeItem(LS_PRIV);
+                }
+            }
+
+            const kp = await crypto.subtle.generateKey({ name: 'Ed25519' }, true, ['sign']);
+            privateKey = kp.privateKey;
+
+            const privJwk = await crypto.subtle.exportKey('jwk', privateKey);
+            const pubRaw = await crypto.subtle.exportKey('raw', kp.publicKey);
+            publicKeyHex = hex(pubRaw);
+
+            localStorage.setItem(LS_PRIV, JSON.stringify(privJwk));
+            document.getElementById('pubkey-box').textContent = 'CLÉ PUBLIQUE : ' + publicKeyHex;
+            log('NOUVEAU KEYPAIR ED25519 GÉNÉRÉ & PERSISTÉ');
+            return true;
+        }
+
+        // ====================== AUTO-VÉRIFICATION ======================
+        async function autoVerifyIntegrity() {
+            let autoTestHash = localStorage.getItem('zcore_autotest_hash');
+            let autoTestSig = localStorage.getItem('zcore_autotest_sig');
+
+            if (!autoTestHash) {
+                const testPayload = "Z-CORE v3 ROOT INTEGRITY TEST " + Date.now();
+                const dataBuf = new TextEncoder().encode(testPayload);
+                const hashBuf = await crypto.subtle.digest('SHA-256', dataBuf);
+                const sigBuf = await crypto.subtle.sign('Ed25519', privateKey, hashBuf);
+
+                autoTestHash = hex(hashBuf);
+                autoTestSig = hex(sigBuf);
+
+                localStorage.setItem('zcore_autotest_hash', autoTestHash);
+                localStorage.setItem('zcore_autotest_sig', autoTestSig);
+                log("Auto-test signature créé avec clé courante");
+            }
+
+            const valid = await verifyDoc(autoTestHash, autoTestSig, publicKeyHex);
+            if (!valid) {
+                document.getElementById('root-status').textContent = "INTÉGRITÉ ROOT COMPROMISE — VÉRIFIEZ LA CLÉ";
+                document.getElementById('root-status').className = 'invalid';
+                log("⚠️ AUTO-VÉRIF ÉCHOUÉE");
+            } else {
+                log("AUTO-VÉRIF OK — intégrité root confirmée");
+            }
+        }
+
+        // ====================== QR CODE INLINE ======================
+        function showVerificationQR(hashHex, sigHex, pubkeyHex) {
+            const qrData = `${hashHex}|${sigHex}|${pubkeyHex}`;
+            const container = document.getElementById('qr-verif');
+            container.innerHTML = '';
+            QRCode.toCanvas(container, qrData, { width: 160, color: { dark: '#d4af37', light: '#111' } });
+            log('QR de vérification du PDF généré');
+        }
+
+        // ====================== CANVAS SIGNATURE ======================
+        const canvas = document.getElementById('sig');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        let drawing = false;
+
+        function resizeCanvas() {
+            const ratio = window.devicePixelRatio || 1;
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            ctx.scale(ratio, ratio);
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        canvas.addEventListener('touchstart', e => { drawing = true; draw(e); });
+        canvas.addEventListener('touchmove', e => { if (drawing) draw(e); });
+        canvas.addEventListener('touchend', () => drawing = false);
+
+        function draw(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+            ctx.strokeStyle = '#00ff41';
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+        }
+
+        // Support souris
+        canvas.addEventListener('mousedown', e => { drawing = true; const r = canvas.getBoundingClientRect(); ctx.beginPath(); ctx.moveTo(e.clientX - r.left, e.clientY - r.top); });
+        canvas.addEventListener('mousemove', e => { if (!drawing) return; const r = canvas.getBoundingClientRect(); ctx.lineTo(e.clientX - r.left, e.clientY - r.top); ctx.strokeStyle = '#00ff41'; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.stroke(); });
+        canvas.addEventListener('mouseup', () => drawing = false);
+        canvas.addEventListener('mouseleave', () => drawing = false);
+
+        // ====================== VÉRIFICATION ======================
+        window.verifyDoc = async function(hashHex, sigHex, pubkeyHex) {
+            const fromHex = h => new Uint8Array(h.match(/.{2}/g).map(b => parseInt(b,16)));
+            const pubKey = await crypto.subtle.importKey(
+                'raw', fromHex(pubkeyHex), { name: 'Ed25519' }, false, ['verify']
+            );
+            const valid = await crypto.subtle.verify(
+                'Ed25519', pubKey, fromHex(sigHex), fromHex(hashHex)
+            );
+            console.log(valid ? '✓ SIGNATURE VALIDE' : '✗ SIGNATURE INVALIDE — DOCUMENT ALTÉRÉ');
+            return valid;
+        };
+
+        // ====================== EXPORT PDF ======================
+        async function exportSealedPDF() {
+            if (!privateKey) return log('CLÉ PRIVÉE INDISPONIBLE — ABORT');
+
+            const data = document.getElementById('obs').value.trim();
+            if (!data) return log('AUCUNE DONNÉE → ABANDON');
+
+            log('SCELLEMENT v3.1 → SHA-256 + ED25519...');
+
+            const sigImg = canvas.toDataURL('image/png', 0.85);
+            const nodes = Array.from(document.querySelectorAll('.node.active')).map(n => n.innerText).join(' | ') || 'AUCUN';
+            const ts = new Date().toISOString();
+            const payload = `${ts}\n${data}\nNŒUDS: ${nodes}\nROOT_LABEL: ${ROOT_LABEL}`;
+
+            const hashBuf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(payload));
+            const hashHex = hex(hashBuf);
+            const sigBuf = await crypto.subtle.sign('Ed25519', privateKey, hashBuf);
+            const sigHex = hex(sigBuf);
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ compress: true });
+
+            doc.setFillColor(0,0,0);
+            doc.rect(0,0,210,297,'F');
+
+            doc.setTextColor(212,175,55); doc.setFontSize(18);
+            doc.text('Z-CORE v3.1 — RAPPORT SCELLÉ', 105, 22, { align:'center' });
+
+            doc.setTextColor(180,180,180); doc.setFontSize(9);
+            doc.text(`GÉNÉRÉ : ${new Date().toLocaleString('fr-FR')}`, 20, 34);
+            doc.text(`ROOT : ${ROOT_LABEL}`, 20, 40);
+
+            doc.setTextColor(0,220,60); doc.setFontSize(8);
+            doc.text('HASH SHA-256 :', 20, 50);
+            doc.setTextColor(200,200,200);
+            doc.text(hashHex, 22, 56);
+
+            doc.setTextColor(0,220,60); doc.setFontSize(8);
+            doc.text('CLÉ PUBLIQUE ED25519 :', 20, 68);
+            doc.setTextColor(160,160,160);
+            doc.text(publicKeyHex, 22, 74);
+
+            doc.setTextColor(212,175,55); doc.setFontSize(8);
+            doc.text('SIGNATURE ED25519 :', 20, 86);
+            doc.setTextColor(150,200,150); doc.setFontSize(7.5);
+            doc.text(sigHex, 22, 92);
+
+            doc.setTextColor(0,220,60); doc.setFontSize(9);
+            doc.text('DONNÉES BRUTES SCELLÉES :', 20, 110);
+            doc.setTextColor(220,220,220); doc.setFontSize(9);
+            const lines = doc.splitTextToSize(data || "NÉANT", 170);
+            doc.text(lines, 20, 118);
+
+            const sigY = 130 + lines.length * 5 + 10;
+            doc.setTextColor(212,175,55); doc.setFontSize(9);
+            doc.text('SIGNATURE TACTILE ROOT :', 20, sigY);
+            doc.addImage(sigImg, 'PNG', 20, sigY + 4, 80, 34, undefined, 'FAST');
+
+            doc.setFontSize(6.5); doc.setTextColor(80,80,80);
+            const footer = "DOCUMENT SCELLÉ CRYPTOGRAPHIQUEMENT. Ed25519 + SHA-256. VÉRIFIABLE OFFLINE.";
+            doc.text(doc.splitTextToSize(footer, 170), 20, 278);
+
+            const filename = `ZCORE_v3.1_${Date.now()}_${hashHex.slice(0,8)}.pdf`;
+            doc.save(filename);
+
+            showVerificationQR(hashHex, sigHex, publicKeyHex);
+            log(`EXPORTÉ : ${filename}`);
+        }
+
+        // ====================== PURGE ======================
+        function emergencyPurge() {
+            if (!confirm("PURGE D'URGENCE — EFFACER TOUT SAUF ROOT ?")) return;
+            localStorage.clear();
+            privateKey = null;
+            publicKeyHex = '';
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            document.getElementById('obs').value = '';
+            document.getElementById('sealBtn').disabled = true;
+            document.getElementById('root-status').textContent = 'CLÉS PURGÉES — RECHARGEMENT REQUIS';
+            document.getElementById('root-status').className = 'invalid';
+            document.getElementById('pubkey-box').textContent = 'CLÉ PUBLIQUE : purgée';
+            log('PURGE TERMINÉE');
+        }
+
+        // ====================== BOOT ======================
+        window.addEventListener('load', async () => {
+            await loadOrGenerateKeypair();
+            await autoVerifyIntegrity();
+            document.getElementById('sealBtn').disabled = false;
+            log("Z-CORE v3.1 → ROOT SCELLÉ & ACTIF");
+        });
+    </script>
+</body>
+</html>
