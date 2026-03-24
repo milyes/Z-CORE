@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MILYES_IA v9 — Enterprise Pro (Sovereign Edition)</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#ffffff;--bg2:#fafaf9;--bg3:#f4f3f0;--ink:#0a0a0a;--ink2:#1e1e1e;
+  --ink3:#4a4a4a;--ink4:#787878;--ink5:#aaaaaa;--rule:#e4e3de;--rule2:#d0cfc9;
+  --ok:#1a6640;--warn:#b86c00;--danger:#b83030;--info:#1a4fa8;--ia:#4a2080;
+  --ok-bg:#eef6f1;--warn-bg:#fdf4e7;--ia-bg:#f4effe;--info-bg:#eef2fc;
+}
+html,body{height:100%;background:#e8e7e1;display:flex;align-items:center;justify-content:center;padding:20px;font-family:'IBM Plex Sans',sans-serif;}
+#shell{width:100%;max-width:1020px;background:var(--bg);border:1px solid var(--rule2);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;min-height:760px;box-shadow:0 2px 8px rgba(0,0,0,.07);}
+.navbar{background:var(--ink);height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;flex-shrink:0;}
+.nlogo{font-size:14px;font-weight:700;letter-spacing:2.5px;color:#fff;}
+.nsub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#666;letter-spacing:.5px;}
+.nav-r{display:flex;align-items:center;gap:18px;}
+.npill{display:flex;align-items:center;gap:5px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#666;letter-spacing:.5px;}
+.ndot{width:6px;height:6px;border-radius:50%;}
+.nd-on{background:#4caf50;animation:dp 2s infinite;} .nd-ia{background:#9c6fcc;animation:dp .8s infinite;}
+@keyframes dp{0%,100%{opacity:1}50%{opacity:.15}}
+#clock{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#555;letter-spacing:1px;}
+.ctxbar{background:var(--bg2);border-bottom:1px solid var(--rule);padding:0 22px;height:36px;display:flex;align-items:center;justify-content:space-between;}
+.bc{font-size:11px;color:var(--ink4);} .bc .a{color:var(--ink);font-weight:500;}
+.main{display:grid;grid-template-columns:1fr 258px;flex:1;min-height:0;}
+.tp{display:flex;flex-direction:column;border-right:1px solid var(--rule);min-height:0;}
+.th{background:var(--bg2);border-bottom:1px solid var(--rule);height:38px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;}
+.tab{display:inline-flex;align-items:center;gap:6px;padding:0 16px;height:100%;font-size:11px;font-weight:500;color:var(--ink);border-bottom:2px solid var(--ink);}
+.term{flex:1;overflow-y:auto;padding:16px 20px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.9;background:var(--bg);scrollbar-width:thin;}
+.ln{display:flex;align-items:flex-start;margin-bottom:2px;}
+.ts{font-size:10px;color:var(--ink5);margin-right:10px;min-width:72px;}
+.bg{font-size:8.5px;font-weight:700;padding:2px 6px;border-radius:2px;margin-right:9px;text-transform:uppercase;}
+.b-ok{background:var(--ok-bg);color:var(--ok);} .b-ia{background:var(--ia-bg);color:var(--ia);} .b-err{background:#fde8e8;color:var(--danger);}
+.lt{color:var(--ink2);} .lt.ia{color:var(--ia);} .lt.cmd{font-weight:600;}
+.sb{margin:4px 0 4px 92px;border-left:2px solid var(--ink);padding:10px 14px;background:var(--bg2);font-family:'IBM Plex Mono',monospace;font-size:12px;white-space:pre-wrap;line-height:1.7;}
+.ib{background:var(--bg2);border-top:1px solid var(--rule);padding:10px 20px;display:flex;align-items:center;gap:10px;}
+.ps{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--ink3);}
+.ib input{flex:1;background:transparent;border:none;outline:none;font-family:'IBM Plex Mono',monospace;font-size:12.5px;}
+.side{background:var(--bg2);overflow-y:auto;}
+.sp{padding:16px;border-bottom:1px solid var(--rule);}
+.sl{font-size:9px;font-weight:700;letter-spacing:2px;color:var(--ink5);text-transform:uppercase;margin-bottom:12px;}
+.mc{background:var(--bg);border:1px solid var(--rule);border-radius:4px;padding:10px;margin-bottom:6px;}
+.mv{font-size:22px;font-weight:700;color:var(--ink);}
+.cb{width:100%;display:flex;align-items:center;gap:8px;padding:8px 11px;background:var(--bg);border:1px solid var(--rule);border-radius:4px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:11.5px;margin-bottom:4px;}
+.cb:hover{background:var(--ink);color:#fff;}
+.cb.danger{border-color:var(--danger);color:var(--danger);} .cb.danger:hover{background:var(--danger);color:#fff;}
+.ir{display:flex;justify-content:space-between;padding:7px 10px;background:var(--bg);border:1px solid var(--rule);border-radius:4px;font-size:11px;margin-bottom:4px;}
+.iv.on{color:var(--ok);font-weight:700;}
+.mw2{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:999;}
+.md{background:var(--bg);border:1px solid var(--rule2);border-radius:8px;width:480px;padding:28px;}
+.md input{width:100%;font-family:'IBM Plex Mono',monospace;padding:10px;margin:15px 0;border:1px solid var(--rule2);border-radius:4px;}
+.btn{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;padding:8px 18px;border-radius:4px;cursor:pointer;border:1px solid var(--rule2);}
+.btn.p{background:var(--ink);color:#fff;}
+</style>
+</head>
+<body>
+
+<div class="mw2" id="modal">
+  <div class="md">
+    <div style="font-weight:700; margin-bottom:10px;">MILYES_IA v9 — Configuration API</div>
+    <div style="font-size:12px; color:var(--ink4);">Connectez votre tunnel local Termux (Port 8010).</div>
+    <input type="text" id="akey" placeholder="sk-ant-api..." autocomplete="off"/>
+    <div style="display:flex; gap:10px; justify-content:flex-end;">
+      <button class="btn" onclick="skipModal()">Mode démo</button>
+      <button class="btn p" onclick="confirmKey()">Lancer la session</button>
+    </div>
+  </div>
+</div>
+
+<div id="shell">
+  <div class="navbar">
+    <div style="display:flex; align-items:center; gap:14px;">
+      <span class="nlogo">MILYES_IA</span>
+      <span class="nsub">v9.0 · Enterprise Pro · Sovereign</span>
+    </div>
+    <div class="nav-r">
+      <div class="npill"><div class="ndot nd-on"></div>ONLINE</div>
+      <div class="npill"><div class="ndot nd-ia" id="aidot"></div>IA LIVE</div>
+      <span id="clock">00:00:00</span>
+    </div>
+  </div>
+
+  <div class="ctxbar">
+    <div class="bc">NetSecurePro / <b>Dr. Mohammed Ilyes Zoubirou</b> / <span class="a">Sovereign Terminal</span></div>
+    <div><span id="apistatus" style="font-size:9px; font-weight:700; padding:2px 8px; border-radius:3px; background:var(--bg3);">WAITING</span></div>
+  </div>
+
+  <div class="main">
+    <div class="tp">
+      <div class="th"><div class="tab">Terminal Principal</div></div>
+      <div class="term" id="term"></div>
+      <div class="ib">
+        <span class="ps">milyes@neo_dz ~$</span>
+        <input id="ci" type="text" placeholder="Entrer commande ou message libre..." autocomplete="off"/>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="sp">
+        <div class="sl">Neural Metrics</div>
+        <div class="mc"><div>CPU</div><div class="mv" id="cpuv">0%</div></div>
+        <div class="mc"><div>Load</div><div class="mv" id="loadv">0%</div></div>
+      </div>
+      <div class="sp">
+        <div class="sl">Actions Rapides</div>
+        <button class="cb" onclick="runCmd('scan')">Rapport Scan</button>
+        <button class="cb" onclick="runCmd('status')">Système Status</button>
+        <button class="cb danger" onclick="runCmd('purge')">PURGE SESSION</button>
+      </div>
+      <div class="sp">
+        <div class="sl">Connectivité</div>
+        <div class="ir"><span>Proxy 8010</span><span class="iv on">ACTIVE</span></div>
+        <div class="ir"><span>IA22 Logic</span><span class="iv" id="ia22v">READY</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let API_KEY = '', demo = false, streaming = false;
+const term = document.getElementById('term'), inp = document.getElementById('ci');
+// Utilisation du tunnel local configuré sur le port 8010
+const PROXY_URL = 'http://localhost:8010/proxy/v1/messages';
+
+const SYS = `Tu es MILYES_IA v9, assistant souverain exclusif de Dr. Mohammed Ilyes Zoubirou (NetSecurePro). 
+Format: Terminal direct. Style: Cyber-Ops. Pas de salutations. Focus: Sec-Ops, Réseaux, Intelligence locale.`;
+
+function skipModal(){ demo=true; document.getElementById('modal').style.display='none'; bootMsg(); }
+function confirmKey(){
+  API_KEY = document.getElementById('akey').value.trim();
+  if(!API_KEY.startsWith('sk-ant')){ alert('Clé API invalide'); return; }
+  document.getElementById('modal').style.display='none';
+  document.getElementById('apistatus').textContent = 'CONNECTED';
+  document.getElementById('apistatus').style.background = 'var(--ok-bg)';
+  bootMsg();
+}
+
+function line(txt, cls, badge) {
+  const d = document.createElement('div'); d.className = 'ln';
+  const b = badge ? `<span class="bg b-${badge}">${badge.toUpperCase()}</span>` : '';
+  d.innerHTML = `<span class="ts">[${new Date().toLocaleTimeString('fr-FR')}]</span>${b}<span class="lt ${cls||''}">${txt}</span>`;
+  term.appendChild(d); term.scrollTop = term.scrollHeight;
+}
+
+async function callAPI(msg) {
+  if(demo) { line("[DÉMO] Mode simulation actif pour cette requête.", "ia", "ia"); return; }
+  streaming = true;
+  const out = document.createElement('div'); out.className = 'sb'; term.appendChild(out);
+  out.textContent = "...";
+  
+  try {
+    const r = await fetch(PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({ model: 'claude-3-5-sonnet-20240620', max_tokens: 1024, system: SYS, messages: [{role:'user', content:msg}] })
+    });
+    const data = await r.json();
+    if(data.content) out.textContent = data.content[0].text;
+    else out.textContent = "Erreur réponse: " + JSON.stringify(data.error);
+  } catch(e) {
+    line("ERREUR TUNNEL : Lancez 'lcp --proxyUrl https://api.anthropic.com'", "err", "err");
+    out.remove();
+  }
+  streaming = false; term.scrollTop = term.scrollHeight;
+}
+
+const CMDS = {
+  scan: () => line("Audit réseau local NetSecurePro initialisé. Cible: localhost.", "ia", "ia"),
+  status: () => line("Proxy 8010 opérationnel. Chiffrement session: actif.", "ok", "ok"),
+  purge: () => {
+    API_KEY = ''; term.innerHTML = '';
+    line("PROTOCOLE ZERO RETENTION : CLÉ ET TERMINAL PURGÉS.", "err", "err");
+    document.getElementById('apistatus').textContent = 'PURGED';
+  },
+  clear: () => term.innerHTML = ''
+};
+
+function runCmd(v) {
+  line(`$ ${v}`, "cmd");
+  const low = v.toLowerCase();
+  if(CMDS[low]) CMDS[low](); else callAPI(v);
+  inp.value = '';
+}
+
+inp.addEventListener('keydown', e => { if(e.key==='Enter' && !streaming) runCmd(inp.value); });
+function bootMsg() { line("MILYES_IA v9 INITIALISÉE. BIENVENUE DR. ZOUBIROU.", "ok", "ok"); }
+
+setInterval(() => {
+  document.getElementById('cpuv').textContent = Math.floor(Math.random()*15+5) + "%";
+  document.getElementById('loadv').textContent = Math.floor(Math.random()*10+40) + "%";
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString('fr-FR');
+}, 2000);
+</script>
+</body>
+</html>

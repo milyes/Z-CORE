@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GRONDIN v2.0 — Guide d'utilisation</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c10;
+    --surface: #0d1520;
+    --border: #1a2a3a;
+    --accent: #00e5ff;
+    --accent2: #00ff88;
+    --warn: #ffcc00;
+    --danger: #ff4060;
+    --text: #cde0f0;
+    --muted: #4a6a82;
+    --green: #00ff88;
+    --yellow: #ffcc00;
+    --blue: #3399ff;
+    --red: #ff4060;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,229,255,0.015) 2px, rgba(0,229,255,0.015) 4px);
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 2rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: rgba(8,12,16,0.95);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .logo span {
+    color: var(--accent);
+  }
+
+  .badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    padding: 0.3rem 0.8rem;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    animation: pulse-border 2s infinite;
+  }
+
+  @keyframes pulse-border {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .hero {
+    padding: 5rem 3rem 4rem;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .hero-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.2s forwards;
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.4s forwards;
+  }
+
+  h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    color: var(--muted);
+    font-size: 1rem;
+    max-width: 520px;
+    margin: 0 auto 3rem;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.6s forwards;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .toc {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.8s forwards;
+  }
+
+  .toc a {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    text-decoration: none;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 0.4rem 1rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+
+  .toc a:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(0,229,255,0.05);
+  }
+
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2rem 3rem 6rem;
+  }
+
+  section {
+    margin-bottom: 4rem;
+    opacity: 0;
+    transform: translateY(16px);
+    animation: fadeUp 0.5s forwards;
+  }
+
+  section:nth-child(1) { animation-delay: 0.1s; }
+  section:nth-child(2) { animation-delay: 0.2s; }
+  section:nth-child(3) { animation-delay: 0.3s; }
+  section:nth-child(4) { animation-delay: 0.4s; }
+  section:nth-child(5) { animation-delay: 0.5s; }
+  section:nth-child(6) { animation-delay: 0.6s; }
+
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  h2 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.02em;
+  }
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 1.5rem 0 0.75rem;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+  }
+
+  p {
+    color: var(--text);
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1.5rem 2rem;
+    margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover {
+    border-color: var(--accent);
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+  }
+
+  .card.green::before { background: var(--green); }
+  .card.yellow::before { background: var(--yellow); }
+  .card.blue::before { background: var(--blue); }
+  .card.red::before { background: var(--red); }
+
+  .card-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.5rem;
+  }
+
+  .card.green .card-title { color: var(--green); }
+  .card.yellow .card-title { color: var(--yellow); }
+  .card.blue .card-title { color: var(--blue); }
+  .card.red .card-title { color: var(--red); }
+
+  .card p { margin: 0; font-size: 0.9rem; color: var(--muted); }
+
+  /* Steps */
+  .steps { counter-reset: step; }
+
+  .step {
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    align-items: start;
+  }
+
+  .step-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--border);
+    line-height: 1;
+    padding-top: 0.2rem;
+    text-align: right;
+  }
+
+  .step-body h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    color: var(--text);
+  }
+
+  .step-body p {
+    font-size: 0.88rem;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  /* Code block */
+  .code-block {
+    background: #040810;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 1.25rem 1.5rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--accent2);
+    margin: 1rem 0;
+    overflow-x: auto;
+    line-height: 1.8;
+  }
+
+  .code-block .comment { color: var(--muted); }
+  .code-block .key { color: var(--accent); }
+
+  /* Workflow pipeline */
+  .pipeline {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 1.5rem 0;
+    flex-wrap: wrap;
+  }
+
+  .pipe-step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 0.5rem 1rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+
+  .pipe-step:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(0,229,255,0.05);
+  }
+
+  .pipe-arrow {
+    color: var(--border);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    padding: 0 0.25rem;
+  }
+
+  /* Config table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    margin: 1rem 0;
+  }
+
+  th {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(26,42,58,0.5);
+    color: var(--text);
+    vertical-align: top;
+  }
+
+  td:first-child {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+  }
+
+  td em {
+    font-style: normal;
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+
+  /* Alert box */
+  .alert {
+    border: 1px solid;
+    padding: 1rem 1.25rem;
+    margin: 1.25rem 0;
+    font-size: 0.88rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .alert.info { border-color: var(--blue); background: rgba(51,153,255,0.05); }
+  .alert.warn { border-color: var(--warn); background: rgba(255,204,0,0.05); }
+
+  .alert-icon {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+    border: 1px solid;
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+  }
+
+  .alert.info .alert-icon { border-color: var(--blue); color: var(--blue); }
+  .alert.warn .alert-icon { border-color: var(--warn); color: var(--warn); }
+
+  .alert p { margin: 0; color: var(--muted); }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  footer span { color: var(--accent); }
+
+  @media (max-width: 640px) {
+    header, main, footer { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .hero { padding: 3rem 1.5rem 2.5rem; }
+    h1 { font-size: 2.2rem; }
+    .step { grid-template-columns: 2rem 1fr; gap: 1rem; }
+    .pipeline { gap: 0.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">NETSECUREPRO · <span>GRONDIN</span> v2.0</div>
+  <div class="badge">● ACTIF</div>
+</header>
+
+<div class="hero">
+  <div class="hero-label">Documentation officielle</div>
+  <h1>Guide d'utilisation<br><em>GRONDIN v2.0</em></h1>
+  <p class="hero-sub">IA Médicale · Workflow stratégique automatisé · Traitement d'emails par classification intelligente</p>
+  <nav class="toc">
+    <a href="#apercu">Aperçu</a>
+    <a href="#categories">Catégories</a>
+    <a href="#workflow">Workflow</a>
+    <a href="#configuration">Configuration</a>
+    <a href="#utilisation">Utilisation</a>
+    <a href="#telegram">Telegram</a>
+  </nav>
+</div>
+
+<main>
+
+  <!-- APERÇU -->
+  <section id="apercu">
+    <div class="section-label">01 — Aperçu</div>
+    <h2>Qu'est-ce que GRONDIN v2 ?</h2>
+    <p>GRONDIN Response Handler v2.0 est un outil web de traitement automatisé d'emails destiné aux professionnels de la santé. Il analyse le contenu d'un email entrant, le classe dans une catégorie, génère une réponse adaptée et peut envoyer une alerte via Telegram.</p>
+    <p>Deux moteurs de classification sont disponibles : <strong>mots-clés locaux</strong> (aucune connexion externe requise) ou <strong>API Claude</strong> (Anthropic) pour une classification plus intelligente et contextuelle.</p>
+
+    <div class="alert info">
+      <div class="alert-icon">INFO</div>
+      <p>L'outil fonctionne entièrement dans votre navigateur. Aucune donnée n'est envoyée à un serveur tiers, sauf si vous activez l'API Claude ou Telegram.</p>
+    </div>
+  </section>
+
+  <!-- CATÉGORIES -->
+  <section id="categories">
+    <div class="section-label">02 — Catégories de classification</div>
+    <h2>Les 4 types de réponse</h2>
+    <p>Chaque email traité est assigné à l'une des catégories suivantes :</p>
+
+    <div class="card green">
+      <div class="card-title">🟢 POSITIVE_MEETING_REQUEST</div>
+      <p>Demande de rencontre ou de rendez-vous positif. L'email exprime une volonté de se rencontrer, une confirmation ou un suivi de réunion.</p>
+    </div>
+
+    <div class="card yellow">
+      <div class="card-title">🟡 INFORMATIONAL_REQUIREMENT</div>
+      <p>Demande d'information générale. L'expéditeur cherche des renseignements, des documents ou des clarifications sur un sujet précis.</p>
+    </div>
+
+    <div class="card blue">
+      <div class="card-title">🔵 PROOF_OF_STATUS</div>
+      <p>Demande de preuve de statut ou de document officiel. Ex : lettre de statut, attestation, certificat médical, confirmation administrative.</p>
+    </div>
+
+    <div class="card red">
+      <div class="card-title">🔴 ACTIF_QR_OTHER</div>
+      <p>Catégorie fourre-tout pour les emails qui ne correspondent pas aux trois catégories précédentes. Nécessite une attention manuelle.</p>
+    </div>
+  </section>
+
+  <!-- WORKFLOW -->
+  <section id="workflow">
+    <div class="section-label">03 — Workflow</div>
+    <h2>États du pipeline de traitement</h2>
+    <p>Chaque email passe par les étapes suivantes, visibles dans l'interface :</p>
+
+    <div class="pipeline">
+      <div class="pipe-step">START</div>
+      <div class="pipe-arrow">›</div>
+      <div class="pipe-step">INIT</div>
+      <div class="pipe-arrow">›</div>
+      <div class="pipe-step">LECTURE</div>
+      <div class="pipe-arrow">›</div>
+      <div class="pipe-step">CLASSIFICATION</div>
+      <div class="pipe-arrow">›</div>
+      <div class="pipe-step">ACTION</div>
+      <div class="pipe-arrow">›</div>
+      <div class="pipe-step">JOURNALISATION</div>
+      <div class="pipe-arrow">›</div>
+      <div class="pipe-step">CLÔTURE</div>
+      <div class="pipe-arrow">›</div>
+      <div class="pipe-step">END</div>
+    </div>
+
+    <h3>Détail des étapes</h3>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-body">
+          <h4>INIT — Initialisation</h4>
+          <p>Chargement de la configuration (moteur, clés API, signature). Vérification des paramètres obligatoires.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-body">
+          <h4>LECTURE — Parsing de l'email</h4>
+          <p>Extraction de l'expéditeur, du sujet, du corps et des noms de pièces jointes fournis.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-body">
+          <h4>CLASSIFICATION — Analyse du contenu</h4>
+          <p>Moteur mots-clés : correspondance locale par dictionnaire. Moteur Claude : envoi à l'API Anthropic pour classification contextuelle.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-body">
+          <h4>ACTION — Génération de la réponse</h4>
+          <p>Création d'un brouillon de réponse adapté à la catégorie détectée, signé avec votre nom/signature configuré.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">05</div>
+        <div class="step-body">
+          <h4>JOURNALISATION — Enregistrement</h4>
+          <p>Ajout de l'entrée dans le journal de session avec horodatage, catégorie et résumé.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">06</div>
+        <div class="step-body">
+          <h4>CLÔTURE — Envoi Telegram (optionnel)</h4>
+          <p>Si Telegram est configuré, une alerte est envoyée avec la catégorie et un résumé du traitement.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONFIGURATION -->
+  <section id="configuration">
+    <div class="section-label">04 — Configuration</div>
+    <h2>Paramètres à configurer</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Champ</th>
+          <th>Obligatoire</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Moteur</td>
+          <td>✓</td>
+          <td>Choisissez <strong>Mots-clés</strong> (local, aucune clé requise) ou <strong>API Claude</strong> (nécessite une clé Anthropic).</td>
+        </tr>
+        <tr>
+          <td>Clé API Claude</td>
+          <td>—</td>
+          <td>Clé API Anthropic au format <code>sk-ant-...</code>. Requise uniquement si le moteur Claude est sélectionné.</td>
+        </tr>
+        <tr>
+          <td>Votre nom / signature</td>
+          <td>✓</td>
+          <td>Nom ou titre qui apparaîtra dans les réponses générées. Ex : <em>Dr. Grondin, MD</em></td>
+        </tr>
+        <tr>
+          <td>Bot Telegram Token</td>
+          <td>—</td>
+          <td>Token du bot Telegram (obtenu via @BotFather). Format : <em>123456:ABC-DEF...</em></td>
+        </tr>
+        <tr>
+          <td>Telegram Chat ID</td>
+          <td>—</td>
+          <td>Identifiant du chat ou canal où envoyer les alertes. Peut être un ID numérique ou un @username.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="alert warn">
+      <div class="alert-icon">AVIS</div>
+      <p>Votre clé API Anthropic reste dans votre navigateur et n'est jamais transmise à un tiers autre qu'Anthropic lors des appels API.</p>
+    </div>
+  </section>
+
+  <!-- UTILISATION -->
+  <section id="utilisation">
+    <div class="section-label">05 — Utilisation pas à pas</div>
+    <h2>Traiter un email</h2>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Remplir les champs de l'email</h4>
+          <p>Entrez l'expéditeur, le sujet, le corps du message et optionnellement les noms des pièces jointes (séparés par des virgules).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Vérifier votre configuration</h4>
+          <p>Assurez-vous que votre nom/signature est renseigné et que le moteur souhaité est sélectionné.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Cliquer sur ▶ EXÉCUTER LE WORKFLOW</h4>
+          <p>Le pipeline démarre. L'état avance en temps réel dans la barre de workflow en bas de l'interface.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>Lire et copier la réponse générée</h4>
+          <p>La réponse s'affiche dans la zone de résultat. Utilisez le bouton <strong>⎘ COPIER LA RÉPONSE</strong> pour la transférer dans votre client email.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h4>Consulter le journal de session</h4>
+          <p>Chaque traitement est consigné avec l'heure, la catégorie détectée et un résumé. Utilisez <strong>✕ EFFACER LE JOURNAL</strong> pour réinitialiser.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>Exemple de corps d'email — PROOF_OF_STATUS</h3>
+    <div class="code-block">
+      <span class="comment">// Email d'exemple déclenchant la catégorie PROOF_OF_STATUS</span><br><br>
+      <span class="key">Expéditeur :</span> assurance@mutuelle-sante.ca<br>
+      <span class="key">Sujet :</span> Demande d'attestation médicale – dossier #2024-8821<br>
+      <span class="key">Corps :</span> Bonjour, suite à votre demande de remboursement,<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nous avons besoin d'une preuve de statut médical<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ainsi qu'une attestation signée par votre médecin.
+    </div>
+  </section>
+
+  <!-- TELEGRAM -->
+  <section id="telegram">
+    <div class="section-label">06 — Intégration Telegram</div>
+    <h2>Configurer les alertes Telegram</h2>
+    <p>GRONDIN peut envoyer une notification automatique sur Telegram après chaque traitement d'email. Voici comment configurer le bot :</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Créer un bot avec @BotFather</h4>
+          <p>Sur Telegram, cherchez <strong>@BotFather</strong>, tapez <code>/newbot</code> et suivez les instructions. Vous recevrez un token de type <code>123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11</code>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Obtenir votre Chat ID</h4>
+          <p>Envoyez un message à votre bot, puis consultez <code>https://api.telegram.org/bot&lt;TOKEN&gt;/getUpdates</code> pour trouver votre <code>chat.id</code>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Entrer les informations dans GRONDIN</h4>
+          <p>Collez le token et le chat ID dans les champs correspondants. Cliquez sur <strong>ENVOYER</strong> dans la section test pour vérifier la connexion.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert info">
+      <div class="alert-icon">INFO</div>
+      <p>Le bouton <strong>ENVOYER</strong> dans la section "Test alerte Telegram" envoie un message de test immédiatement, sans traiter d'email.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div>NETSECUREPRO · <span>GRONDIN</span> RESPONSE HANDLER v2.0</div>
+  <div>IA MÉDICALE · WORKFLOW STRATÉGIQUE AUTOMATISÉ</div>
+</footer>
+
+</body>
+</html>
