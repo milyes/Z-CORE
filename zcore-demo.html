@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Z-CORE IA — Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c10;
+    --surface: #0d1117;
+    --border: #1a2332;
+    --accent: #00e5a0;
+    --accent2: #0066ff;
+    --accent3: #ff6b35;
+    --text: #c9d1d9;
+    --text-dim: #4a5568;
+    --text-bright: #f0f6fc;
+    --mono: 'Space Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,160,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,160,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  header {
+    padding: 48px 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .logo-icon {
+    width: 40px; height: 40px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--bg);
+    letter-spacing: -1px;
+  }
+
+  .logo-text {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: 20px;
+    color: var(--text-bright);
+    letter-spacing: 2px;
+  }
+
+  .logo-text span { color: var(--accent); }
+
+  .status-badge {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    border: 1px solid rgba(0,229,160,0.3);
+    padding: 6px 12px;
+    border-radius: 4px;
+    background: rgba(0,229,160,0.05);
+  }
+
+  .status-dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    margin-bottom: 56px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .hero h1 {
+    font-size: clamp(32px, 6vw, 56px);
+    font-weight: 800;
+    color: var(--text-bright);
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .hero p {
+    font-size: 16px;
+    color: var(--text-dim);
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* Stack pills */
+  .stack-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin: 24px 0 48px;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+
+  .pill {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    background: var(--surface);
+    letter-spacing: 1px;
+  }
+
+  .pill.active { border-color: rgba(0,229,160,0.4); color: var(--accent); background: rgba(0,229,160,0.05); }
+
+  /* Terminal demo */
+  .terminal-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s 0.3s ease both;
+    box-shadow: 0 0 60px rgba(0,229,160,0.06), 0 24px 48px rgba(0,0,0,0.4);
+  }
+
+  .terminal-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .dot-row { display: flex; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot.r { background: #ff5f57; }
+  .dot.y { background: #ffbd2e; }
+  .dot.g { background: #28ca41; }
+
+  .terminal-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    flex: 1;
+    text-align: center;
+  }
+
+  .terminal-body {
+    padding: 24px 20px;
+    min-height: 400px;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.8;
+  }
+
+  .msg {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.4s ease;
+  }
+
+  .msg.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .msg-prefix {
+    color: var(--text-dim);
+    flex-shrink: 0;
+    user-select: none;
+  }
+
+  .msg.user .msg-prefix { color: var(--accent2); }
+  .msg.ai .msg-prefix { color: var(--accent); }
+  .msg.system .msg-prefix { color: var(--accent3); }
+
+  .msg-content { color: var(--text); }
+  .msg.user .msg-content { color: var(--text-bright); }
+
+  .msg-content .highlight { color: var(--accent); }
+  .msg-content .dim { color: var(--text-dim); }
+  .msg-content .warn { color: var(--accent3); }
+  .msg-content .link { color: var(--accent2); text-decoration: underline; cursor: pointer; }
+
+  .tag-badge {
+    display: inline-block;
+    font-size: 9px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    background: rgba(0,229,160,0.1);
+    border: 1px solid rgba(0,229,160,0.3);
+    color: var(--accent);
+    margin-right: 4px;
+    vertical-align: middle;
+    letter-spacing: 1px;
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 8px; height: 14px;
+    background: var(--accent);
+    vertical-align: middle;
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* Input area */
+  .input-area {
+    border-top: 1px solid var(--border);
+    padding: 16px 20px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    background: rgba(255,255,255,0.02);
+  }
+
+  .input-prefix { font-family: var(--mono); font-size: 13px; color: var(--accent2); }
+
+  .input-field {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text-bright);
+    caret-color: var(--accent);
+  }
+
+  .input-field::placeholder { color: var(--text-dim); }
+
+  .send-btn {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .send-btn:hover { background: #00ffb3; transform: scale(1.03); }
+
+  /* Scenario selector */
+  .scenarios {
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s 0.4s ease both;
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .scenario-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+  }
+
+  .scenario-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    color: var(--text);
+  }
+
+  .scenario-btn:hover {
+    border-color: rgba(0,229,160,0.4);
+    background: rgba(0,229,160,0.04);
+    transform: translateY(-2px);
+  }
+
+  .scenario-btn.active {
+    border-color: var(--accent);
+    background: rgba(0,229,160,0.08);
+  }
+
+  .scenario-icon { font-size: 18px; margin-bottom: 8px; }
+  .scenario-title { font-size: 12px; font-weight: 700; color: var(--text-bright); margin-bottom: 4px; }
+  .scenario-desc { font-family: var(--mono); font-size: 10px; color: var(--text-dim); }
+
+  /* Features */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s 0.5s ease both;
+  }
+
+  @media (max-width: 600px) {
+    .features { grid-template-columns: 1fr; }
+    .scenario-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  .feature-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+
+  .feature-card:hover { border-color: rgba(0,229,160,0.3); }
+
+  .feature-icon {
+    font-size: 22px;
+    margin-bottom: 10px;
+  }
+
+  .feature-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 6px;
+  }
+
+  .feature-desc {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 24px;
+  }
+
+  .footer-tag { color: var(--accent); }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 40px 0;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="logo">
+      <div class="logo-icon">Z●C</div>
+      <div class="logo-text">Z-CORE <span>IA</span></div>
+    </div>
+    <div class="status-badge">
+      <div class="status-dot"></div>
+      SYSTÈME ACTIF
+    </div>
+  </header>
+
+  <div class="hero">
+    <div class="hero-tag">// Démo interactive</div>
+    <h1>Votre stack.<br><em>Votre intelligence.</em></h1>
+    <p>Un assistant IA privé qui interroge vos données locales — emails, fichiers, chats — sans jamais quitter vos serveurs.</p>
+  </div>
+
+  <div class="stack-row">
+    <span class="pill active">Nextcloud 30</span>
+    <span class="pill active">Matrix E2EE</span>
+    <span class="pill active">Stalwart Mail</span>
+    <span class="pill active">Collabora</span>
+    <span class="pill active">Vaultwarden</span>
+    <span class="pill">PostgreSQL 16</span>
+    <span class="pill">Redis 7</span>
+    <span class="pill">Kanidm SSO</span>
+  </div>
+
+  <div class="section-label">// Sélectionnez un scénario</div>
+
+  <div class="scenarios">
+    <div class="scenario-grid">
+      <div class="scenario-btn active" onclick="loadScenario('mail')">
+        <div class="scenario-icon">📧</div>
+        <div class="scenario-title">Emails non lus</div>
+        <div class="scenario-desc">Stalwart Mail</div>
+      </div>
+      <div class="scenario-btn" onclick="loadScenario('files')">
+        <div class="scenario-icon">📁</div>
+        <div class="scenario-title">Fichiers récents</div>
+        <div class="scenario-desc">Nextcloud 30</div>
+      </div>
+      <div class="scenario-btn" onclick="loadScenario('chat')">
+        <div class="scenario-icon">💬</div>
+        <div class="scenario-title">Résumé Matrix</div>
+        <div class="scenario-desc">Dendrite E2EE</div>
+      </div>
+      <div class="scenario-btn" onclick="loadScenario('metrics')">
+        <div class="scenario-icon">📊</div>
+        <div class="scenario-title">Métriques stack</div>
+        <div class="scenario-desc">PostgreSQL + Redis</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="terminal-wrap">
+    <div class="terminal-bar">
+      <div class="dot-row">
+        <div class="dot r"></div>
+        <div class="dot y"></div>
+        <div class="dot g"></div>
+      </div>
+      <div class="terminal-title">z-core-ia — session sécurisée · Montréal 🇨🇦</div>
+    </div>
+    <div class="terminal-body" id="terminal">
+      <!-- Messages injected by JS -->
+    </div>
+    <div class="input-area">
+      <span class="input-prefix">ilyes@zcore ›</span>
+      <input class="input-field" id="userInput" placeholder="Posez une question en langage naturel…" />
+      <button class="send-btn" onclick="handleSend()">ENVOYER</button>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-label">// Pourquoi Z-CORE IA</div>
+
+  <div class="features">
+    <div class="feature-card">
+      <div class="feature-icon">🔒</div>
+      <div class="feature-title">100% Privé</div>
+      <div class="feature-desc">Aucune donnée ne quitte vos serveurs. Zéro cloud. Zéro tracking.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🧠</div>
+      <div class="feature-title">Langage naturel</div>
+      <div class="feature-desc">Interrogez emails, fichiers et chats sans syntaxe spéciale.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <div class="feature-title">Multi-sources</div>
+      <div class="feature-desc">Combine Analyst + Search sur toute la stack en une réponse.</div>
+    </div>
+  </div>
+
+  <footer>
+    <span class="footer-tag">Z-CORE IA</span>
+    <span>Montréal, Québec 🇨🇦 · Stack auto-hébergée · Kanidm SSO</span>
+    <span>v1.0 — 2026</span>
+  </footer>
+
+</div>
+
+<script>
+const scenarios = {
+  mail: [
+    { type: 'system', prefix: '⬡ SYSTÈME', content: 'Connexion Stalwart Mail via JMAP… <span class="highlight">OK</span>' },
+    { type: 'user', prefix: 'ilyes@zcore ›', content: 'Combien d\'emails non lus aujourd\'hui ? Résume les plus importants.' },
+    { type: 'ai', prefix: 'Z-CORE IA ›', content: '<span class="tag-badge">ANALYST</span> <span class="highlight">7 emails non lus</span> — 23 mars 2026, 21h31' },
+    { type: 'ai', prefix: '', content: '📧 <span class="highlight">OVHcloud</span> · Renouvellement domaine — expire dans <span class="warn">3 jours</span><br>📧 <span class="highlight">GitHub</span> · Security alert sur repo <span class="warn">zcore-infra</span><br>📧 <span class="highlight">Let\'s Encrypt</span> · Certificat SSL renouvelé <span class="highlight">✓</span><br><span class="dim">+ 4 autres (newsletters, notifications)</span>' },
+    { type: 'system', prefix: '⬡ SOURCE', content: 'Réponse basée sur <span class="highlight">Cortex Analyst</span> — aucune donnée transmise externalement.' },
+  ],
+  files: [
+    { type: 'system', prefix: '⬡ SYSTÈME', content: 'Connexion Nextcloud 30 via WebDAV… <span class="highlight">OK</span>' },
+    { type: 'user', prefix: 'ilyes@zcore ›', content: 'Quels fichiers ont été modifiés cette semaine ?' },
+    { type: 'ai', prefix: 'Z-CORE IA ›', content: '<span class="tag-badge">ANALYST</span> <span class="highlight">12 fichiers modifiés</span> — semaine du 17 mars 2026' },
+    { type: 'ai', prefix: '', content: '📄 <span class="highlight">zcore-architecture-v3.drawio</span> · 23 mars, 18h42<br>📄 <span class="highlight">stack-docker-compose.yml</span> · 22 mars, 09h15<br>📄 <span class="highlight">rapport-securite-Q1.docx</span> · 21 mars, 14h30<br><span class="dim">+ 9 autres dans /Documents/Projets</span>' },
+    { type: 'system', prefix: '⬡ SOURCE', content: 'Réponse basée sur <span class="highlight">Cortex Analyst</span> — index local PostgreSQL 16.' },
+  ],
+  chat: [
+    { type: 'system', prefix: '⬡ SYSTÈME', content: 'Connexion Matrix Dendrite (E2EE)… <span class="highlight">OK</span>' },
+    { type: 'user', prefix: 'ilyes@zcore ›', content: 'Résume les 24 dernières heures dans le salon #infra.' },
+    { type: 'ai', prefix: 'Z-CORE IA ›', content: '<span class="tag-badge">SEARCH</span> Analyse du salon <span class="highlight">#infra</span> — 38 messages déchiffrés' },
+    { type: 'ai', prefix: '', content: '🔑 <span class="highlight">Migration Kanidm</span> terminée à 14h — confirmée par tous<br>⚠️ Discussion ouverte sur <span class="warn">rate limiting Redis</span> (pic à 22h hier)<br>✅ Déploiement <span class="highlight">Stalwart v0.8.2</span> validé sans interruption<br><span class="dim">Aucun incident critique signalé.</span>' },
+    { type: 'system', prefix: '⬡ SOURCE', content: 'Réponse basée sur <span class="highlight">Cortex Search</span> — déchiffrement local uniquement.' },
+  ],
+  metrics: [
+    { type: 'system', prefix: '⬡ SYSTÈME', content: 'Connexion PostgreSQL 16 + Redis 7… <span class="highlight">OK</span>' },
+    { type: 'user', prefix: 'ilyes@zcore ›', content: 'Donne-moi un aperçu de la santé de la stack.' },
+    { type: 'ai', prefix: 'Z-CORE IA ›', content: '<span class="tag-badge">ANALYST</span> État de la stack au <span class="highlight">23 mars 2026, 21h31</span>' },
+    { type: 'ai', prefix: '', content: '🟢 <span class="highlight">Nextcloud</span> · Uptime 99.8% · 14.2 GB utilisés<br>🟢 <span class="highlight">Matrix</span> · 3 rooms actives · 2 users en ligne<br>🟢 <span class="highlight">Stalwart Mail</span> · Queue vide · TLS actif<br>🟡 <span class="highlight">Redis</span> · <span class="warn">78% mémoire</span> — nettoyage conseillé<br>🟢 <span class="highlight">PostgreSQL</span> · 23 connexions actives · latence 2ms' },
+    { type: 'system', prefix: '⬡ SOURCE', content: 'Réponse basée sur <span class="highlight">Analyst + Search</span> — métriques temps réel.' },
+  ]
+};
+
+const customResponses = [
+  { keywords: ['email', 'mail', 'inbox', 'non lu', 'message'],
+    response: '📧 <span class="highlight">7 emails non lus</span> détectés via Stalwart Mail (JMAP).<br>Priorité haute : OVHcloud (renouvellement domaine, expire dans 3j) et GitHub Security Alert.<br><span class="dim">Réponse basée sur Cortex Analyst.</span>' },
+  { keywords: ['fichier', 'file', 'document', 'nextcloud', 'modifié'],
+    response: '📁 <span class="highlight">12 fichiers modifiés</span> cette semaine dans Nextcloud.<br>Dernier : <span class="highlight">zcore-architecture-v3.drawio</span> — 23 mars, 18h42.<br><span class="dim">Réponse basée sur Cortex Analyst.</span>' },
+  { keywords: ['chat', 'matrix', 'message', 'salon', 'conversation'],
+    response: '💬 Salon <span class="highlight">#infra</span> — 38 messages (24h).<br>Points clés : migration Kanidm terminée ✓, discussion Redis rate limiting, déploiement Stalwart v0.8.2 OK.<br><span class="dim">Réponse basée sur Cortex Search.</span>' },
+  { keywords: ['métrique', 'metric', 'santé', 'statut', 'status', 'stack', 'uptime'],
+    response: '📊 Stack opérationnelle à <span class="highlight">99.8%</span>.<br>⚠️ Redis à 78% mémoire — nettoyage recommandé.<br>Tous les autres services : <span class="highlight">nominal</span>.<br><span class="dim">Réponse basée sur Analyst + Search.</span>' },
+  { keywords: ['secret', 'vault', 'password', 'mot de passe'],
+    response: '🔐 Accès Vaultwarden requis.<br>Validation <span class="highlight">Kanidm SSO</span> nécessaire pour continuer.<br><span class="warn">Session MFA requise.</span>' },
+  { keywords: ['calendrier', 'calendar', 'agenda', 'événement', 'rdv'],
+    response: '📅 <span class="highlight">3 événements</span> à venir cette semaine.<br>Prochain : <span class="highlight">Sync infra</span> — 25 mars, 10h00 (Nextcloud Calendar).<br><span class="dim">Réponse basée sur Cortex Analyst.</span>' },
+];
+
+let currentScenario = 'mail';
+
+function loadScenario(name) {
+  currentScenario = name;
+  document.querySelectorAll('.scenario-btn').forEach((b, i) => {
+    b.classList.toggle('active', Object.keys(scenarios)[i] === name);
+  });
+
+  const terminal = document.getElementById('terminal');
+  terminal.innerHTML = '';
+
+  const messages = scenarios[name];
+  messages.forEach((msg, idx) => {
+    setTimeout(() => addMessage(msg.type, msg.prefix, msg.content), idx * 400);
+  });
+}
+
+function addMessage(type, prefix, content, showCursor = false) {
+  const terminal = document.getElementById('terminal');
+  const el = document.createElement('div');
+  el.className = `msg ${type}`;
+  el.innerHTML = `
+    <span class="msg-prefix">${prefix}</span>
+    <span class="msg-content">${content}${showCursor ? ' <span class="cursor"></span>' : ''}</span>
+  `;
+  terminal.appendChild(el);
+  requestAnimationFrame(() => { el.classList.add('visible'); });
+  terminal.scrollTop = terminal.scrollHeight;
+}
+
+function handleSend() {
+  const input = document.getElementById('userInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  addMessage('user', 'ilyes@zcore ›', text);
+  input.value = '';
+
+  const lower = text.toLowerCase();
+  let response = null;
+
+  for (const r of customResponses) {
+    if (r.keywords.some(k => lower.includes(k))) {
+      response = r.response;
+      break;
+    }
+  }
+
+  if (!response) {
+    response = '🔍 Recherche en cours sur votre stack…<br><span class="highlight">Aucun résultat précis trouvé</span> pour cette requête.<br><span class="dim">Essayez : emails, fichiers, chat, métriques, calendrier.</span>';
+  }
+
+  setTimeout(() => {
+    addMessage('system', '⬡ SYSTÈME', 'Traitement local en cours… <span class="highlight">OK</span>');
+    setTimeout(() => {
+      addMessage('ai', 'Z-CORE IA ›', response);
+    }, 600);
+  }, 400);
+}
+
+document.getElementById('userInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') handleSend();
+});
+
+// Load default scenario
+loadScenario('mail');
+</script>
+</body>
+</html>
