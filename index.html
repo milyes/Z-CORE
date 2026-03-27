@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>MILYES_IA v9.0 — Universal Chat</title>
+<meta name="description" content="MILYES_IA v9.0 - Universal Chat • Z-CORE H202.Ia • NetSecurePro" />
+<style>
+  :root{
+    --accent:#4f46e5;
+    --bg:#f8fafc;
+    --card:#ffffff;
+    --border:#e2e8f0;
+    --text:#0f172a;
+    --muted:#64748b;
+  }
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,sans-serif;}
+  body{background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;}
+  
+  .container{
+    width:100%; max-width:960px; background:var(--card);
+    box-shadow:0 10px 40px rgba(15,23,42,0.1);
+    border-radius:16px; overflow:hidden; border:1px solid var(--border);
+  }
+  header{
+    background:linear-gradient(135deg, #1e2937, #334155);
+    color:white; padding:20px 28px; display:flex; align-items:center; gap:16px;
+  }
+  .logo{
+    width:52px; height:52px; border-radius:12px;
+    background:linear-gradient(135deg,#6366f1,#a5b4fc);
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:22px; color:white; box-shadow:0 4px 12px rgba(99,102,241,0.3);
+  }
+  h1{margin:0; font-size:24px;}
+  .subtitle{font-size:14px; opacity:0.85;}
+
+  .chat-area{padding:24px; background:#f8fafc;}
+  #messages{
+    height:520px; overflow-y:auto; padding:12px; 
+    display:flex; flex-direction:column; gap:14px;
+    background:#f1f5f9; border-radius:12px; border:1px solid var(--border);
+  }
+  .msg{
+    max-width:85%; padding:14px 18px; border-radius:18px; line-height:1.55;
+    box-shadow:0 2px 8px rgba(0,0,0,0.06);
+  }
+  .msg.user{
+    background:var(--accent); color:white; align-self:flex-end; 
+    border-bottom-right-radius:4px;
+  }
+  .msg.bot{
+    background:white; color:var(--text); align-self:flex-start; 
+    border:1px solid var(--border); border-bottom-left-radius:4px;
+  }
+  .typing{
+    font-style:italic; color:#64748b;
+  }
+
+  .controls{
+    margin-top:16px; display:flex; gap:10px;
+  }
+  input[type="text"]{
+    flex:1; padding:16px 20px; border:2px solid #e2e8f0;
+    border-radius:9999px; font-size:16px; outline:none;
+  }
+  input:focus{border-color:#6366f1;}
+  
+  button.primary{
+    background:var(--accent); color:white; border:none;
+    padding:16px 28px; border-radius:9999px; font-weight:600; cursor:pointer;
+  }
+  button.ghost{
+    background:transparent; border:2px solid #e2e8f0;
+    padding:16px 20px; border-radius:9999px; cursor:pointer;
+  }
+
+  footer{
+    padding:16px 28px; background:#f8fafc; font-size:13px; color:var(--muted);
+    display:flex; justify-content:space-between; align-items:center;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">Z</div>
+      <div>
+        <h1>MILYES_IA v9.0 — Universal Chat</h1>
+        <p class="subtitle">Z-CORE H202.Ia • Mode Local • NetSecurePro</p>
+      </div>
+    </header>
+
+    <div class="chat-area">
+      <div id="messages"></div>
+
+      <div class="controls">
+        <input id="inputText" type="text" placeholder="Posez votre question à Z-CORE H202.Ia..." autocomplete="off" />
+        <button id="sendBtn" class="primary">Envoyer</button>
+        <button id="clearBtn" class="ghost">Effacer</button>
+      </div>
+    </div>
+
+    <footer>
+      <div>100% Local • Aucune donnée envoyée • Zoubirou Mohammed Ilyes</div>
+      <div>Enterprise Pro Simulation • v9.0</div>
+    </footer>
+  </div>
+
+<script>
+// ================== Z-CORE SYSTEM PROMPT ==================
+const SYSTEM_PROMPT = `Tu es Z-CORE H202.Ia v9.0, l'assistant IA souverain de NetSecurePro développé par Mohammed Ilyes Zoubirou.
+Tu fonctionnes en mode 100% local. Tu es expert en cybersécurité, IA locale, self-hosting, Zero Trust, prompt engineering et développement web.
+Tu parles français de façon naturelle, professionnelle et motivante.
+Tu donnes des réponses précises, structurées et actionnables.
+Quand on te demande du code, tu fournis du code propre et complet.
+Tu gardes toujours le contexte de la conversation.`;
+
+const messagesDiv = document.getElementById('messages');
+const input = document.getElementById('inputText');
+const sendBtn = document.getElementById('sendBtn');
+const clearBtn = document.getElementById('clearBtn');
+
+const LS_KEY = 'milyes_ia_universal_history_v9';
+
+// Chargement historique
+function loadHistory() {
+  try {
+    const data = localStorage.getItem(LS_KEY);
+    return data ? JSON.parse(data) : [];
+  } catch(e) { return []; }
+}
+
+// Sauvegarde
+function saveHistory(hist) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(hist)); } catch(e){}
+}
+
+// Ajout message
+function addMessage(text, role) {
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  div.innerHTML = `<strong>${role === 'user' ? 'Vous' : 'Z-CORE H202.Ia'} :</strong><br>${text}`;
+  messagesDiv.appendChild(div);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+// Streaming simulé (beaucoup plus fluide)
+function simulateStreaming(text, element) {
+  element.innerHTML = `<strong>Z-CORE H202.Ia :</strong><br>`;
+  let i = 0;
+  const speed = 18;
+  const interval = setInterval(() => {
+    if (i < text.length) {
+      element.innerHTML += text.charAt(i);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      i++;
+    } else {
+      clearInterval(interval);
+    }
+  }, speed);
+}
+
+// Réponse intelligente (basée sur le System Prompt)
+function getZCoreResponse(userText) {
+  const q = userText.toLowerCase().trim();
+  
+  if (q.includes('bonjour') || q.includes('salut') || q.includes('hey')) 
+    return "Bonjour Mohammed Ilyes ! Z-CORE H202.Ia v9.0 est pleinement chargé. Comment puis-je vous assister aujourd’hui ?";
+  
+  if (q.includes('linkedin') || q.includes('profil')) 
+    return "Votre profil LinkedIn est déjà très bon (98/100). Je recommande de mettre en avant <strong>Z-CORE H202.Ia</strong> comme projet signature et d’ajouter le lien direct dans la bannière.";
+  
+  if (q.includes('partenariat') || q.includes('partenaire')) 
+    return "Pour les partenariats, je recommande de cibler les entreprises/self-hosting (Nextcloud, Matrix, Kanidm) et les startups IA à Montréal. Veux-tu que je te prépare un pitch ou des messages personnalisés ?";
+  
+  if (q.includes('code') || q.includes('prototype')) 
+    return "Je peux améliorer ce prototype Universal Chat. Veux-tu ajouter le support Markdown, la reconnaissance vocale, ou le mode multi-modèles ?";
+  
+  // Réponse par défaut intelligente
+  return "Reçu. Je peux vous aider sur plusieurs axes : cybersécurité Zero Trust, amélioration de prototypes IA locaux, stratégie LinkedIn, ou développement de partenariats autour de Z-CORE. Que souhaitez-vous approfondir ?";
+}
+
+// Envoi
+async function handleSend() {
+  const text = input.value.trim();
+  if (!text) return;
+
+  // Ajouter message utilisateur
+  addMessage(text, 'user');
+  
+  const history = loadHistory();
+  history.push({ role: 'user', content: text });
+  saveHistory(history);
+
+  input.value = '';
+
+  // Loader
+  const loader = document.createElement('div');
+  loader.className = 'msg bot typing';
+  loader.textContent = 'Z-CORE réfléchit...';
+  messagesDiv.appendChild(loader);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+  // Simulation IA
+  setTimeout(() => {
+    loader.remove();
+    
+    const responseText = getZCoreResponse(text);
+    const responseDiv = document.createElement('div');
+    responseDiv.className = 'msg bot';
+    messagesDiv.appendChild(responseDiv);
+    
+    simulateStreaming(responseText, responseDiv);
+
+    history.push({ role: 'assistant', content: responseText });
+    saveHistory(history);
+  }, 650);
+}
+
+// Effacer
+function handleClear() {
+  if (confirm('Effacer tout l’historique de MILYES_IA ?')) {
+    localStorage.removeItem(LS_KEY);
+    messagesDiv.innerHTML = '';
+    addMessage("Session réinitialisée.<br>Z-CORE H202.Ia v9.0 prêt à l’emploi.", 'bot');
+  }
+}
+
+// Events
+sendBtn.addEventListener('click', handleSend);
+input.addEventListener('keydown', e => { if (e.key === 'Enter') handleSend(); });
+clearBtn.addEventListener('click', handleClear);
+
+// Initialisation
+window.onload = () => {
+  const history = loadHistory();
+  if (history.length > 0) {
+    history.forEach(item => addMessage(item.content, item.role));
+  } else {
+    addMessage("Bonjour ! Je suis <strong>Z-CORE H202.Ia v9.0</strong>, l’assistant IA souverain de NetSecurePro.<br>Que souhaitez-vous construire ou améliorer aujourd’hui ?", 'bot');
+  }
+  input.focus();
+};
+</script>
+</body>
+</html>
