@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Z-CORE — Architecture Souveraine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0a0e14;
+    --bg2:       #0f1520;
+    --bg3:       #141c2a;
+    --border:    rgba(255,255,255,0.06);
+    --border2:   rgba(255,255,255,0.12);
+
+    --blue:      #2d8fff;
+    --blue-dim:  rgba(45,143,255,0.12);
+    --blue-glow: rgba(45,143,255,0.25);
+    --teal:      #00d4a0;
+    --teal-dim:  rgba(0,212,160,0.10);
+    --teal-glow: rgba(0,212,160,0.22);
+    --purple:    #9b7bff;
+    --purple-dim:rgba(155,123,255,0.10);
+    --coral:     #ff6b6b;
+    --coral-dim: rgba(255,107,107,0.10);
+    --amber:     #ffb347;
+    --amber-dim: rgba(255,179,71,0.10);
+    --red:       #ff4757;
+    --red-dim:   rgba(255,71,87,0.10);
+    --gray:      #6b7c99;
+    --gray-dim:  rgba(107,124,153,0.10);
+
+    --text:      #e2e8f4;
+    --text2:     #8899bb;
+    --text3:     #4a5a78;
+
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-ui:   'Space Grotesk', sans-serif;
+    --r:         8px;
+    --r-lg:      14px;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-ui);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  /* ── SCAN-LINE TEXTURE ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 28px 40px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg2);
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .logo-mark {
+    width: 38px; height: 38px;
+    border: 1.5px solid var(--teal);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--teal);
+    letter-spacing: -0.5px;
+    box-shadow: 0 0 18px var(--teal-glow);
+  }
+  .logo-text { font-family: var(--font-mono); }
+  .logo-text h1 {
+    font-size: 15px; font-weight: 600; color: var(--text);
+    letter-spacing: 0.08em;
+  }
+  .logo-text span {
+    font-size: 11px; color: var(--text3);
+    letter-spacing: 0.12em;
+  }
+  .header-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text3);
+    text-align: right;
+    line-height: 1.8;
+  }
+  .status-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--teal);
+    box-shadow: 0 0 6px var(--teal);
+    margin-right: 5px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  /* ── MAIN LAYOUT ── */
+  main {
+    padding: 32px 40px 60px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* ── ZONE CONTAINERS ── */
+  .zone {
+    border-radius: var(--r-lg);
+    padding: 20px;
+    margin-bottom: 16px;
+    position: relative;
+    animation: fadeIn 0.4s ease both;
+  }
+  .zone-sovereign {
+    border: 1px solid rgba(45,143,255,0.3);
+    background: rgba(45,143,255,0.03);
+  }
+  .zone-external {
+    border: 1px dashed rgba(255,71,87,0.4);
+    background: rgba(255,71,87,0.02);
+  }
+  .zone-security {
+    border: 1px dashed rgba(255,71,87,0.3);
+    background: rgba(255,71,87,0.025);
+    border-radius: var(--r);
+    padding: 14px 16px 16px;
+    margin-bottom: 16px;
+  }
+  .zone-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .zone-sovereign .zone-label { color: var(--blue); }
+  .zone-external .zone-label  { color: var(--red); }
+  .zone-security .zone-label  { color: var(--red); }
+  .zone-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.2;
+  }
+
+  /* ── ROWS ── */
+  .row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+    justify-content: center;
+  }
+  .row.single { justify-content: center; }
+  .row.infra  { flex-direction: column; gap: 10px; }
+
+  /* ── NODES ── */
+  .node {
+    border-radius: var(--r);
+    padding: 12px 16px;
+    border: 1px solid;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    position: relative;
+    min-width: 0;
+    animation: fadeIn 0.5s ease both;
+  }
+  .node:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+  }
+  .node:hover .node-glow { opacity: 1; }
+  .node.active { filter: brightness(1.2); }
+  .node-title {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  .node-sub {
+    font-size: 10px;
+    font-family: var(--font-mono);
+    opacity: 0.6;
+    margin-top: 3px;
+    white-space: nowrap;
+  }
+  .node-glow {
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 0.18s;
+    pointer-events: none;
+  }
+
+  /* Color variants */
+  .n-clients  { background: var(--gray-dim);   border-color: var(--gray);   color: var(--text2); }
+  .n-caddy    { background: var(--blue-dim);   border-color: var(--blue);   color: #7dbfff; }
+  .n-caddy    .node-glow { box-shadow: 0 0 16px var(--blue-glow); }
+  .n-kanidm   { background: var(--teal-dim);   border-color: var(--teal);   color: #7fffdf; }
+  .n-kanidm   .node-glow { box-shadow: 0 0 16px var(--teal-glow); }
+  .n-service  { background: var(--purple-dim); border-color: var(--purple); color: #c4b0ff; }
+  .n-data     { background: var(--coral-dim);  border-color: var(--coral);  color: #ffa0a0; }
+  .n-security { background: var(--red-dim);    border-color: var(--red);    color: #ff8f99; }
+  .n-infra    { background: var(--gray-dim);   border-color: var(--gray);   color: var(--text2); }
+  .n-server   { background: var(--teal-dim);   border-color: rgba(0,212,160,0.4); color: #7fffdf; }
+  .n-standby  { background: var(--gray-dim);   border-color: var(--gray);   color: var(--text2); }
+  .n-external { background: var(--amber-dim);  border-color: var(--amber);  color: #ffd080; }
+
+  /* ── ARROWS ── */
+  .arrows-svg {
+    width: 100%;
+    overflow: visible;
+    display: block;
+    pointer-events: none;
+  }
+
+  /* ── CONNECTOR LINES (CSS approach) ── */
+  .connector {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 28px;
+    position: relative;
+    margin: -4px 0;
+  }
+  .connector::after {
+    content: '';
+    display: block;
+    width: 1.5px;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent, currentColor, transparent);
+  }
+  .connector.blue::after { color: var(--blue); background: var(--blue); opacity: 0.4; }
+  .connector.teal::after { color: var(--teal); background: var(--teal); opacity: 0.4; }
+  .connector.gray::after { color: var(--gray); background: var(--gray); opacity: 0.25; }
+  .connector.dashed::after {
+    background: repeating-linear-gradient(
+      to bottom,
+      var(--amber) 0px, var(--amber) 5px,
+      transparent 5px, transparent 10px
+    );
+    opacity: 0.45;
+  }
+
+  /* Fan connector using SVG */
+  .fan-svg {
+    width: 100%;
+    height: 50px;
+    display: block;
+    margin: -4px 0;
+    overflow: visible;
+  }
+
+  /* ── INFO PANEL ── */
+  .info-panel {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 320px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: var(--r-lg);
+    padding: 18px 20px;
+    transform: translateY(120%);
+    transition: transform 0.25s cubic-bezier(.34,1.56,.64,1);
+    z-index: 500;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .info-panel.visible { transform: translateY(0); }
+  .info-panel h3 {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .info-panel p {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.65;
+  }
+  .info-panel .tags {
+    display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px;
+  }
+  .info-panel .tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border2);
+    color: var(--text3);
+  }
+  .info-close {
+    position: absolute;
+    top: 12px; right: 14px;
+    background: none; border: none;
+    color: var(--text3); cursor: pointer;
+    font-size: 16px; line-height: 1;
+  }
+  .info-close:hover { color: var(--text); }
+
+  /* ── LEGEND ── */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 14px 20px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    margin-top: 20px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text2);
+  }
+  .legend-item { display: flex; align-items: center; gap: 7px; }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    border: 1.5px solid;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 16px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg2);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text3);
+  }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* Stagger children */
+  .zone > * { animation-fill-mode: both; }
+  .row:nth-child(1) .node { animation-delay: 0.05s; }
+  .row:nth-child(2) .node { animation-delay: 0.10s; }
+  .row:nth-child(3) .node { animation-delay: 0.15s; }
+  .row:nth-child(4) .node { animation-delay: 0.20s; }
+  .row:nth-child(5) .node { animation-delay: 0.25s; }
+
+  /* Wide nodes */
+  .w-full { flex: 1; }
+  .w-half { flex: 0 0 calc(50% - 6px); }
+  .w-third { flex: 0 0 calc(33.33% - 8px); }
+  .w-fifth { flex: 0 0 calc(20% - 10px); }
+
+  @media (max-width: 700px) {
+    main { padding: 16px; }
+    header { padding: 16px; }
+    .w-fifth { flex: 0 0 calc(50% - 6px); }
+    .info-panel { width: calc(100vw - 32px); right: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">ZC</div>
+    <div class="logo-text">
+      <h1>Z-CORE</h1>
+      <span>ZERO TRUST SOVEREIGN STACK</span>
+    </div>
+  </div>
+  <div class="header-meta">
+    <div><span class="status-dot"></span>MAINFRAME ACTIVE</div>
+    <div>Debian 12 · Docker Compose · Ansible</div>
+    <div>Montréal · Hetzner CPX31 · 2025</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- CLIENTS -->
+  <div class="row single" style="margin-bottom:0">
+    <div class="node n-clients w-full" onclick="showInfo('clients')" style="text-align:center;">
+      <div class="node-title">Internet / Clients</div>
+      <div class="node-sub">Navigateur · Thunderbird · Element · DAVx5 · apps mobiles</div>
+      <div class="node-glow"></div>
+    </div>
+  </div>
+
+  <div class="connector blue"></div>
+
+  <!-- SOVEREIGN ZONE -->
+  <div class="zone zone-sovereign">
+    <div class="zone-label">Zone souveraine &mdash; auto-hébergée &mdash; données 100% locales</div>
+
+    <!-- CADDY -->
+    <div class="row single" style="margin-bottom:0">
+      <div class="node n-caddy w-full" onclick="showInfo('caddy')" style="text-align:center;">
+        <div class="node-title">Caddy 2 &mdash; Reverse Proxy</div>
+        <div class="node-sub">TLS auto (ACME / Let's Encrypt) &nbsp;·&nbsp; routing par domaine &nbsp;·&nbsp; rate-limit &nbsp;·&nbsp; HTTP/3</div>
+        <div class="node-glow"></div>
+      </div>
+    </div>
+
+    <!-- Fan SVG: Caddy → Kanidm (single arrow) -->
+    <svg class="fan-svg" viewBox="0 0 800 50" preserveAspectRatio="none">
+      <defs>
+        <marker id="arr-teal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#00d4a0" stroke-width="1.5" stroke-linecap="round"/>
+        </marker>
+      </defs>
+      <line x1="400" y1="0" x2="400" y2="44" stroke="#00d4a0" stroke-width="1.5" opacity="0.5" marker-end="url(#arr-teal)"/>
+    </svg>
+
+    <!-- KANIDM -->
+    <div class="row single" style="margin-bottom:0">
+      <div class="node n-kanidm w-full" onclick="showInfo('kanidm')" style="text-align:center;">
+        <div class="node-title">Kanidm &mdash; SSO Central &nbsp;·&nbsp; Identity Provider</div>
+        <div class="node-sub">OIDC &nbsp;·&nbsp; OAuth2 &nbsp;·&nbsp; WebAuthn &nbsp;·&nbsp; MFA &nbsp;·&nbsp; LDAP &nbsp;·&nbsp; authentification unifiée</div>
+        <div class="node-glow"></div>
+      </div>
+    </div>
+
+    <!-- Fan SVG: Kanidm → 5 services -->
+    <svg class="fan-svg" viewBox="0 0 800 50" preserveAspectRatio="none" style="height:44px">
+      <defs>
+        <marker id="arr-purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#9b7bff" stroke-width="1.5" stroke-linecap="round"/>
+        </marker>
+      </defs>
+      <!-- from center 400 to 5 service centers: 80,240,400,560,720 -->
+      <line x1="400" y1="0" x2="80"  y2="44" stroke="#9b7bff" stroke-width="1" opacity="0.45" marker-end="url(#arr-purple)"/>
+      <line x1="400" y1="0" x2="240" y2="44" stroke="#9b7bff" stroke-width="1" opacity="0.45" marker-end="url(#arr-purple)"/>
+      <line x1="400" y1="0" x2="400" y2="44" stroke="#9b7bff" stroke-width="1" opacity="0.45" marker-end="url(#arr-purple)"/>
+      <line x1="400" y1="0" x2="560" y2="44" stroke="#9b7bff" stroke-width="1" opacity="0.45" marker-end="url(#arr-purple)"/>
+      <line x1="400" y1="0" x2="720" y2="44" stroke="#9b7bff" stroke-width="1" opacity="0.45" marker-end="url(#arr-purple)"/>
+    </svg>
+
+    <!-- SERVICES ROW -->
+    <div class="row" style="margin-bottom:0">
+      <div class="node n-service w-fifth" onclick="showInfo('stalwart')">
+        <div class="node-title">Stalwart Mail</div>
+        <div class="node-sub">SMTP · IMAP · JMAP · TLS · E2EE</div>
+        <div class="node-glow"></div>
+      </div>
+      <div class="node n-service w-fifth" onclick="showInfo('matrix')">
+        <div class="node-title">Matrix Dendrite</div>
+        <div class="node-sub">Chat E2EE · Element Web · Rooms</div>
+        <div class="node-glow"></div>
+      </div>
+      <div class="node n-service w-fifth" onclick="showInfo('nextcloud')">
+        <div class="node-title">Nextcloud 30</div>
+        <div class="node-sub">Drive · Cal · Contacts · Collabora</div>
+        <div class="node-glow"></div>
+      </div>
+      <div class="node n-service w-fifth" onclick="showInfo('vault')">
+        <div class="node-title">Vaultwarden</div>
+        <div class="node-sub">Secrets · MDP · Auth SSO</div>
+        <div class="node-glow"></div>
+      </div>
+      <div class="node n-service w-fifth" onclick="showInfo('jitsi')">
+        <div class="node-title">Jitsi Meet</div>
+        <div class="node-sub">Visio WebRTC · coturn · TURN</div>
+        <div class="node-glow"></div>
+      </div>
+    </div>
+
+    <!-- Fan SVG: services → data -->
+    <svg class="fan-svg" viewBox="0 0 800 50" preserveAspectRatio="none" style="height:40px">
+      <defs>
+        <marker id="arr-coral" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#ff6b6b" stroke-width="1.5" stroke-linecap="round"/>
+        </marker>
+      </defs>
+      <line x1="80"  y1="0" x2="250" y2="44" stroke="#ff6b6b" stroke-width="1" opacity="0.35" marker-end="url(#arr-coral)"/>
+      <line x1="240" y1="0" x2="280" y2="44" stroke="#ff6b6b" stroke-width="1" opacity="0.35" marker-end="url(#arr-coral)"/>
+      <line x1="400" y1="0" x2="310" y2="44" stroke="#ff6b6b" stroke-width="1" opacity="0.35" marker-end="url(#arr-coral)"/>
+      <line x1="560" y1="0" x2="500" y2="44" stroke="#ff6b6b" stroke-width="1" opacity="0.35" marker-end="url(#arr-coral)"/>
+      <line x1="720" y1="0" x2="545" y2="44" stroke="#ff6b6b" stroke-width="1" opacity="0.35" marker-end="url(#arr-coral)"/>
+    </svg>
+
+    <!-- DATA LAYER -->
+    <div class="row" style="margin-bottom:0">
+      <div class="node n-data w-half" onclick="showInfo('postgres')">
+        <div class="node-title">PostgreSQL 16 &mdash; Base principale</div>
+        <div class="node-sub">Tous services &nbsp;·&nbsp; ACID &nbsp;·&nbsp; volumes Docker chiffrés LUKS</div>
+        <div class="node-glow"></div>
+      </div>
+      <div class="node n-data w-half" onclick="showInfo('redis')">
+        <div class="node-title">Redis 7 &mdash; Cache &amp; Sessions</div>
+        <div class="node-sub">Sessions · cache · pub/sub · métadonnées temps réel</div>
+        <div class="node-glow"></div>
+      </div>
+    </div>
+
+    <div style="height:14px"></div>
+
+    <!-- SECURITY LAYER -->
+    <div class="zone-security">
+      <div class="zone-label">Couche sécurité &mdash; Zero Trust Architecture</div>
+      <div class="row" style="margin-bottom:0">
+        <div class="node n-security w-third" onclick="showInfo('fail2ban')">
+          <div class="node-title">Fail2ban</div>
+          <div class="node-sub">Blocage IP auto · brute-force</div>
+          <div class="node-glow"></div>
+        </div>
+        <div class="node n-security w-third" onclick="showInfo('crowdsec')">
+          <div class="node-title">CrowdSec</div>
+          <div class="node-sub">Threat intelligence · CTI</div>
+          <div class="node-glow"></div>
+        </div>
+        <div class="node n-security w-third" onclick="showInfo('wg')">
+          <div class="node-title">WireGuard VPN</div>
+          <div class="node-sub">Tunnel chiffré · accès admin</div>
+          <div class="node-glow"></div>
+        </div>
+      </div>
+      <div style="height:10px"></div>
+      <div class="row" style="margin-bottom:0">
+        <div class="node n-security w-half" onclick="showInfo('ufw')">
+          <div class="node-title">UFW Firewall</div>
+          <div class="node-sub">Règles réseau · ports minimaux</div>
+          <div class="node-glow"></div>
+        </div>
+        <div class="node n-security w-half" onclick="showInfo('hardening')">
+          <div class="node-title">OS Hardening</div>
+          <div class="node-sub">sysctl · SSH keys · no root · audit</div>
+          <div class="node-glow"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFRA LAYER -->
+    <div class="node n-infra w-full" onclick="showInfo('infra')" style="text-align:center; margin-bottom:12px;">
+      <div class="node-title">Infrastructure &mdash; Debian 12 · Docker Compose · Ansible idempotent</div>
+      <div class="node-sub">Prometheus + Grafana &nbsp;·&nbsp; Restic → NAS chiffré &nbsp;·&nbsp; logs 30j max &nbsp;·&nbsp; volumes LUKS</div>
+      <div class="node-glow"></div>
+    </div>
+
+    <!-- SERVERS ROW -->
+    <div class="row" style="margin-bottom:0">
+      <div class="node n-server w-half" onclick="showInfo('server-active')">
+        <div class="node-title">Hetzner CPX31 &mdash; Nœud actif</div>
+        <div class="node-sub">8 Go RAM · 4 vCPU · Falkenstein · nœud principal</div>
+        <div class="node-glow"></div>
+      </div>
+      <div class="node n-standby w-half" onclick="showInfo('server-standby')">
+        <div class="node-title">Hetzner CPX21 &mdash; Standby</div>
+        <div class="node-sub">4 Go RAM · 3 vCPU · Nuremberg · haute disponibilité</div>
+        <div class="node-glow"></div>
+      </div>
+    </div>
+
+  </div><!-- /zone-sovereign -->
+
+  <!-- Dashed arrow to external zone -->
+  <svg class="fan-svg" viewBox="0 0 800 44" preserveAspectRatio="none" style="height:36px;margin:-4px 0">
+    <defs>
+      <marker id="arr-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M2 1L8 5L2 9" fill="none" stroke="#ffb347" stroke-width="1.5" stroke-linecap="round"/>
+      </marker>
+    </defs>
+    <line x1="250" y1="0" x2="200" y2="44" stroke="#ffb347" stroke-width="1" stroke-dasharray="5 4" opacity="0.5" marker-end="url(#arr-amber)"/>
+    <line x1="550" y1="0" x2="600" y2="44" stroke="#ffb347" stroke-width="1" stroke-dasharray="5 4" opacity="0.5" marker-end="url(#arr-amber)"/>
+    <text x="400" y="22" text-anchor="middle" fill="#ffb347" font-size="10" font-family="JetBrains Mono" opacity="0.5">appels externes uniquement</text>
+  </svg>
+
+  <!-- EXTERNAL ZONE -->
+  <div class="zone zone-external">
+    <div class="zone-label">Zone cloud US &mdash; non souveraine &mdash; dépendances externes minimales</div>
+    <div class="row" style="margin-bottom:0">
+      <div class="node n-external w-half" onclick="showInfo('anthropic')">
+        <div class="node-title">api.anthropic.com &mdash; Claude API</div>
+        <div class="node-sub">LLM externe · Z-CORE IA Analyst · appels HTTPS chiffrés</div>
+        <div class="node-glow"></div>
+      </div>
+      <div class="node n-external w-half" onclick="showInfo('azure')">
+        <div class="node-title">azure.microsoft.com &mdash; Azure CLI</div>
+        <div class="node-sub">Infra cloud US optionnelle · Cloud Act US applicable</div>
+        <div class="node-glow"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="border-color:var(--blue);background:var(--blue-dim)"></div>Proxy / Entrée</div>
+    <div class="legend-item"><div class="legend-dot" style="border-color:var(--teal);background:var(--teal-dim)"></div>Auth SSO</div>
+    <div class="legend-item"><div class="legend-dot" style="border-color:var(--purple);background:var(--purple-dim)"></div>Services</div>
+    <div class="legend-item"><div class="legend-dot" style="border-color:var(--coral);background:var(--coral-dim)"></div>Données</div>
+    <div class="legend-item"><div class="legend-dot" style="border-color:var(--red);background:var(--red-dim)"></div>Sécurité Zero Trust</div>
+    <div class="legend-item"><div class="legend-dot" style="border-color:var(--gray);background:var(--gray-dim)"></div>Infrastructure</div>
+    <div class="legend-item"><div class="legend-dot" style="border-color:var(--amber);background:var(--amber-dim)"></div>Cloud US externe</div>
+    <div style="margin-left:auto;color:var(--text3);font-size:11px">Cliquer sur un composant pour les détails</div>
+  </div>
+
+</main>
+
+<footer>
+  <span>Z-CORE &mdash; Netsecurepro IA &mdash; Mohammed Ilyes Zoubirou</span>
+  <span>Données 100% souveraines · Self-hosted · Montréal 🇨🇦</span>
+</footer>
+
+<!-- INFO PANEL -->
+<div class="info-panel" id="info-panel">
+  <button class="info-close" onclick="closeInfo()">&#215;</button>
+  <h3 id="info-title"></h3>
+  <p id="info-desc"></p>
+  <div class="tags" id="info-tags"></div>
+</div>
+
+<script>
+const INFO = {
+  clients: {
+    title: "Clients & Interfaces",
+    desc: "Tous les accès entrants passent par le reverse proxy Caddy. Les clients incluent navigateurs web (HTTPS), Thunderbird (IMAP/SMTP), Element (Matrix), DAVx5 (CalDAV/CardDAV), et applications mobiles.",
+    tags: ["HTTPS", "IMAP", "CalDAV", "WebSocket", "HTTP/3"]
+  },
+  caddy: {
+    title: "Caddy 2 — Reverse Proxy",
+    desc: "Point d'entrée unique de la stack. Caddy gère automatiquement les certificats TLS via Let's Encrypt (ACME), route les requêtes par nom de domaine vers chaque service, et applique le rate-limiting.",
+    tags: ["TLS auto", "ACME", "HTTP/3", "rate-limit", "routing", "Caddyfile"]
+  },
+  kanidm: {
+    title: "Kanidm — SSO Central",
+    desc: "Fournisseur d'identité central open-source. Tous les services s'authentifient via Kanidm avec OIDC/OAuth2. Supporte WebAuthn (clés physiques), MFA TOTP, et LDAP pour la compatibilité legacy.",
+    tags: ["OIDC", "OAuth2", "WebAuthn", "MFA", "LDAP", "Rust"]
+  },
+  stalwart: {
+    title: "Stalwart Mail",
+    desc: "Serveur de messagerie complet en Rust. Supporte SMTP, IMAP, JMAP (protocole moderne). Intégration DKIM, SPF, DMARC pour la délivrabilité. Chiffrement E2EE avec S/MIME ou PGP côté client.",
+    tags: ["SMTP", "IMAP", "JMAP", "DKIM", "SPF", "Rust", "E2EE"]
+  },
+  matrix: {
+    title: "Matrix Dendrite",
+    desc: "Serveur Matrix léger en Go. Chiffrement bout-en-bout natif pour tous les messages. Interface Element Web intégrée. Support des rooms privées et fédération optionnelle avec l'écosystème Matrix global.",
+    tags: ["E2EE", "Dendrite", "Go", "Element Web", "Fédération", "Rooms"]
+  },
+  nextcloud: {
+    title: "Nextcloud 30 + Collabora",
+    desc: "Suite bureautique souveraine complète. Nextcloud gère fichiers, calendrier, contacts, notes, tâches. Collabora CODE permet l'édition de documents Office en temps réel directement dans le navigateur.",
+    tags: ["Drive", "CalDAV", "CardDAV", "Collabora CODE", "Docs/Sheets/Slides"]
+  },
+  vault: {
+    title: "Vaultwarden",
+    desc: "Gestionnaire de mots de passe auto-hébergé, compatible avec tous les clients Bitwarden. Accès en lecture seule via Kanidm SSO. Coffre-fort chiffré AES-256 pour secrets d'équipe et credentials.",
+    tags: ["Bitwarden", "AES-256", "SSO", "secrets", "MDP", "partage sécurisé"]
+  },
+  jitsi: {
+    title: "Jitsi Meet",
+    desc: "Visioconférence WebRTC open-source. Coturn (TURN/STUN) pour traversée NAT. Aucun compte requis. Intégration possible avec les rooms Matrix pour démarrer une vidéo depuis le chat.",
+    tags: ["WebRTC", "coturn", "TURN/STUN", "NAT traversal", "no account"]
+  },
+  postgres: {
+    title: "PostgreSQL 16",
+    desc: "Base de données relationnelle principale. Tous les services (Nextcloud, Matrix, Stalwart, Kanidm, Vaultwarden) utilisent des bases distinctes sur la même instance. Volumes Docker chiffrés LUKS.",
+    tags: ["ACID", "Docker volume", "LUKS", "backups Restic", "PG 16"]
+  },
+  redis: {
+    title: "Redis 7",
+    desc: "Cache en mémoire pour les sessions utilisateurs, les métadonnées temps réel et le pub/sub. Utilisé principalement par Nextcloud pour les sessions et Matrix pour les événements temps réel.",
+    tags: ["sessions", "cache", "pub/sub", "in-memory", "AOF persistence"]
+  },
+  fail2ban: {
+    title: "Fail2ban",
+    desc: "Détecte les tentatives d'authentification échouées dans les logs et bloque automatiquement les IP offensantes via iptables/nftables. Règles configurées pour tous les services de la stack.",
+    tags: ["brute-force", "iptables", "ban auto", "logs", "regex"]
+  },
+  crowdsec: {
+    title: "CrowdSec",
+    desc: "Agent de sécurité collaboratif. Analyse les comportements suspects, consulte la base CTI communautaire pour bloquer les IPs malveillantes connues. Bouncers Caddy et nftables intégrés.",
+    tags: ["CTI", "threat intel", "bouncers", "comportemental", "communautaire"]
+  },
+  wg: {
+    title: "WireGuard VPN",
+    desc: "Tunnel VPN moderne et léger pour l'administration à distance sécurisée. Seul accès SSH autorisé depuis le tunnel WireGuard. Clés ED25519. Interface wg0 sur port UDP non standard.",
+    tags: ["ED25519", "UDP", "tunnel", "admin SSH", "zéro config"]
+  },
+  ufw: {
+    title: "UFW Firewall",
+    desc: "Pare-feu simplifié gérant les règles iptables. Seuls les ports strictement nécessaires sont ouverts (80, 443, WireGuard). Toutes autres connexions entrantes bloquées par défaut.",
+    tags: ["iptables", "deny by default", "ports minimaux", "règles"]
+  },
+  hardening: {
+    title: "OS Hardening",
+    desc: "Durcissement système : SSH par clés uniquement (no password), no root login, sysctl sécurisé, auditd, unattended-upgrades, rkhunter. Ansible idempotent pour reproductibilité totale.",
+    tags: ["SSH keys", "sysctl", "auditd", "rkhunter", "Ansible", "CIS benchmark"]
+  },
+  infra: {
+    title: "Infrastructure — Debian 12 + Docker Compose",
+    desc: "Orchestration via Docker Compose avec health checks. Ansible pour le provisioning idempotent et reproductible. Prometheus + Grafana pour la supervision. Restic pour les sauvegardes vers NAS chiffré.",
+    tags: ["Debian 12", "Docker Compose", "Ansible", "Prometheus", "Grafana", "Restic"]
+  },
+  'server-active': {
+    title: "Hetzner CPX31 — Nœud actif",
+    desc: "Serveur principal hébergeant l'ensemble de la stack Z-CORE. Situé à Falkenstein, Allemagne. 8 Go RAM, 4 vCPU AMD, 160 Go NVMe. Choix Hetzner pour la conformité RGPD européenne.",
+    tags: ["8 Go RAM", "4 vCPU", "160 Go NVMe", "Falkenstein DE", "RGPD"]
+  },
+  'server-standby': {
+    title: "Hetzner CPX21 — Nœud standby",
+    desc: "Nœud de secours pour haute disponibilité. Reçoit les sauvegardes Restic en temps réel. En cas de panne du nœud actif, peut prendre le relais avec Ansible en moins de 15 minutes.",
+    tags: ["4 Go RAM", "3 vCPU", "Nuremberg DE", "HA", "failover 15min"]
+  },
+  anthropic: {
+    title: "api.anthropic.com — Claude API",
+    desc: "Seule dépendance IA externe. Utilisée par le module Z-CORE IA pour l'analyse documentaire et le chat en langage naturel. Les données transmises sont limitées au strict nécessaire. Cloud Act US applicable.",
+    tags: ["Claude API", "HTTPS", "Cloud Act US", "données minimales", "externe"]
+  },
+  azure: {
+    title: "azure.microsoft.com — Azure CLI",
+    desc: "Services cloud Microsoft utilisés optionnellement pour des ressources externes (Azure Blob, DNS zones, etc.). Dépendance non souveraine soumise au Cloud Act américain. Usage limité et documenté.",
+    tags: ["Azure CLI", "Cloud Act US", "optionnel", "Blob", "DNS", "externe"]
+  }
+};
+
+function showInfo(key) {
+  const d = INFO[key];
+  if (!d) return;
+  document.getElementById('info-title').textContent = d.title;
+  document.getElementById('info-desc').textContent = d.desc;
+  const tagsEl = document.getElementById('info-tags');
+  tagsEl.innerHTML = d.tags.map(t => `<span class="tag">${t}</span>`).join('');
+  document.getElementById('info-panel').classList.add('visible');
+}
+
+function closeInfo() {
+  document.getElementById('info-panel').classList.remove('visible');
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeInfo(); });
+</script>
+</body>
+</html>
