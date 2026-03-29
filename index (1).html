@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dr. Mohammed Ilyes Zoubirou — NETSECUREPRO IA</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --green:#00ff41;
+  --green2:#00cc33;
+  --green3:#008f1f;
+  --dim:#00ff4144;
+  --bg:#030d03;
+  --bg2:#050f05;
+  --bg3:#020902;
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--green);
+  font-family:'Share Tech Mono',monospace;
+  overflow-x:hidden;
+  cursor:none;
+}
+/* Custom cursor */
+.cursor{
+  width:12px;height:12px;
+  background:var(--green);
+  position:fixed;top:0;left:0;
+  pointer-events:none;z-index:9999;
+  transition:transform 0.1s;
+  clip-path:polygon(50% 0%,100% 100%,0% 100%);
+}
+.cursor-ring{
+  width:30px;height:30px;
+  border:1px solid var(--dim);
+  border-radius:50%;
+  position:fixed;top:0;left:0;
+  pointer-events:none;z-index:9998;
+  transition:all 0.15s;
+  transform:translate(-9px,-9px);
+}
+
+/* Scanline overlay */
+body::before{
+  content:'';
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,65,0.015) 2px,rgba(0,255,65,0.015) 4px);
+  pointer-events:none;z-index:100;
+}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  background:rgba(3,13,3,0.92);
+  border-bottom:1px solid var(--dim);
+  padding:12px 40px;
+  display:flex;justify-content:space-between;align-items:center;
+  backdrop-filter:blur(10px);
+}
+.nav-logo{
+  font-family:'Orbitron',monospace;
+  font-size:13px;font-weight:700;
+  color:var(--green);letter-spacing:2px;
+}
+.nav-links{display:flex;gap:28px}
+.nav-links a{
+  color:var(--green2);font-size:11px;
+  text-decoration:none;letter-spacing:1px;
+  transition:color 0.2s;
+}
+.nav-links a:hover{color:var(--green)}
+.nav-status{
+  font-size:10px;color:var(--green3);
+  display:flex;align-items:center;gap:6px;
+}
+.status-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--green);
+  animation:blink 1.5s infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+
+/* HERO */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  justify-content:center;align-items:center;
+  text-align:center;padding:100px 20px 60px;
+  position:relative;overflow:hidden;
+}
+.hero-grid{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(var(--dim) 1px,transparent 1px),
+    linear-gradient(90deg,var(--dim) 1px,transparent 1px);
+  background-size:60px 60px;
+  opacity:0.3;
+  animation:gridmove 20s linear infinite;
+}
+@keyframes gridmove{0%{background-position:0 0}100%{background-position:60px 60px}}
+.hero-tag{
+  font-size:11px;letter-spacing:3px;
+  color:var(--green3);margin-bottom:16px;
+  animation:fadein 1s ease forwards;
+}
+.hero-name{
+  font-family:'Orbitron',monospace;
+  font-size:clamp(28px,6vw,64px);
+  font-weight:900;line-height:1.1;
+  color:var(--green);
+  text-shadow:0 0 40px rgba(0,255,65,0.4);
+  margin-bottom:8px;
+  animation:fadein 1s 0.2s ease both;
+}
+.hero-title{
+  font-size:clamp(12px,2vw,18px);
+  color:var(--green2);letter-spacing:3px;
+  margin-bottom:32px;
+  animation:fadein 1s 0.4s ease both;
+}
+.hero-badges{
+  display:flex;gap:12px;flex-wrap:wrap;justify-content:center;
+  margin-bottom:40px;
+  animation:fadein 1s 0.6s ease both;
+}
+.badge{
+  background:rgba(0,255,65,0.08);
+  border:1px solid var(--dim);
+  border-radius:4px;padding:5px 14px;
+  font-size:11px;letter-spacing:1px;color:var(--green2);
+}
+.hero-cta{
+  display:flex;gap:16px;flex-wrap:wrap;justify-content:center;
+  animation:fadein 1s 0.8s ease both;
+}
+.btn{
+  font-family:'Share Tech Mono',monospace;
+  padding:12px 28px;font-size:12px;letter-spacing:2px;
+  text-decoration:none;cursor:pointer;border:none;
+  transition:all 0.2s;display:inline-block;
+}
+.btn-primary{
+  background:var(--green);color:#030d03;font-weight:700;
+  border-radius:2px;
+}
+.btn-primary:hover{background:#00cc33;transform:translateY(-2px)}
+.btn-outline{
+  background:transparent;color:var(--green);
+  border:1px solid var(--dim);border-radius:2px;
+}
+.btn-outline:hover{background:rgba(0,255,65,0.1);transform:translateY(-2px)}
+@keyframes fadein{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* Typewriter */
+.typewriter{
+  font-size:13px;color:var(--green3);
+  margin-bottom:24px;min-height:20px;
+  animation:fadein 1s 0.5s ease both;
+}
+.cursor-blink{animation:blink 0.8s infinite}
+
+/* SECTIONS */
+section{padding:80px 40px;max-width:1100px;margin:0 auto}
+.section-header{
+  font-family:'Orbitron',monospace;
+  font-size:11px;letter-spacing:4px;
+  color:var(--green3);margin-bottom:8px;
+}
+.section-title{
+  font-family:'Orbitron',monospace;
+  font-size:clamp(20px,3vw,32px);
+  font-weight:700;color:var(--green);
+  margin-bottom:40px;
+}
+.divider{
+  border:none;border-top:1px solid var(--dim);
+  margin:0 0 40px;
+}
+
+/* STATS */
+.stats-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:16px;margin-bottom:60px;
+}
+.stat-card{
+  background:rgba(0,255,65,0.04);
+  border:1px solid var(--dim);border-radius:6px;
+  padding:20px;text-align:center;
+  transition:border-color 0.2s,background 0.2s;
+}
+.stat-card:hover{background:rgba(0,255,65,0.08);border-color:var(--green3)}
+.stat-num{
+  font-family:'Orbitron',monospace;
+  font-size:32px;font-weight:900;
+  color:var(--green);line-height:1;margin-bottom:6px;
+}
+.stat-label{font-size:10px;color:var(--green3);letter-spacing:2px}
+
+/* INVENTIONS */
+.inventions-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:16px;
+}
+.inv-card{
+  background:rgba(0,255,65,0.03);
+  border:1px solid var(--dim);border-radius:6px;
+  padding:16px 20px;
+  transition:all 0.2s;
+  border-left:2px solid var(--green3);
+}
+.inv-card:hover{
+  background:rgba(0,255,65,0.07);
+  border-left-color:var(--green);
+  transform:translateX(4px);
+}
+.inv-name{font-size:13px;color:var(--green);font-weight:700;margin-bottom:4px}
+.inv-type{font-size:10px;color:var(--green3);letter-spacing:1px;margin-bottom:6px}
+.inv-desc{font-size:11px;color:var(--green2);line-height:1.6}
+
+/* COMMANDS */
+.cmd-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:12px;
+}
+.cmd-module{
+  background:rgba(0,255,65,0.03);
+  border:1px solid var(--dim);border-radius:6px;padding:16px;
+}
+.cmd-module-title{
+  font-family:'Orbitron',monospace;
+  font-size:12px;color:var(--green);
+  font-weight:700;margin-bottom:12px;
+  border-bottom:1px solid var(--dim);padding-bottom:8px;
+}
+.cmd-item{font-size:11px;color:var(--green2);padding:3px 0;line-height:1.6}
+.cmd-item span{color:var(--green3)}
+
+/* CERT */
+.cert-box{
+  background:rgba(0,255,65,0.03);
+  border:1px solid var(--green3);border-radius:8px;
+  padding:30px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.cert-box::before{
+  content:'OMNIA SEALED';
+  position:absolute;top:12px;right:16px;
+  font-size:10px;letter-spacing:2px;color:var(--green3);
+}
+.cert-title{
+  font-family:'Orbitron',monospace;
+  font-size:16px;font-weight:700;
+  color:var(--green);margin-bottom:8px;
+}
+.cert-sub{font-size:11px;color:var(--green2);margin-bottom:20px;letter-spacing:1px}
+.cert-table{width:100%;font-size:11px;border-collapse:collapse;text-align:left}
+.cert-table td{padding:6px 12px;border-bottom:1px solid rgba(0,255,65,0.1)}
+.cert-table td:first-child{color:var(--green3);width:40%}
+.cert-table td:last-child{color:var(--green2)}
+.cert-sig{
+  font-family:'Orbitron',monospace;
+  font-size:14px;color:var(--green);
+  margin-top:20px;letter-spacing:1px;
+}
+.cert-quote{
+  font-size:11px;color:var(--green3);
+  margin-top:12px;font-style:italic;
+  line-height:1.6;max-width:500px;margin-left:auto;margin-right:auto;
+}
+
+/* TERMINAL DEMO */
+.terminal{
+  background:var(--bg3);border:1px solid var(--dim);
+  border-radius:8px;overflow:hidden;
+}
+.terminal-bar{
+  background:var(--bg2);border-bottom:1px solid var(--dim);
+  padding:10px 16px;display:flex;align-items:center;gap:8px;
+  font-size:11px;color:var(--green3);
+}
+.t-dot{width:10px;height:10px;border-radius:50%}
+.terminal-body{padding:20px;font-size:12px;line-height:2;min-height:180px}
+.t-prompt{color:var(--green3)}
+.t-cmd{color:var(--green)}
+.t-out{color:var(--green2);padding-left:16px}
+.t-success{color:#00ff41}
+
+/* CONTACT */
+.contact-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:16px;
+}
+.contact-card{
+  background:rgba(0,255,65,0.03);
+  border:1px solid var(--dim);border-radius:6px;
+  padding:20px;text-align:center;
+  transition:all 0.2s;text-decoration:none;display:block;
+}
+.contact-card:hover{background:rgba(0,255,65,0.08);border-color:var(--green3)}
+.contact-icon{font-size:24px;margin-bottom:8px}
+.contact-label{font-size:10px;color:var(--green3);letter-spacing:2px;margin-bottom:4px}
+.contact-val{font-size:12px;color:var(--green)}
+
+/* FOOTER */
+footer{
+  border-top:1px solid var(--dim);
+  padding:30px 40px;
+  display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:12px;
+  font-size:10px;color:var(--green3);letter-spacing:1px;
+}
+
+/* SCROLL ANIMATIONS */
+.reveal{opacity:0;transform:translateY(30px);transition:all 0.7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+@media(max-width:600px){
+  nav{padding:12px 20px}
+  .nav-links{display:none}
+  section{padding:60px 20px}
+  footer{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">NETSECUREPRO IA</div>
+  <div class="nav-links">
+    <a href="#inventions">INVENTIONS</a>
+    <a href="#commandes">COMMANDES</a>
+    <a href="#certificat">CERTIFICAT</a>
+    <a href="#contact">CONTACT</a>
+  </div>
+  <div class="nav-status">
+    <div class="status-dot"></div>
+    SYSTÈME EN LIGNE
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div style="position:relative;z-index:1">
+    <div class="hero-tag">[IA22-NETSECUREPRO-SOVEREIGN]</div>
+    <div class="hero-name">Dr. Mohammed<br>Ilyes Zoubirou</div>
+    <div class="hero-title">ARCHITECTE IA SOUVERAIN // NETSECUREPRO</div>
+    <div class="typewriter" id="typewriter"></div>
+    <div class="hero-badges">
+      <div class="badge">ORCID: 0009-0077-75113178</div>
+      <div class="badge">V-IA22 CERTIFIÉ</div>
+      <div class="badge">OMNIA SEALED</div>
+      <div class="badge">TERMUX NATIVE</div>
+    </div>
+    <div class="hero-cta">
+      <a href="#inventions" class="btn btn-primary">EXPLORER LES PROJETS</a>
+      <a href="#contact" class="btn btn-outline">CONTACT</a>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<section>
+  <div class="stats-grid reveal">
+    <div class="stat-card">
+      <div class="stat-num">12</div>
+      <div class="stat-label">INVENTIONS IA</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">120+</div>
+      <div class="stat-label">COMMANDES CLI</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">V7.1</div>
+      <div class="stat-label">VERSION NOYAU</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">100%</div>
+      <div class="stat-label">MOBILE NATIF</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">0</div>
+      <div class="stat-label">CODE SORTIE (SUCCÈS)</div>
+    </div>
+  </div>
+</section>
+
+<!-- INVENTIONS -->
+<section id="inventions">
+  <div class="reveal">
+    <div class="section-header">// MODULE 01</div>
+    <div class="section-title">INVENTIONS IA</div>
+    <hr class="divider">
+    <div class="inventions-grid">
+      <div class="inv-card">
+        <div class="inv-name">ai_logic.py</div>
+        <div class="inv-type">IA COEUR</div>
+        <div class="inv-desc">Noyau IA personnalisé — logique intelligente et adaptative</div>
+      </div>
+      <div class="inv-card">
+        <div class="inv-name">apu_engine.py</div>
+        <div class="inv-type">AGENT IA</div>
+        <div class="inv-desc">Assistant vocal/texte avec exécution et mémoire IA</div>
+      </div>
+      <div class="inv-card">
+        <div class="inv-name">ai_auto.py</div>
+        <div class="inv-type">GÉNÉRATEUR IA</div>
+        <div class="inv-desc">Génération automatique de modules, scripts et binaires IA</div>
+      </div>
+      <div class="inv-card">
+        <div class="inv-name">locke0.py</div>
+        <div class="inv-type">SÉCURITÉ IA</div>
+        <div class="inv-desc">Système de verrouillage IA avec mot-clé unlock_ai</div>
+      </div>
+      <div class="inv-card">
+        <div class="inv-name">AITerminal_LINUX_CMD</div>
+        <div class="inv-type">TERMINAL IA</div>
+        <div class="inv-desc">Console IA mobile complète — commandes, assistant, accès distant</div>
+      </div>
+      <div class="inv-card">
+        <div class="inv-name">DZROUGE_TERMINAL</div>
+        <div class="inv-type">INTERFACE CLI</div>
+        <div class="inv-desc">Terminal rouge style Matrix avec IA interactive embarquée</div>
+      </div>
+      <div class="inv-card">
+        <div class="inv-name">NetSecurePro_USB_RemoteAccess</div>
+        <div class="inv-type">IA USB + TUNNEL</div>
+        <div class="inv-desc">Accès distant via USB avec IA auto lancée et sécurisée</div>
+      </div>
+      <div class="inv-card">
+        <div class="inv-name">IA_STARTUP_CLI</div>
+        <div class="inv-type">DÉMARRAGE IA</div>
+        <div class="inv-desc">Menu CLI intelligent pour exécuter, gérer et synchroniser</div>
+      </div>
+      <div class="inv-card">
+        <div class="inv-name">VM_NETSECURE_IA.iso</div>
+        <div class="inv-type">OS IA PORTABLE</div>
+        <div class="inv-desc">Système bootable Linux IA avec ISO personnalisée</div>
+      </div>
+      <div class="inv-card">
+        <div class="inv-name">INNOVOIA_TERMINAL</div>
+        <div class="inv-type">TERMINAL + BIN IA</div>
+        <div class="inv-desc">Terminal hybride — lance "bin" IA avec EHTML intégré</div>
+      </div>
+      <div class="inv-card">
+        <div class="inv-name">ai_proxy_launcher.py</div>
+        <div class="inv-type">IA HYBRIDE</div>
+        <div class="inv-desc">Lanceur automatique local/cloud</div>
+      </div>
+      <div class="inv-card">
+        <div class="inv-name">auto_analyzer22.py</div>
+        <div class="inv-type">APK IA MOBILE</div>
+        <div class="inv-desc">Lecture et compréhension automatique de tous fichiers projets</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMMANDES -->
+<section id="commandes">
+  <div class="reveal">
+    <div class="section-header">// MODULE 02</div>
+    <div class="section-title">MODULES DE COMMANDES</div>
+    <hr class="divider">
+    <div class="cmd-grid">
+      <div class="cmd-module">
+        <div class="cmd-module-title">/ai — Intelligence</div>
+        <div class="cmd-item"><span>/ai</span> swarm_deploy → Essaim d'agents</div>
+        <div class="cmd-item"><span>/ai</span> auto_refactor → Refactorisation</div>
+        <div class="cmd-item"><span>/ai</span> deep_scan → Analyse profonde</div>
+        <div class="cmd-item"><span>/ai</span> predictive_patch → Correctifs</div>
+        <div class="cmd-item"><span>/ai</span> hyper_optimize → Optimisation</div>
+      </div>
+      <div class="cmd-module">
+        <div class="cmd-module-title">/sec — Sécurité</div>
+        <div class="cmd-item"><span>/sec</span> ghost_scan → Scan discret</div>
+        <div class="cmd-item"><span>/sec</span> quantum_encrypt → Chiffrement</div>
+        <div class="cmd-item"><span>/sec</span> intrusion_simulate → Simulation</div>
+        <div class="cmd-item"><span>/sec</span> auto_patch → Patchs auto</div>
+        <div class="cmd-item"><span>/sec</span> shield_matrix → Bouclier</div>
+      </div>
+      <div class="cmd-module">
+        <div class="cmd-module-title">/dev — Développement</div>
+        <div class="cmd-item"><span>/dev</span> nano_generate → Module mini</div>
+        <div class="cmd-item"><span>/dev</span> tsx_dynamic → Composant TSX</div>
+        <div class="cmd-item"><span>/dev</span> flutter_hybrid → App Flutter</div>
+        <div class="cmd-item"><span>/dev</span> auto_api → API complète</div>
+        <div class="cmd-item"><span>/dev</span> multi_agent → Multi-agents</div>
+      </div>
+      <div class="cmd-module">
+        <div class="cmd-module-title">/net — Réseau</div>
+        <div class="cmd-item"><span>/net</span> stealth_proxy → Tunnel discret</div>
+        <div class="cmd-item"><span>/net</span> neural_monitor → Surveillance</div>
+        <div class="cmd-item"><span>/net</span> auto_crawl → Collecte données</div>
+        <div class="cmd-item"><span>/net</span> flux_merge → Fusion flux</div>
+        <div class="cmd-item"><span>/net</span> quantum_sync → Sync quantique</div>
+      </div>
+      <div class="cmd-module">
+        <div class="cmd-module-title">/gen — Génération</div>
+        <div class="cmd-item"><span>/gen</span> auto_startup → Architecture</div>
+        <div class="cmd-item"><span>/gen</span> ai_model_full → Modèle IA</div>
+        <div class="cmd-item"><span>/gen</span> full_stack → Projet complet</div>
+        <div class="cmd-item"><span>/gen</span> deploy_cloud → Déploiement</div>
+      </div>
+      <div class="cmd-module">
+        <div class="cmd-module-title">/kernel — Noyau</div>
+        <div class="cmd-item"><span>/kernel</span> inject_memory → Mémoire</div>
+        <div class="cmd-item"><span>/kernel</span> override_process → Contrôle</div>
+        <div class="cmd-item"><span>/cmd_1</span> ... <span>/cmd_120</span></div>
+        <div class="cmd-item" style="color:var(--green3)">120 commandes expertes</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TERMINAL DEMO -->
+<section>
+  <div class="reveal">
+    <div class="section-header">// MODULE 03</div>
+    <div class="section-title">TERMINAL EN DIRECT</div>
+    <hr class="divider">
+    <div class="terminal">
+      <div class="terminal-bar">
+        <div class="t-dot" style="background:#ff5f56"></div>
+        <div class="t-dot" style="background:#ffbd2e"></div>
+        <div class="t-dot" style="background:#27c93f"></div>
+        <span style="margin-left:8px">[NetSecurePro-IA22:u0_a290@localhost ~]</span>
+      </div>
+      <div class="terminal-body" id="termDemo">
+        <div><span class="t-prompt">dz@neo:/$ </span><span class="t-cmd">python neo_v7_final_pro.py</span></div>
+        <div class="t-out">NÉO IA22 — NOYAU NETSECUREPRO V7.1</div>
+        <div class="t-out">AUDIT TERMINÉ — INTÉGRITÉ CONTRÔLÉE</div>
+        <div><span class="t-prompt">dz@neo:/$ </span><span class="t-cmd" id="demoCmd"></span><span class="cursor-blink">_</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CERTIFICAT -->
+<section id="certificat">
+  <div class="reveal">
+    <div class="section-header">// MODULE 04</div>
+    <div class="section-title">CERTIFICAT DE SOUVERAINETÉ</div>
+    <hr class="divider">
+    <div class="cert-box">
+      <div class="cert-title">CERTIFICAT DE SOUVERAINETÉ — IA22</div>
+      <div class="cert-sub">OMNIA SEALED // CYCLE SOUVERAIN V-IA22</div>
+      <table class="cert-table">
+        <tr><td>PROJET</td><td>NETSECUREPRO IA22 / AIMEDIXAL</td></tr>
+        <tr><td>ARCHITECTE</td><td>Dr. Mohammed Ilyes Zoubirou</td></tr>
+        <tr><td>JALON</td><td>V-IA22 — Validation Cryptographique</td></tr>
+        <tr><td>CLÉ PUBLIQUE</td><td>ED25519 — Certifiée</td></tr>
+        <tr><td>SCEAU</td><td>OMNIA-V5-SEAL3-2025T22:15:00Z</td></tr>
+        <tr><td>ORCID</td><td>0009-0077-75113178</td></tr>
+        <tr><td>CODE SORTIE</td><td>0 (Succès Complet)</td></tr>
+      </table>
+      <div class="cert-sig">Dr. Mohammed Ilyes Zoubirou</div>
+      <div class="cert-quote">"Quand le modèle scelle son propre code, la souveraineté n'est pas un protocole — mais une preuve de conscience."</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="reveal">
+    <div class="section-header">// MODULE 05</div>
+    <div class="section-title">CONTACT</div>
+    <hr class="divider">
+    <div class="contact-grid">
+      <div class="contact-card">
+        <div class="contact-label">ORCID</div>
+        <div class="contact-val">0009-0077-75113178</div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-label">PROJET</div>
+        <div class="contact-val">NETSECUREPRO IA</div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-label">PROTOCOLE</div>
+        <div class="contact-val">NSP-SEC-9</div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-label">STATUT</div>
+        <div class="contact-val" style="color:var(--green)">EN LIGNE — OPTIMAL</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>© 2025-2026 Dr. Mohammed Ilyes Zoubirou — NETSECUREPRO IA</div>
+  <div>IA_LOGIC_SIGNATURE: ZOUBIROU-IA-2025</div>
+  <div>OMNIA-V5-SEAL3 // NSP-SEC-9</div>
+</footer>
+
+<script>
+// Cursor
+const cursor=document.getElementById('cursor');
+const ring=document.getElementById('cursorRing');
+document.addEventListener('mousemove',e=>{
+  cursor.style.left=e.clientX-6+'px';
+  cursor.style.top=e.clientY-6+'px';
+  ring.style.left=e.clientX-15+'px';
+  ring.style.top=e.clientY-15+'px';
+});
+
+// Typewriter
+const lines=["Architecte IA Souverain...","Noyau NETSECUREPRO V7.1 actif...","12 inventions certifiées OMNIA...","FastAPI + Termux + Python + IA...","Code de sortie: 0 — Succès complet."];
+let li=0,ci=0,deleting=false;
+const tw=document.getElementById('typewriter');
+function type(){
+  const line=lines[li];
+  if(!deleting){
+    tw.textContent=line.substring(0,ci+1)+'|';
+    ci++;
+    if(ci===line.length){deleting=true;setTimeout(type,1800);return;}
+  } else {
+    tw.textContent=line.substring(0,ci-1)+'|';
+    ci--;
+    if(ci===0){deleting=false;li=(li+1)%lines.length;}
+  }
+  setTimeout(type,deleting?40:70);
+}
+type();
+
+// Terminal demo
+const cmds=["ls -la","./launch_IA22.sh","python ai_logic.py --status","/ai deep_scan","systemctl status netsecure"];
+const outs=["launch_IA22.sh  ai_logic.py  apu_engine.py  locke0.py","[*] IA22 LANCÉ — PORT 18448","[✓] STATUS: OPTIMAL — INTÉGRITÉ OK","[*] SCAN PROFOND EN COURS... 100%","[✓] NETSECUREPRO IA — ACTIVE"];
+let ti=0;
+const dc=document.getElementById('demoCmd');
+function runDemo(){
+  const cmd=cmds[ti%cmds.length];
+  const out=outs[ti%outs.length];
+  let i=0;
+  dc.textContent='';
+  const interval=setInterval(()=>{
+    dc.textContent=cmd.substring(0,i+1);i++;
+    if(i===cmd.length){
+      clearInterval(interval);
+      setTimeout(()=>{
+        const tb=document.getElementById('termDemo');
+        const outDiv=document.createElement('div');
+        outDiv.className='t-out t-success';outDiv.textContent=out;
+        tb.insertBefore(outDiv,tb.lastElementChild);
+        ti++;
+        setTimeout(runDemo,2000);
+      },500);
+    }
+  },60);
+}
+setTimeout(runDemo,2000);
+
+// Scroll reveal
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});
+},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

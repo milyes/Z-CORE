@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediDream — Tableau de Bord</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sky:#EEF5FF;--sky2:#E2EFFE;--white:#FFFFFF;
+  --blue:#2B6CB0;--blue2:#4A90D9;--blue3:#7BB8F0;--blue-pale:#B8D6F5;
+  --ink:#1A2535;--mid:#4A6080;--mist:#8AAAC8;
+  --border:#D8E8F7;--dream1:#C9E0FA;--dream2:#E8D5F5;
+  --green:#2A8060;--amber:#C07020;--rose:#C04060;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--sky);font-family:'DM Sans',sans-serif;color:var(--ink);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse 800px 600px at 10% 20%,rgba(180,215,255,0.35) 0%,transparent 70%),radial-gradient(ellipse 600px 500px at 90% 80%,rgba(200,180,240,0.2) 0%,transparent 70%),radial-gradient(ellipse 500px 400px at 60% 10%,rgba(180,240,220,0.15) 0%,transparent 70%);pointer-events:none;z-index:0;animation:dreamshift 18s ease-in-out infinite alternate;}
+@keyframes dreamshift{0%{opacity:1;transform:scale(1)}100%{opacity:0.7;transform:scale(1.05)}}
+.orb{position:fixed;border-radius:50%;filter:blur(60px);pointer-events:none;z-index:0;animation:float linear infinite;}
+.orb1{width:320px;height:320px;background:rgba(120,180,255,0.12);top:-80px;left:-80px;animation-duration:25s;}
+.orb2{width:240px;height:240px;background:rgba(180,140,240,0.1);bottom:10%;right:-60px;animation-duration:20s;animation-delay:-8s;}
+.orb3{width:180px;height:180px;background:rgba(140,220,180,0.1);top:40%;left:30%;animation-duration:30s;animation-delay:-14s;}
+@keyframes float{0%,100%{transform:translateY(0) translateX(0)}33%{transform:translateY(-30px) translateX(15px)}66%{transform:translateY(20px) translateX(-10px)}}
+header{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:rgba(255,255,255,0.75);backdrop-filter:blur(20px);border-bottom:1px solid rgba(180,210,250,0.4);}
+.h-brand{display:flex;align-items:center;gap:10px;}
+.h-logo-icon{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--blue2),var(--blue3));display:flex;align-items:center;justify-content:center;font-size:14px;color:white;box-shadow:0 2px 12px rgba(74,144,217,0.3);}
+.h-logo-text{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--ink);}
+.h-logo-text span{color:var(--blue2);font-style:italic;}
+.h-nav{display:flex;gap:28px;}
+.h-nav a{font-size:13px;font-weight:400;color:var(--mid);text-decoration:none;transition:color 0.2s;}
+.h-nav a:hover,.h-nav a.active{color:var(--blue);}
+.h-nav a.active{font-weight:500;}
+.h-right{display:flex;align-items:center;gap:12px;}
+.h-pulse{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--green);font-weight:500;}
+.h-pulse::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.8)}}
+.h-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--dream1),var(--blue-pale));border:2px solid rgba(74,144,217,0.3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--blue);cursor:pointer;}
+main{padding-top:56px;display:grid;grid-template-columns:200px 1fr;min-height:100vh;position:relative;z-index:1;}
+.sidebar{background:rgba(255,255,255,0.6);backdrop-filter:blur(16px);border-right:1px solid rgba(180,210,250,0.4);padding:24px 0;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;}
+.sb-section{margin-bottom:28px;}
+.sb-label{font-size:9px;font-weight:500;letter-spacing:0.28em;color:var(--mist);padding:0 20px 10px;text-transform:uppercase;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 20px;font-size:13px;color:var(--mid);cursor:pointer;border-left:2px solid transparent;transition:all 0.2s;border-radius:0 8px 8px 0;margin-right:8px;}
+.sb-item:hover{color:var(--blue);background:rgba(74,144,217,0.06);}
+.sb-item.active{color:var(--blue);font-weight:500;border-left-color:var(--blue2);background:rgba(74,144,217,0.08);}
+.sb-icon{font-size:15px;}
+.sb-badge{margin-left:auto;font-size:10px;font-weight:600;background:rgba(74,144,217,0.12);color:var(--blue2);padding:1px 7px;border-radius:20px;}
+.sb-badge.alert{background:rgba(192,64,96,0.1);color:var(--rose);}
+.dream-state{margin:8px 14px;background:linear-gradient(135deg,rgba(200,225,255,0.5),rgba(220,200,250,0.3));border:1px solid rgba(180,210,250,0.5);border-radius:12px;padding:14px;}
+.ds-label{font-size:9px;letter-spacing:0.2em;color:var(--mist);margin-bottom:8px;text-transform:uppercase;}
+.ds-waves{display:flex;align-items:flex-end;gap:3px;height:28px;margin-bottom:8px;}
+.ds-wave{flex:1;border-radius:2px;background:linear-gradient(180deg,var(--blue3),var(--blue-pale));animation:wave 1.5s ease-in-out infinite;}
+.ds-wave:nth-child(1){height:40%;animation-delay:0s}.ds-wave:nth-child(2){height:70%;animation-delay:0.15s}.ds-wave:nth-child(3){height:55%;animation-delay:0.3s}.ds-wave:nth-child(4){height:90%;animation-delay:0.45s}.ds-wave:nth-child(5){height:65%;animation-delay:0.6s}.ds-wave:nth-child(6){height:80%;animation-delay:0.75s}.ds-wave:nth-child(7){height:45%;animation-delay:0.9s}.ds-wave:nth-child(8){height:60%;animation-delay:1.05s}
+@keyframes wave{0%,100%{opacity:0.5;transform:scaleY(1)}50%{opacity:1;transform:scaleY(1.2)}}
+.ds-val{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--blue);}
+.ds-sub{font-size:10px;color:var(--mist);}
+.content{padding:28px 32px;}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;opacity:0;animation:riseIn 0.6s 0.05s forwards;}
+@keyframes riseIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.ph-greeting{font-size:12px;color:var(--mist);letter-spacing:0.06em;margin-bottom:4px;}
+.ph-title{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:600;color:var(--ink);line-height:1.1;}
+.ph-title em{font-style:italic;color:var(--blue2);}
+.ph-sub{font-size:13px;color:var(--mid);margin-top:4px;font-weight:300;}
+.ph-right{display:flex;gap:10px;align-items:center;}
+.ph-btn{padding:9px 18px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;border:none;letter-spacing:0.03em;font-family:'DM Sans',sans-serif;}
+.ph-btn.primary{background:var(--blue2);color:white;box-shadow:0 4px 14px rgba(74,144,217,0.3);}
+.ph-btn.primary:hover{background:var(--blue);}
+.ph-btn.ghost{background:rgba(255,255,255,0.7);color:var(--mid);border:1px solid var(--border);}
+.ph-btn.ghost:hover{color:var(--blue);border-color:var(--blue-pale);}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;opacity:0;animation:riseIn 0.6s 0.12s forwards;}
+.kpi-card{background:rgba(255,255,255,0.75);backdrop-filter:blur(16px);border:1px solid rgba(180,210,250,0.4);border-radius:14px;padding:20px 18px;transition:transform 0.2s,box-shadow 0.2s;position:relative;overflow:hidden;}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(74,144,217,0.12);}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0;}
+.kc-blue::before{background:linear-gradient(90deg,var(--blue2),var(--blue3));}
+.kc-green::before{background:linear-gradient(90deg,var(--green),#50C0A0);}
+.kc-rose::before{background:linear-gradient(90deg,var(--rose),#E07090);}
+.kc-dream::before{background:linear-gradient(90deg,#9B70D0,#C090E8);}
+.kpi-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:14px;}
+.kc-blue .kpi-icon{background:rgba(74,144,217,0.1);}
+.kc-green .kpi-icon{background:rgba(42,128,96,0.1);}
+.kc-rose .kpi-icon{background:rgba(192,64,96,0.1);}
+.kc-dream .kpi-icon{background:rgba(155,112,208,0.1);}
+.kpi-label{font-size:11px;color:var(--mist);letter-spacing:0.06em;margin-bottom:6px;}
+.kpi-val{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:600;line-height:1;}
+.kc-blue .kpi-val{color:var(--blue);}
+.kc-green .kpi-val{color:var(--green);}
+.kc-rose .kpi-val{color:var(--rose);}
+.kc-dream .kpi-val{color:#7B50B8;}
+.kpi-unit{font-size:11px;color:var(--mist);margin-top:3px;}
+.kpi-trend{font-size:11px;margin-top:12px;font-weight:500;}
+.trend-up{color:var(--green);}.trend-down{color:var(--rose);}.trend-flat{color:var(--mist);}
+.grid2{display:grid;grid-template-columns:1fr 320px;gap:14px;margin-bottom:24px;opacity:0;animation:riseIn 0.6s 0.2s forwards;}
+.vitals-card,.dream-panel{background:rgba(255,255,255,0.75);backdrop-filter:blur(16px);border:1px solid rgba(180,210,250,0.4);border-radius:14px;padding:22px;}
+.dream-panel{background:linear-gradient(160deg,rgba(220,235,255,0.7),rgba(235,220,255,0.5));border-color:rgba(180,190,255,0.35);display:flex;flex-direction:column;gap:16px;}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--ink);}
+.card-tag{font-size:10px;font-weight:500;padding:3px 10px;border-radius:20px;background:rgba(74,144,217,0.1);color:var(--blue2);letter-spacing:0.06em;}
+.chart-area{height:130px;position:relative;margin-bottom:16px;}
+.chart-svg{width:100%;height:100%;overflow:visible;}
+.patient-list{display:flex;flex-direction:column;gap:8px;}
+.patient-row{display:grid;grid-template-columns:36px 1fr 72px 60px 72px;align-items:center;gap:10px;padding:10px 12px;background:rgba(238,245,255,0.5);border-radius:10px;border:1px solid rgba(180,210,250,0.3);transition:background 0.15s;cursor:pointer;}
+.patient-row:hover{background:rgba(74,144,217,0.06);}
+.patient-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;}
+.av1{background:linear-gradient(135deg,#B8D6F5,#D5EAFF);color:var(--blue);}
+.av2{background:linear-gradient(135deg,#C9F0E0,#D5F5EC);color:var(--green);}
+.av3{background:linear-gradient(135deg,#F5D5E5,#FFE0EC);color:var(--rose);}
+.av4{background:linear-gradient(135deg,#E0D0F5,#EDE0FF);color:#7B50B8;}
+.patient-name{font-size:13px;font-weight:500;color:var(--ink);}
+.patient-sub{font-size:11px;color:var(--mist);}
+.patient-stat{font-size:12px;color:var(--mid);text-align:center;}
+.patient-stat span{display:block;font-size:10px;color:var(--mist);}
+.patient-status{font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;text-align:center;}
+.st-stable{background:rgba(42,128,96,0.1);color:var(--green);}
+.st-watch{background:rgba(192,112,32,0.1);color:var(--amber);}
+.st-dream{background:rgba(155,112,208,0.1);color:#7B50B8;}
+.dream-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:400;color:var(--ink);font-style:italic;}
+.dream-subtitle{font-size:10px;color:var(--mist);letter-spacing:0.06em;margin-top:-10px;}
+.sleep-phases{display:flex;flex-direction:column;gap:8px;}
+.phase-row{display:flex;align-items:center;gap:10px;}
+.phase-label{font-size:11px;color:var(--mist);width:48px;flex-shrink:0;}
+.phase-track{flex:1;height:8px;background:rgba(180,210,250,0.2);border-radius:4px;overflow:hidden;}
+.phase-fill{height:100%;border-radius:4px;}
+.pf-deep{background:linear-gradient(90deg,#4A70D0,#7090E8);}
+.pf-rem{background:linear-gradient(90deg,#9B70D0,#C090E8);}
+.pf-light{background:linear-gradient(90deg,#70B0D0,#90C8E8);}
+.pf-wake{background:linear-gradient(90deg,#D0A870,#E8C490);}
+.phase-pct{font-size:11px;color:var(--mid);font-weight:500;width:28px;text-align:right;}
+.dream-insight{background:rgba(255,255,255,0.5);border-radius:10px;padding:12px 14px;border:1px solid rgba(180,190,255,0.3);}
+.di-label{font-size:9px;letter-spacing:0.18em;color:var(--mist);text-transform:uppercase;margin-bottom:5px;}
+.di-text{font-family:'Cormorant Garamond',serif;font-size:14px;color:var(--ink);font-style:italic;line-height:1.5;}
+.dream-metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.dm-cell{background:rgba(255,255,255,0.45);border-radius:10px;padding:10px;border:1px solid rgba(180,210,250,0.25);text-align:center;}
+.dm-val{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--blue);}
+.dm-unit{font-size:10px;color:var(--mist);}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;opacity:0;animation:riseIn 0.6s 0.3s forwards;}
+.meds-card,.alerts-card,.schedule-card{background:rgba(255,255,255,0.75);backdrop-filter:blur(16px);border:1px solid rgba(180,210,250,0.4);border-radius:14px;padding:20px;}
+.med-item{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid rgba(180,210,250,0.2);}
+.med-item:last-child{border-bottom:none;}
+.med-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.med-info{flex:1;}
+.med-name{font-size:13px;font-weight:500;color:var(--ink);}
+.med-dose{font-size:11px;color:var(--mist);}
+.med-time{font-family:'DM Mono',monospace;font-size:11px;color:var(--mid);}
+.alert-item{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid rgba(180,210,250,0.2);}
+.alert-item:last-child{border-bottom:none;}
+.alert-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
+.alert-text{font-size:12px;color:var(--mid);line-height:1.5;flex:1;}
+.alert-text strong{color:var(--ink);font-weight:500;display:block;}
+.alert-time{font-size:10px;color:var(--mist);font-family:'DM Mono',monospace;flex-shrink:0;}
+.sched-item{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid rgba(180,210,250,0.2);}
+.sched-item:last-child{border-bottom:none;}
+.sched-time{font-family:'DM Mono',monospace;font-size:11px;color:var(--blue2);width:38px;flex-shrink:0;}
+.sched-bar{width:3px;height:34px;border-radius:2px;flex-shrink:0;}
+.sched-info{flex:1;}
+.sched-name{font-size:13px;font-weight:500;color:var(--ink);}
+.sched-sub{font-size:11px;color:var(--mist);}
+footer{border-top:1px solid rgba(180,210,250,0.4);padding:16px 32px;display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.5);backdrop-filter:blur(12px);font-size:11px;color:var(--mist);letter-spacing:0.04em;position:relative;z-index:1;}
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<header>
+  <div class="h-brand">
+    <div class="h-logo-icon">✦</div>
+    <div class="h-logo-text">Medi<span>Dream</span></div>
+  </div>
+  <nav class="h-nav">
+    <a href="#" class="active">Dashboard</a>
+    <a href="#">Patients</a>
+    <a href="#">Sommeil</a>
+    <a href="#">Analyses</a>
+    <a href="#">Agenda</a>
+  </nav>
+  <div class="h-right">
+    <div class="h-pulse">Systèmes actifs</div>
+    <div class="h-avatar">Dr</div>
+  </div>
+</header>
+
+<main>
+  <aside class="sidebar">
+    <div class="sb-section">
+      <div class="sb-label">Clinique</div>
+      <div class="sb-item active"><span class="sb-icon">⬡</span> Vue générale</div>
+      <div class="sb-item"><span class="sb-icon">◎</span> Patients <span class="sb-badge">24</span></div>
+      <div class="sb-item"><span class="sb-icon">♡</span> Soins actifs <span class="sb-badge alert">3</span></div>
+      <div class="sb-item"><span class="sb-icon">⊕</span> Médicaments</div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-label">Sommeil & Rêves</div>
+      <div class="sb-item"><span class="sb-icon">◐</span> Cycles de nuit</div>
+      <div class="sb-item"><span class="sb-icon">✦</span> Phases de rêve</div>
+      <div class="sb-item"><span class="sb-icon">∿</span> Ondes cérébrales</div>
+    </div>
+    <div class="sb-section">
+      <div class="dream-state">
+        <div class="ds-label">Activité onirique</div>
+        <div class="ds-waves">
+          <div class="ds-wave"></div><div class="ds-wave"></div><div class="ds-wave"></div>
+          <div class="ds-wave"></div><div class="ds-wave"></div><div class="ds-wave"></div>
+          <div class="ds-wave"></div><div class="ds-wave"></div>
+        </div>
+        <div class="ds-val" id="remVal">REM 32%</div>
+        <div class="ds-sub">Phase active · 02h14</div>
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-label">Système</div>
+      <div class="sb-item"><span class="sb-icon">◷</span> Rapports</div>
+      <div class="sb-item"><span class="sb-icon">⚙</span> Paramètres</div>
+    </div>
+  </aside>
+
+  <div class="content">
+    <div class="page-header">
+      <div>
+        <div class="ph-greeting">Mercredi, 19 mars 2026 · 02:14</div>
+        <h1 class="ph-title">Tableau de bord <em>médical</em></h1>
+        <p class="ph-sub">24 patients suivis · 3 alertes actives · Nuit calme</p>
+      </div>
+      <div class="ph-right">
+        <button class="ph-btn ghost">↓ Exporter</button>
+        <button class="ph-btn primary">+ Nouveau patient</button>
+      </div>
+    </div>
+
+    <div class="kpi-row">
+      <div class="kpi-card kc-blue">
+        <div class="kpi-icon">🫀</div>
+        <div class="kpi-label">PATIENTS ACTIFS</div>
+        <div class="kpi-val">24</div>
+        <div class="kpi-unit">en suivi ce soir</div>
+        <div class="kpi-trend trend-up">↑ +2 admissions</div>
+      </div>
+      <div class="kpi-card kc-green">
+        <div class="kpi-icon">🩺</div>
+        <div class="kpi-label">SIGNES VITAUX OK</div>
+        <div class="kpi-val">21</div>
+        <div class="kpi-unit">patients stables</div>
+        <div class="kpi-trend trend-flat">→ Stable cette nuit</div>
+      </div>
+      <div class="kpi-card kc-rose">
+        <div class="kpi-icon">⚠</div>
+        <div class="kpi-label">ALERTES ACTIVES</div>
+        <div class="kpi-val">3</div>
+        <div class="kpi-unit">à surveiller</div>
+        <div class="kpi-trend trend-down">↓ −1 depuis 23h</div>
+      </div>
+      <div class="kpi-card kc-dream">
+        <div class="kpi-icon">◐</div>
+        <div class="kpi-label">PHASE SOMMEIL</div>
+        <div class="kpi-val">REM</div>
+        <div class="kpi-unit">18 patients en cycle</div>
+        <div class="kpi-trend" style="color:#7B50B8">✦ Activité onirique</div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="vitals-card">
+        <div class="card-header">
+          <div class="card-title">Patients — Suivi nocturne</div>
+          <div class="card-tag">TEMPS RÉEL</div>
+        </div>
+        <div class="chart-area">
+          <svg class="chart-svg" viewBox="0 0 600 130" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="fg" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="rgba(74,144,217,0.18)"/>
+                <stop offset="100%" stop-color="rgba(74,144,217,0)"/>
+              </linearGradient>
+            </defs>
+            <line x1="0" y1="25"  x2="600" y2="25"  stroke="rgba(180,210,250,0.3)" stroke-width="1" stroke-dasharray="4,4"/>
+            <line x1="0" y1="65"  x2="600" y2="65"  stroke="rgba(180,210,250,0.3)" stroke-width="1" stroke-dasharray="4,4"/>
+            <line x1="0" y1="100" x2="600" y2="100" stroke="rgba(180,210,250,0.3)" stroke-width="1" stroke-dasharray="4,4"/>
+            <path d="M0,85 C40,85 50,25 70,25 C90,25 100,85 130,85 C160,85 170,45 190,45 C210,45 220,85 250,85 C280,85 290,15 310,15 C330,15 340,85 370,85 C400,85 410,50 430,50 C450,50 460,85 490,85 C520,85 530,35 550,35 C570,35 580,85 600,85 L600,130 L0,130 Z" fill="url(#fg)"/>
+            <path d="M0,85 C40,85 50,25 70,25 C90,25 100,85 130,85 C160,85 170,45 190,45 C210,45 220,85 250,85 C280,85 290,15 310,15 C330,15 340,85 370,85 C400,85 410,50 430,50 C450,50 460,85 490,85 C520,85 530,35 550,35 C570,35 580,85 600,85" fill="none" stroke="var(--blue2)" stroke-width="2"/>
+            <path d="M0,95 C50,95 60,68 100,68 C140,68 150,105 200,105 C250,105 260,72 300,72 C340,72 350,100 400,100 C450,100 460,70 500,70 C540,70 550,95 600,95" fill="none" stroke="rgba(155,112,208,0.45)" stroke-width="1.5" stroke-dasharray="5,3"/>
+            <text x="0"   y="122" fill="rgba(138,170,200,0.7)" font-size="9" font-family="DM Mono">20h</text>
+            <text x="120" y="122" fill="rgba(138,170,200,0.7)" font-size="9" font-family="DM Mono">21h</text>
+            <text x="240" y="122" fill="rgba(138,170,200,0.7)" font-size="9" font-family="DM Mono">22h</text>
+            <text x="360" y="122" fill="rgba(138,170,200,0.7)" font-size="9" font-family="DM Mono">23h</text>
+            <text x="480" y="122" fill="rgba(138,170,200,0.7)" font-size="9" font-family="DM Mono">02h</text>
+          </svg>
+        </div>
+        <div class="patient-list">
+          <div class="patient-row">
+            <div class="patient-avatar av1">AM</div>
+            <div><div class="patient-name">Amira Messaoud</div><div class="patient-sub">Chambre 12 · Cardio</div></div>
+            <div class="patient-stat">72 bpm<span>Pouls</span></div>
+            <div class="patient-stat">98%<span>SpO₂</span></div>
+            <div class="patient-status st-stable">Stable</div>
+          </div>
+          <div class="patient-row">
+            <div class="patient-avatar av2">LB</div>
+            <div><div class="patient-name">Luca Bernardi</div><div class="patient-sub">Chambre 7 · Neurologie</div></div>
+            <div class="patient-stat">68 bpm<span>Pouls</span></div>
+            <div class="patient-stat">97%<span>SpO₂</span></div>
+            <div class="patient-status st-dream">REM actif</div>
+          </div>
+          <div class="patient-row">
+            <div class="patient-avatar av3">SK</div>
+            <div><div class="patient-name">Sofia Karim</div><div class="patient-sub">Chambre 3 · Urgences</div></div>
+            <div class="patient-stat">91 bpm<span>Pouls</span></div>
+            <div class="patient-stat">95%<span>SpO₂</span></div>
+            <div class="patient-status st-watch">Surveiller</div>
+          </div>
+          <div class="patient-row">
+            <div class="patient-avatar av4">NM</div>
+            <div><div class="patient-name">Noah Martin</div><div class="patient-sub">Chambre 15 · Pédiatrie</div></div>
+            <div class="patient-stat">78 bpm<span>Pouls</span></div>
+            <div class="patient-stat">99%<span>SpO₂</span></div>
+            <div class="patient-status st-stable">Stable</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dream-panel">
+        <div>
+          <div class="dream-title">Analyse du sommeil</div>
+          <div class="dream-subtitle">CYCLES ONIRIQUES · NUIT DU 19 MARS</div>
+        </div>
+        <div class="sleep-phases">
+          <div class="phase-row"><div class="phase-label">Profond</div><div class="phase-track"><div class="phase-fill pf-deep" style="width:28%"></div></div><div class="phase-pct">28%</div></div>
+          <div class="phase-row"><div class="phase-label">REM</div><div class="phase-track"><div class="phase-fill pf-rem" style="width:32%"></div></div><div class="phase-pct">32%</div></div>
+          <div class="phase-row"><div class="phase-label">Léger</div><div class="phase-track"><div class="phase-fill pf-light" style="width:34%"></div></div><div class="phase-pct">34%</div></div>
+          <div class="phase-row"><div class="phase-label">Éveil</div><div class="phase-track"><div class="phase-fill pf-wake" style="width:6%"></div></div><div class="phase-pct">6%</div></div>
+        </div>
+        <div class="dream-insight">
+          <div class="di-label">Insight onirique</div>
+          <div class="di-text">"Activité cérébrale intense en phase REM — schémas de consolidation mémorielle observés chez 6 patients neurologiques."</div>
+        </div>
+        <div class="dream-metrics">
+          <div class="dm-cell"><div class="dm-val">7h 12</div><div class="dm-unit">durée moy. sommeil</div></div>
+          <div class="dm-cell"><div class="dm-val">4.3</div><div class="dm-unit">cycles complétés</div></div>
+          <div class="dm-cell"><div class="dm-val">18</div><div class="dm-unit">patients en REM</div></div>
+          <div class="dm-cell"><div class="dm-val">92%</div><div class="dm-unit">qualité sommeil</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid3">
+      <div class="meds-card">
+        <div class="card-header"><div class="card-title">Médicaments</div><div class="card-tag">CE SOIR</div></div>
+        <div class="med-item"><div class="med-dot" style="background:var(--blue2)"></div><div class="med-info"><div class="med-name">Mélatonine 5mg</div><div class="med-dose">Induction sommeil · 8 patients</div></div><div class="med-time">22:00</div></div>
+        <div class="med-item"><div class="med-dot" style="background:var(--green)"></div><div class="med-info"><div class="med-name">Lorazépam 1mg</div><div class="med-dose">Anxiété nocturne · 3 patients</div></div><div class="med-time">22:30</div></div>
+        <div class="med-item"><div class="med-dot" style="background:#9B70D0"></div><div class="med-info"><div class="med-name">Clonazépam 0.5mg</div><div class="med-dose">Troubles REM · 2 patients</div></div><div class="med-time">23:00</div></div>
+        <div class="med-item"><div class="med-dot" style="background:var(--amber)"></div><div class="med-info"><div class="med-name">Morphine 10mg</div><div class="med-dose">Douleur post-op · 1 patient</div></div><div class="med-time">02:00</div></div>
+        <div class="med-item"><div class="med-dot" style="background:var(--blue3)"></div><div class="med-info"><div class="med-name">Propofol 200mg</div><div class="med-dose">Sédation · salle A</div></div><div class="med-time">03:00</div></div>
+      </div>
+      <div class="alerts-card">
+        <div class="card-header"><div class="card-title">Alertes</div><div class="card-tag" style="background:rgba(192,64,96,0.1);color:var(--rose)">3 ACTIVES</div></div>
+        <div class="alert-item"><div class="alert-icon">⚠️</div><div class="alert-text"><strong>Sofia Karim — SpO₂ 95%</strong>Saturation légèrement basse. Surveillance renforcée.</div><div class="alert-time">02:08</div></div>
+        <div class="alert-item"><div class="alert-icon">💊</div><div class="alert-text"><strong>Luca Bernardi — REM prolongé</strong>Phase de rêve >90 min. Évaluation au réveil.</div><div class="alert-time">01:44</div></div>
+        <div class="alert-item"><div class="alert-icon">🌡️</div><div class="alert-text"><strong>Chambre 8 — Température</strong>37.9°C enregistré. Médecin notifié.</div><div class="alert-time">01:22</div></div>
+        <div class="alert-item" style="opacity:0.45"><div class="alert-icon">✓</div><div class="alert-text"><strong>Amira Messaoud — Résolue</strong>Rythme cardiaque normalisé.</div><div class="alert-time">23:55</div></div>
+      </div>
+      <div class="schedule-card">
+        <div class="card-header"><div class="card-title">Agenda</div><div class="card-tag">CETTE NUIT</div></div>
+        <div class="sched-item"><div class="sched-time">02:30</div><div class="sched-bar" style="background:var(--blue2)"></div><div class="sched-info"><div class="sched-name">Ronde nocturne</div><div class="sched-sub">Dr. Farah · Aile B</div></div></div>
+        <div class="sched-item"><div class="sched-time">03:00</div><div class="sched-bar" style="background:var(--rose)"></div><div class="sched-info"><div class="sched-name">Bloc opératoire</div><div class="sched-sub">Dr. Selin · Urgence</div></div></div>
+        <div class="sched-item"><div class="sched-time">04:00</div><div class="sched-bar" style="background:#9B70D0"></div><div class="sched-info"><div class="sched-name">Analyse EEG sommeil</div><div class="sched-sub">Neurologie · Luca B.</div></div></div>
+        <div class="sched-item"><div class="sched-time">05:30</div><div class="sched-bar" style="background:var(--green)"></div><div class="sched-info"><div class="sched-name">Réveil progressif</div><div class="sched-sub">Protocole post-sédation</div></div></div>
+        <div class="sched-item"><div class="sched-time">06:00</div><div class="sched-bar" style="background:var(--amber)"></div><div class="sched-info"><div class="sched-name">Rapport de nuit</div><div class="sched-sub">Transmission équipe matin</div></div></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <span>MediDream © 2026 — Surveillance médicale & onirique</span>
+  <span>Dernière sync : 02:14:32 · Tous systèmes opérationnels</span>
+</footer>
+
+<script>
+document.querySelectorAll('.sb-item').forEach(function(item){
+  item.addEventListener('click',function(){
+    document.querySelectorAll('.sb-item').forEach(function(i){i.classList.remove('active');});
+    item.classList.add('active');
+  });
+});
+document.querySelectorAll('.h-nav a').forEach(function(a){
+  a.addEventListener('click',function(e){
+    e.preventDefault();
+    document.querySelectorAll('.h-nav a').forEach(function(x){x.classList.remove('active');});
+    a.classList.add('active');
+  });
+});
+var base=32;
+setInterval(function(){
+  base+=(Math.random()-0.5)*2;
+  base=Math.max(28,Math.min(38,base));
+  document.getElementById('remVal').textContent='REM '+base.toFixed(0)+'%';
+},3000);
+// Live clock
+function updateClock(){
+  var now=new Date();
+  var h=String(now.getHours()).padStart(2,'0');
+  var m=String(now.getMinutes()).padStart(2,'0');
+  var s=String(now.getSeconds()).padStart(2,'0');
+  var el=document.querySelector('.ph-greeting');
+  if(el) el.textContent='Mercredi, 19 mars 2026 · '+h+'h'+m;
+}
+setInterval(updateClock,1000);
+</script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI_ENGINE_IA22</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#000;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px}
+.term{background:#030d03;border-radius:12px;overflow:hidden;font-family:monospace;color:#00ff41;width:100%;max-width:600px;border:1px solid #00ff4133}
+.header{background:#050f05;border-bottom:1px solid #00ff4133;padding:12px 16px}
+.hrow{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.icon{background:#00ff4122;border:1px solid #00ff4144;border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#00ff41}
+.htitle{font-size:14px;font-weight:700;color:#00ff41;letter-spacing:1px}
+.hsub{font-size:10px;color:#00ff4188;letter-spacing:2px}
+.badges{display:flex;gap:8px;flex-wrap:wrap}
+.badge{background:#00ff4111;border:1px solid #00ff4133;border-radius:4px;padding:3px 10px;font-size:11px;color:#00ff41;letter-spacing:1px;display:flex;align-items:center;gap:5px}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:#00ff41;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.body{padding:16px;min-height:280px;max-height:380px;overflow-y:auto}
+.ts{color:#00ff4166;font-size:11px;margin-bottom:6px}
+.msg{border-left:2px solid #00ff4144;padding:10px 14px;margin-bottom:12px;font-size:13px;line-height:1.7;color:#00cc33}
+.output{font-size:12px;line-height:1.8}
+.inputrow{border-top:1px solid #00ff4133;padding:10px 14px;display:flex;align-items:center;gap:8px;background:#020902}
+.prompt{color:#00ff41;font-size:13px;font-weight:700}
+.inp{background:transparent;border:none;outline:none;color:#00ff41;font-family:monospace;font-size:13px;flex:1;caret-color:#00ff41}
+.inp::placeholder{color:#00ff4144}
+.send{background:#00ff4122;border:1px solid #00ff4155;border-radius:6px;padding:5px 12px;color:#00ff41;font-family:monospace;font-size:12px;cursor:pointer}
+.send:hover{background:#00ff4133}
+.footer{background:#020902;border-top:1px solid #00ff4122;padding:6px 16px;display:flex;justify-content:space-between}
+.ftext{font-size:10px;color:#00ff4155;letter-spacing:1px}
+.user-line{color:#00ff4188;font-size:12px;margin-bottom:4px}
+.ai-line{color:#00ff41;font-size:12px;margin-bottom:10px;border-left:2px solid #00ff4144;padding-left:10px}
+</style>
+</head>
+<body>
+<div class="term">
+  <div class="header">
+    <div class="hrow">
+      <div class="icon">&gt;_</div>
+      <div>
+        <div class="htitle">AI_ENGINE_IA22_ASSISTERMINAL</div>
+        <div class="hsub">SOUVERAINETÉ NUMÉRIQUE // NETSECUREPRO</div>
+      </div>
+    </div>
+    <div class="badges">
+      <div class="badge"><div class="badge-dot"></div>CPU: 2.6%</div>
+      <div class="badge"><div class="badge-dot"></div>UPTIME: 842:15:51</div>
+      <div class="badge"><div class="badge-dot"></div>SEC: MAX</div>
+      <div class="badge"><div class="badge-dot"></div>SHIELD: ACTIVE</div>
+    </div>
+  </div>
+  <div class="body" id="body">
+    <div class="ts">[18:00:56] &gt; SYSTEM</div>
+    <div class="msg">MILYES_IA v9 est à votre entière disposition, Maître. Vos directives sont les seules commandes prioritaires.</div>
+    <div id="out"></div>
+  </div>
+  <div class="inputrow">
+    <span class="prompt">&gt; _</span>
+    <input class="inp" id="inp" placeholder="Entrez une directive prioritaire" autocomplete="off"/>
+    <button class="send" onclick="send()">ENVOYER</button>
+  </div>
+  <div class="footer">
+    <span class="ftext">ENCODAGE: UTF-8 // PROTOCOLE: NSP-SEC-9</span>
+    <span class="ftext">© 2026 NETSECUREPRO SOVEREIGN AI</span>
+  </div>
+</div>
+<script>
+const replies=[
+  "Directive reçue. Traitement en cours...",
+  "Commande prioritaire enregistrée. Exécution immédiate.",
+  "Protocole activé. Toutes les ressources sont mobilisées.",
+  "Analyse complète. Résultat transmis au nœud central.",
+  "Accès autorisé. Niveau de sécurité: MAXIMAL.",
+  "Synchronisation avec le serveur souverain... OK.",
+  "Mémoire quantique mise à jour. Statut: OPÉRATIONNEL.",
+  "Directive exécutée. Système en attente de nouvelles instructions.",
+];
+let idx=0;
+function now(){
+  const d=new Date();
+  return '['+d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0')+':'+d.getSeconds().toString().padStart(2,'0')+']';
+}
+function send(){
+  const inp=document.getElementById('inp');
+  const out=document.getElementById('out');
+  const body=document.getElementById('body');
+  const val=inp.value.trim();
+  if(!val)return;
+  const u=document.createElement('div');
+  u.className='user-line';
+  u.textContent=now()+' > MAÎTRE: '+val;
+  out.appendChild(u);
+  inp.value='';
+  setTimeout(()=>{
+    const a=document.createElement('div');
+    a.className='ai-line';
+    a.textContent=now()+' > IA22: '+replies[idx%replies.length];
+    idx++;
+    out.appendChild(a);
+    body.scrollTop=body.scrollHeight;
+  },600);
+}
+document.getElementById('inp').addEventListener('keydown',e=>{if(e.key==='Enter')send()});
+</script>
+</body>
+</html>
