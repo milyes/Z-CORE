@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Surveillance Qualité RAG — Guide Complet 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --bg2: #111419;
+    --bg3: #181c24;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --text: #e8eaf0;
+    --muted: #7a8096;
+    --accent: #5b8fff;
+    --accent2: #3dffc0;
+    --accent3: #ff6b6b;
+    --amber: #ffb347;
+    --purple: #a78bfa;
+    --teal: #2dd4bf;
+    --coral: #fb7185;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(10,12,16,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; gap: 0; height: 52px;
+  }
+  .nav-brand {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px; color: var(--accent2); letter-spacing: 0.1em;
+    margin-right: auto; white-space: nowrap;
+  }
+  nav a {
+    color: var(--muted); text-decoration: none; font-size: 12px;
+    padding: 0 1rem; height: 52px; display: flex; align-items: center;
+    transition: color 0.2s; letter-spacing: 0.04em; white-space: nowrap;
+  }
+  nav a:hover { color: var(--text); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 6rem 3rem 4rem;
+    position: relative; overflow: hidden;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 100%);
+  }
+  .hero-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: 0.15em; color: var(--accent2);
+    margin-bottom: 1.5rem; text-transform: uppercase;
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    line-height: 1.1; font-weight: 400;
+    max-width: 800px; margin-bottom: 1.5rem;
+  }
+  .hero h1 em { color: var(--accent); font-style: italic; }
+  .hero-sub {
+    font-size: 1.05rem; color: var(--muted); max-width: 560px;
+    margin-bottom: 3rem; font-weight: 300;
+  }
+  .hero-pills { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .pill {
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    padding: 0.3rem 0.8rem; border-radius: 20px;
+    border: 1px solid var(--border2); color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+  .pill.active { border-color: var(--accent); color: var(--accent); }
+
+  /* SECTIONS */
+  section { padding: 5rem 3rem; border-bottom: 1px solid var(--border); }
+  .section-label {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 0.2em; color: var(--accent2); text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.8rem, 3vw, 2.8rem); font-weight: 400;
+    margin-bottom: 1rem; line-height: 1.2;
+  }
+  .section-intro { color: var(--muted); max-width: 680px; margin-bottom: 3rem; font-size: 15px; }
+
+  /* PIPELINE */
+  .pipeline {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 0;
+    margin-bottom: 3rem;
+  }
+  .pipe-step {
+    background: var(--bg2); border: 1px solid var(--border2);
+    border-radius: 10px; padding: 1rem 1.25rem;
+    min-width: 120px; text-align: center;
+    transition: border-color 0.2s, transform 0.2s;
+    cursor: default;
+  }
+  .pipe-step:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .pipe-step .step-label {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    color: var(--muted); letter-spacing: 0.1em; margin-bottom: 0.3rem;
+  }
+  .pipe-step .step-name { font-size: 13px; font-weight: 500; color: var(--text); }
+  .pipe-arrow { color: var(--border2); font-size: 18px; padding: 0 0.3rem; }
+  .pipe-step.highlight { border-color: var(--accent); }
+  .pipe-step.highlight .step-name { color: var(--accent); }
+
+  /* CARDS GRID */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; }
+  .card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 1.75rem;
+    transition: border-color 0.25s, transform 0.25s;
+    position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: var(--card-accent, var(--accent));
+    opacity: 0; transition: opacity 0.25s;
+  }
+  .card:hover { border-color: var(--border2); transform: translateY(-3px); }
+  .card:hover::before { opacity: 1; }
+  .card-icon {
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    color: var(--card-accent, var(--accent)); letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+  }
+  .card h3 { font-size: 15px; font-weight: 500; margin-bottom: 0.6rem; }
+  .card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .card ul { list-style: none; margin-top: 0.75rem; }
+  .card ul li {
+    font-size: 13px; color: var(--muted); padding: 0.25rem 0;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: baseline; gap: 0.5rem;
+  }
+  .card ul li::before { content: '→'; color: var(--card-accent, var(--accent)); font-size: 11px; flex-shrink: 0; }
+
+  /* METRICS TABLE */
+  .metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; margin-bottom: 2.5rem; }
+  .metric-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 1.75rem;
+    position: relative; overflow: hidden;
+    transition: border-color 0.25s;
+  }
+  .metric-card:hover { border-color: var(--border2); }
+  .metric-score {
+    font-family: 'DM Serif Display', serif;
+    font-size: 3rem; line-height: 1;
+    color: var(--metric-color, var(--accent));
+    margin-bottom: 0.5rem;
+  }
+  .metric-name { font-size: 14px; font-weight: 500; margin-bottom: 0.4rem; }
+  .metric-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .metric-formula {
+    margin-top: 1rem; padding: 0.5rem 0.75rem;
+    background: var(--bg3); border-radius: 6px;
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* DIAGNOSTIC TABLE */
+  .diag-table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+  .diag-table th {
+    text-align: left; font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.12em; color: var(--muted);
+    padding: 0.6rem 1rem; border-bottom: 1px solid var(--border2);
+  }
+  .diag-table td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .diag-table tr:last-child td { border-bottom: none; }
+  .diag-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .badge {
+    display: inline-block; padding: 0.15rem 0.55rem; border-radius: 4px;
+    font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500;
+    letter-spacing: 0.06em;
+  }
+  .badge.high { background: rgba(61,255,192,0.12); color: var(--accent2); }
+  .badge.low { background: rgba(255,107,107,0.12); color: var(--coral); }
+  .badge.warn { background: rgba(255,179,71,0.12); color: var(--amber); }
+
+  /* HYBRID RETRIEVAL */
+  .hybrid-split {
+    display: grid; grid-template-columns: 1fr auto 1fr; gap: 0;
+    align-items: start; margin-bottom: 2.5rem;
+  }
+  .hybrid-col { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 1.75rem; }
+  .hybrid-vs {
+    display: flex; align-items: center; justify-content: center;
+    width: 60px; font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem; color: var(--muted); padding-top: 1.5rem;
+  }
+  .hybrid-col h3 { font-size: 14px; font-weight: 500; margin-bottom: 0.5rem; }
+  .hybrid-col .type { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; margin-bottom: 1rem; }
+  .hybrid-merge {
+    background: var(--bg2); border: 1px solid var(--accent);
+    border-radius: 14px; padding: 1.75rem; text-align: center;
+    margin-top: 1.5rem;
+  }
+  .hybrid-merge h3 { font-size: 15px; font-weight: 500; color: var(--accent); margin-bottom: 0.5rem; }
+  .rrf-formula {
+    font-family: 'DM Mono', monospace; font-size: 12px;
+    color: var(--accent2); background: var(--bg3);
+    padding: 0.6rem 1rem; border-radius: 6px; display: inline-block;
+    margin: 0.75rem 0;
+  }
+
+  /* OBSERVABILITY */
+  .obs-layers { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2.5rem; }
+  .obs-layer {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.25rem 1.75rem;
+    display: grid; grid-template-columns: 140px 1fr auto;
+    align-items: center; gap: 1.5rem;
+    transition: border-color 0.2s;
+  }
+  .obs-layer:hover { border-color: var(--border2); }
+  .obs-layer-name { font-size: 13px; font-weight: 500; }
+  .obs-layer-desc { font-size: 13px; color: var(--muted); }
+  .obs-layer-tag {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    padding: 0.25rem 0.6rem; border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  /* GOVERNANCE */
+  .gov-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+  .gov-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 1.75rem;
+    transition: border-color 0.25s, transform 0.25s;
+  }
+  .gov-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+  .gov-number {
+    font-family: 'DM Serif Display', serif; font-size: 3rem;
+    color: var(--border2); line-height: 1; margin-bottom: 0.75rem;
+  }
+  .gov-card h3 { font-size: 15px; font-weight: 500; margin-bottom: 0.5rem; }
+  .gov-card p { font-size: 13px; color: var(--muted); }
+
+  /* TOOLS */
+  .tools-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+  .tool-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.25rem 1.5rem;
+    transition: border-color 0.2s;
+  }
+  .tool-card:hover { border-color: var(--border2); }
+  .tool-name { font-size: 14px; font-weight: 500; margin-bottom: 0.25rem; }
+  .tool-role { font-size: 12px; color: var(--muted); }
+  .tool-tag {
+    display: inline-block; margin-top: 0.6rem;
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    padding: 0.15rem 0.5rem; border-radius: 4px;
+    background: rgba(91,143,255,0.1); color: var(--accent);
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 2.5rem 3rem; text-align: center;
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    color: var(--muted); letter-spacing: 0.08em;
+  }
+
+  @media (max-width: 768px) {
+    nav a { display: none; }
+    .hero { padding: 5rem 1.5rem 3rem; }
+    section { padding: 3rem 1.5rem; }
+    .hybrid-split { grid-template-columns: 1fr; }
+    .hybrid-vs { display: none; }
+    .metrics-grid, .gov-grid { grid-template-columns: 1fr; }
+    .obs-layer { grid-template-columns: 1fr; gap: 0.5rem; }
+    .pipeline { gap: 0.5rem; }
+    .pipe-arrow { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">RAG · QUALITY · 2026</span>
+  <a href="#pipeline">Pipeline</a>
+  <a href="#retrieval">Retrieval hybride</a>
+  <a href="#ragas">RAGAS</a>
+  <a href="#observabilite">Observabilité</a>
+  <a href="#gouvernance">Gouvernance</a>
+  <a href="#outils">Outils</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div style="position:relative">
+    <p class="hero-tag">Guide technique · RAG Systems · 2026</p>
+    <h1>Surveillance qualité<br>des systèmes <em>RAG</em></h1>
+    <p class="hero-sub">Pipeline complet — du chunking à la gouvernance — pour déployer et maintenir un RAG fiable en production.</p>
+    <div class="hero-pills">
+      <span class="pill active">Retrieval Hybride</span>
+      <span class="pill active">RAGAS Metrics</span>
+      <span class="pill active">Observabilité</span>
+      <span class="pill active">Gouvernance</span>
+      <span class="pill">EU AI Act</span>
+      <span class="pill">LangSmith</span>
+      <span class="pill">Arize Phoenix</span>
+    </div>
+  </div>
+</div>
+
+<!-- PIPELINE -->
+<section id="pipeline">
+  <p class="section-label">01 — Vue d'ensemble</p>
+  <h2>Le pipeline RAG</h2>
+  <p class="section-intro">Un système RAG se divise en deux phases : l'indexation (construction de la base de connaissance) et la requête (récupération + génération en temps réel).</p>
+
+  <p style="font-size:12px;color:var(--muted);margin-bottom:0.6rem;font-family:'DM Mono',monospace;letter-spacing:0.08em">PHASE 1 — INDEXATION</p>
+  <div class="pipeline" style="margin-bottom:2rem">
+    <div class="pipe-step">
+      <div class="step-label">SOURCE</div>
+      <div class="step-name">Documents</div>
+    </div>
+    <span class="pipe-arrow">→</span>
+    <div class="pipe-step highlight">
+      <div class="step-label">DÉCOUPAGE</div>
+      <div class="step-name">Chunking</div>
+    </div>
+    <span class="pipe-arrow">→</span>
+    <div class="pipe-step highlight">
+      <div class="step-label">VECTORISATION</div>
+      <div class="step-name">Embedding</div>
+    </div>
+    <span class="pipe-arrow">→</span>
+    <div class="pipe-step">
+      <div class="step-label">STOCKAGE</div>
+      <div class="step-name">Vector DB</div>
+    </div>
+  </div>
+
+  <p style="font-size:12px;color:var(--muted);margin-bottom:0.6rem;font-family:'DM Mono',monospace;letter-spacing:0.08em">PHASE 2 — REQUÊTE</p>
+  <div class="pipeline">
+    <div class="pipe-step">
+      <div class="step-label">INPUT</div>
+      <div class="step-name">Question</div>
+    </div>
+    <span class="pipe-arrow">→</span>
+    <div class="pipe-step highlight">
+      <div class="step-label">RECHERCHE</div>
+      <div class="step-name">Retrieval</div>
+    </div>
+    <span class="pipe-arrow">→</span>
+    <div class="pipe-step highlight">
+      <div class="step-label">FILTRAGE</div>
+      <div class="step-name">Reranking</div>
+    </div>
+    <span class="pipe-arrow">→</span>
+    <div class="pipe-step">
+      <div class="step-label">GÉNÉRATION</div>
+      <div class="step-name">LLM</div>
+    </div>
+    <span class="pipe-arrow">→</span>
+    <div class="pipe-step">
+      <div class="step-label">OUTPUT</div>
+      <div class="step-name">Réponse</div>
+    </div>
+  </div>
+
+  <div style="margin-top:2.5rem" class="cards">
+    <div class="card" style="--card-accent: var(--amber)">
+      <div class="card-icon">CHUNKING</div>
+      <h3>Règles de découpage</h3>
+      <ul>
+        <li>200–500 tokens par chunk</li>
+        <li>Overlap de 10–20%</li>
+        <li>Respecter les frontières sémantiques</li>
+        <li>Conserver les métadonnées (date, source)</li>
+      </ul>
+    </div>
+    <div class="card" style="--card-accent: var(--accent)">
+      <div class="card-icon">EMBEDDING</div>
+      <h3>Choix du modèle</h3>
+      <ul>
+        <li>text-embedding-3-large (OpenAI)</li>
+        <li>BGE-M3 (multilingue, open-source)</li>
+        <li>Cohere Embed v3 (enterprise)</li>
+        <li>Cohérence modèle indexation / requête</li>
+      </ul>
+    </div>
+    <div class="card" style="--card-accent: var(--teal)">
+      <div class="card-icon">VECTOR DB</div>
+      <h3>Bases vectorielles</h3>
+      <ul>
+        <li>Pinecone — cloud managé</li>
+        <li>Weaviate — hybride intégré</li>
+        <li>Chroma — local / dev</li>
+        <li>pgvector — PostgreSQL natif</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- RETRIEVAL HYBRIDE -->
+<section id="retrieval">
+  <p class="section-label">02 — Retrieval</p>
+  <h2>Retrieval hybride</h2>
+  <p class="section-intro">Combiner la recherche sémantique et la recherche par mots-clés donne +15 à +30% de précision sur les datasets d'entreprise réels par rapport au vectoriel seul.</p>
+
+  <div class="hybrid-split">
+    <div class="hybrid-col">
+      <div class="type" style="color:var(--accent)">VECTORIEL</div>
+      <h3>Similarité sémantique</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:1rem">Comprend le sens, les synonymes, le contexte implicite.</p>
+      <ul style="list-style:none">
+        <li style="font-size:12px;color:var(--accent2);padding:0.3rem 0;border-top:1px solid var(--border)">✓ Requêtes en langage naturel</li>
+        <li style="font-size:12px;color:var(--accent2);padding:0.3rem 0;border-top:1px solid var(--border)">✓ Multilingue</li>
+        <li style="font-size:12px;color:var(--accent2);padding:0.3rem 0;border-top:1px solid var(--border)">✓ Synonymes, paraphrases</li>
+        <li style="font-size:12px;color:var(--coral);padding:0.3rem 0;border-top:1px solid var(--border)">✗ Codes exacts, IDs, acronymes</li>
+      </ul>
+    </div>
+    <div class="hybrid-vs">vs</div>
+    <div class="hybrid-col">
+      <div class="type" style="color:var(--teal)">KEYWORD (BM25)</div>
+      <h3>Correspondance exacte</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:1rem">Parfait sur les termes précis, codes, noms propres.</p>
+      <ul style="list-style:none">
+        <li style="font-size:12px;color:var(--accent2);padding:0.3rem 0;border-top:1px solid var(--border)">✓ Codes, références, IDs</li>
+        <li style="font-size:12px;color:var(--accent2);padding:0.3rem 0;border-top:1px solid var(--border)">✓ Rapide, explicable</li>
+        <li style="font-size:12px;color:var(--accent2);padding:0.3rem 0;border-top:1px solid var(--border)">✓ Noms propres, sigles</li>
+        <li style="font-size:12px;color:var(--coral);padding:0.3rem 0;border-top:1px solid var(--border)">✗ Sens, contexte, paraphrases</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="hybrid-merge">
+    <h3>Reciprocal Rank Fusion (RRF)</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:0.5rem">Fusionne les deux listes de résultats en un seul score consolidé</p>
+    <div class="rrf-formula">score = 1/(k + rang_vectoriel) + 1/(k + rang_keyword) &nbsp;— k = 60</div>
+    <p style="font-size:12px;color:var(--muted)">Puis un <strong style="color:var(--text);font-weight:500">cross-encoder reranker</strong> reclasse les top-20 résultats fusionnés (~50–150ms de latence additionnelle)</p>
+  </div>
+</section>
+
+<!-- RAGAS -->
+<section id="ragas">
+  <p class="section-label">03 — Métriques</p>
+  <h2>Framework RAGAS</h2>
+  <p class="section-intro">RAGAS évalue automatiquement ton pipeline RAG à partir de 3 inputs : la question, le contexte récupéré, et la réponse générée.</p>
+
+  <div class="metrics-grid">
+    <div class="metric-card" style="--metric-color: var(--coral)">
+      <div class="metric-score">F</div>
+      <div class="metric-name">Faithfulness — Fidélité</div>
+      <div class="metric-desc">Chaque affirmation de la réponse est-elle traçable dans le contexte récupéré ? Un score bas signale que le LLM hallucine.</div>
+      <div class="metric-formula">Seuil critique : &gt; 0.70</div>
+    </div>
+    <div class="metric-card" style="--metric-color: var(--accent)">
+      <div class="metric-score">AR</div>
+      <div class="metric-name">Answer Relevancy — Pertinence réponse</div>
+      <div class="metric-desc">La réponse répond-elle bien à la question posée ? Une réponse peut être fidèle mais hors-sujet.</div>
+      <div class="metric-formula">Seuil critique : &gt; 0.65</div>
+    </div>
+    <div class="metric-card" style="--metric-color: var(--teal)">
+      <div class="metric-score">CP</div>
+      <div class="metric-name">Context Precision — Précision contexte</div>
+      <div class="metric-desc">Les chunks récupérés sont-ils tous utiles ? Un score bas indique trop de bruit dans le retrieval.</div>
+      <div class="metric-formula">Seuil critique : &gt; 0.60</div>
+    </div>
+    <div class="metric-card" style="--metric-color: var(--purple)">
+      <div class="metric-score">CR</div>
+      <div class="metric-name">Context Recall — Rappel contexte</div>
+      <div class="metric-desc">Toutes les informations nécessaires ont-elles été récupérées ? Un score bas = sources manquantes dans l'index.</div>
+      <div class="metric-formula">Seuil critique : &gt; 0.65</div>
+    </div>
+  </div>
+
+  <h3 style="font-size:15px;font-weight:500;margin-bottom:1rem">Table de diagnostic</h3>
+  <table class="diag-table">
+    <thead>
+      <tr>
+        <th>Faithfulness</th>
+        <th>Context Precision</th>
+        <th>Context Recall</th>
+        <th>Diagnostic</th>
+        <th>Action recommandée</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="badge low">Bas</span></td>
+        <td><span class="badge high">Élevée</span></td>
+        <td><span class="badge high">Élevée</span></td>
+        <td>LLM hallucine malgré de bons chunks</td>
+        <td>Revoir le prompt système, contraindre la génération</td>
+      </tr>
+      <tr>
+        <td><span class="badge high">Élevée</span></td>
+        <td><span class="badge low">Bas</span></td>
+        <td><span class="badge warn">Moyen</span></td>
+        <td>Retrieval ramène trop de bruit</td>
+        <td>Améliorer chunking, ajouter reranker</td>
+      </tr>
+      <tr>
+        <td><span class="badge high">Élevée</span></td>
+        <td><span class="badge warn">Moyen</span></td>
+        <td><span class="badge low">Bas</span></td>
+        <td>Sources manquantes dans l'index</td>
+        <td>Étendre la base documentaire, re-indexer</td>
+      </tr>
+      <tr>
+        <td><span class="badge low">Bas</span></td>
+        <td><span class="badge low">Bas</span></td>
+        <td><span class="badge low">Bas</span></td>
+        <td>Problème à tous les niveaux</td>
+        <td>Audit complet du pipeline</td>
+      </tr>
+      <tr>
+        <td><span class="badge high">Élevée</span></td>
+        <td><span class="badge high">Élevée</span></td>
+        <td><span class="badge high">Élevée</span></td>
+        <td>Pipeline sain</td>
+        <td>Surveiller la dérive dans le temps</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- OBSERVABILITÉ -->
+<section id="observabilite">
+  <p class="section-label">04 — Monitoring</p>
+  <h2>Observabilité en production</h2>
+  <p class="section-intro">L'observabilité répond à la question "que se passe-t-il ?" — mesurer, tracer, alerter sur 3 couches distinctes.</p>
+
+  <div class="obs-layers">
+    <div class="obs-layer">
+      <div class="obs-layer-name">Modèle & performance</div>
+      <div class="obs-layer-desc">Latence p50/p99, tokens/seconde, taux d'erreur, coût par requête</div>
+      <span class="obs-layer-tag" style="background:rgba(91,143,255,0.1);color:var(--accent)">TEMPS RÉEL</span>
+    </div>
+    <div class="obs-layer">
+      <div class="obs-layer-name">Qualité des outputs</div>
+      <div class="obs-layer-desc">Score RAGAS, détection d'hallucinations, dérive sémantique, feedback utilisateur</div>
+      <span class="obs-layer-tag" style="background:rgba(255,107,107,0.1);color:var(--coral)">CRITIQUE</span>
+    </div>
+    <div class="obs-layer">
+      <div class="obs-layer-name">Données & contexte</div>
+      <div class="obs-layer-desc">Fraîcheur des documents, data drift, couverture de l'index, distribution des requêtes</div>
+      <span class="obs-layer-tag" style="background:rgba(45,212,191,0.1);color:var(--teal)">BATCH</span>
+    </div>
+    <div class="obs-layer" style="border-color:var(--accent)">
+      <div class="obs-layer-name" style="color:var(--accent)">Boucle de correction</div>
+      <div class="obs-layer-desc">Alertes → Re-chunking → Ré-embedding → Revalidation automatique</div>
+      <span class="obs-layer-tag" style="background:rgba(91,143,255,0.15);color:var(--accent)">AUTOMATISÉ</span>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card" style="--card-accent: var(--amber)">
+      <div class="card-icon">FRAÎCHEUR</div>
+      <h3>Gestion du TTL</h3>
+      <p>Chaque document indexé porte une date de création et une durée de vie (TTL). Un job batch vérifie quotidiennement les documents expirés et déclenche leur ré-indexation.</p>
+    </div>
+    <div class="card" style="--card-accent: var(--coral)">
+      <div class="card-icon">DATA DRIFT</div>
+      <h3>Détection de dérive</h3>
+      <p>Surveiller la distribution des embeddings dans le temps. Une dérive statistique (KL divergence &gt; seuil) signale que les données d'usage s'éloignent de l'index.</p>
+    </div>
+    <div class="card" style="--card-accent: var(--accent2)">
+      <div class="card-icon">ALERTE</div>
+      <h3>Seuils d'alerte</h3>
+      <ul>
+        <li>Faithfulness &lt; 0.70 → alerte critique</li>
+        <li>Latence p99 &gt; 3s → alerte perf</li>
+        <li>Score similarité moyen &lt; 0.55 → audit retrieval</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- GOUVERNANCE -->
+<section id="gouvernance">
+  <p class="section-label">05 — Gouvernance</p>
+  <h2>Gouvernance & conformité</h2>
+  <p class="section-intro">La gouvernance répond à "qui décide, qui est responsable, et selon quelles règles ?" — 4 piliers essentiels pour un système IA responsable.</p>
+
+  <div class="gov-grid">
+    <div class="gov-card">
+      <div class="gov-number">01</div>
+      <h3>Contrôle des accès</h3>
+      <p style="font-size:13px;color:var(--muted)">Qui peut interroger le système, avec quels droits, sur quelles bases documentaires. RBAC, audit des requêtes, isolation des données sensibles.</p>
+    </div>
+    <div class="gov-card">
+      <div class="gov-number">02</div>
+      <h3>Traçabilité & audit</h3>
+      <p style="font-size:13px;color:var(--muted)">Log immuable de chaque décision : quelle question, quels chunks récupérés, quelle réponse produite. Nécessaire pour l'EU AI Act.</p>
+    </div>
+    <div class="gov-card">
+      <div class="gov-number">03</div>
+      <h3>Éthique & biais</h3>
+      <p style="font-size:13px;color:var(--muted)">Détection automatique de biais dans les réponses, évaluation de l'équité sur différentes populations d'utilisateurs, red-teaming régulier.</p>
+    </div>
+    <div class="gov-card">
+      <div class="gov-number">04</div>
+      <h3>Conformité réglementaire</h3>
+      <p style="font-size:13px;color:var(--muted)">RGPD (données personnelles), EU AI Act (classification du risque, supervision humaine obligatoire pour les systèmes à haut risque), normes sectorielles.</p>
+    </div>
+  </div>
+
+  <div style="margin-top:1.5rem;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.75rem">
+    <p style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.12em;color:var(--amber);margin-bottom:0.75rem">AVERTISSEMENT 2025</p>
+    <p style="font-size:13px;color:var(--muted);line-height:1.7">Une étude 2025 a montré que des systèmes RAG peuvent citer des sources exactes sans halluciner, mais rester <strong style="color:var(--text);font-weight:500">pragmatiquement trompeurs</strong> — décontextualisant des faits, omettant des sources critiques. Pour les domaines critiques (médical, légal, finance), les métriques automatiques ne suffisent pas. Une supervision humaine reste nécessaire.</p>
+  </div>
+</section>
+
+<!-- OUTILS -->
+<section id="outils">
+  <p class="section-label">06 — Écosystème</p>
+  <h2>Outils de référence 2026</h2>
+  <p class="section-intro">5 plateformes couvrent l'essentiel des besoins d'évaluation et d'observabilité pour un pipeline RAG en production.</p>
+
+  <div class="tools-list">
+    <div class="tool-card">
+      <div class="tool-name">Maxim AI</div>
+      <div class="tool-role">Plateforme full-stack d'évaluation RAG</div>
+      <span class="tool-tag">FULL-STACK</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">LangSmith</div>
+      <div class="tool-role">Observabilité native LangChain, traces détaillées</div>
+      <span class="tool-tag">OBSERVABILITÉ</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">Arize Phoenix</div>
+      <div class="tool-role">Open-source, monitoring embeddings et dérives</div>
+      <span class="tool-tag" style="background:rgba(61,255,192,0.1);color:var(--accent2)">OPEN-SOURCE</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">RAGAS</div>
+      <div class="tool-role">Framework de métriques sans ground truth</div>
+      <span class="tool-tag" style="background:rgba(61,255,192,0.1);color:var(--accent2)">OPEN-SOURCE</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">DeepEval</div>
+      <div class="tool-role">Tests style pytest pour pipelines LLM</div>
+      <span class="tool-tag">CI/CD</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">Weights & Biases</div>
+      <div class="tool-role">Expérimentations, suivi des métriques dans le temps</div>
+      <span class="tool-tag">EXPÉRIENCES</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Surveillance qualité RAG · Guide technique 2026 · Généré avec Claude (Anthropic)
+</footer>
+
+</body>
+</html>
