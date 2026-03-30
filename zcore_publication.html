@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Z-CORE OS IA — Mohammed Ilyes Zoubirou</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #030810;
+    --bg2: #060f1e;
+    --accent: #00c8ff;
+    --accent2: #00ff9d;
+    --warn: #ff6b35;
+    --text: #e8f4f8;
+    --muted: #4a7a8a;
+    --border: rgba(0,200,255,0.12);
+    --card: rgba(6,20,40,0.85);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,200,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,200,255,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(3,8,16,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-brand {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 24px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--accent); }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    z-index: 1;
+    padding: 80px 24px 60px;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,200,255,0.06);
+    border: 1px solid rgba(0,200,255,0.2);
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    padding: 5px 14px;
+    border-radius: 2px;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+  }
+
+  .hero-badge::before {
+    content: '●';
+    color: var(--accent2);
+    animation: blink 2s infinite;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.0;
+    margin-bottom: 12px;
+  }
+
+  .hero h1 span { color: var(--accent); }
+
+  .hero-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .hero-desc {
+    font-size: 16px;
+    color: #8ab8c8;
+    line-height: 1.7;
+    max-width: 600px;
+    margin: 0 auto 36px;
+  }
+
+  .hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 40px;
+  }
+
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    padding: 4px 12px;
+    border-radius: 2px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .tag-blue { background: rgba(0,200,255,0.08); border: 1px solid rgba(0,200,255,0.2); color: var(--accent); }
+  .tag-green { background: rgba(0,255,157,0.06); border: 1px solid rgba(0,255,157,0.18); color: var(--accent2); }
+  .tag-warn { background: rgba(255,107,53,0.07); border: 1px solid rgba(255,107,53,0.2); color: var(--warn); }
+
+  .hero-contact {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,255,157,0.06);
+    border: 1px solid rgba(0,255,157,0.2);
+    color: var(--accent2);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    padding: 8px 18px;
+    border-radius: 2px;
+    text-decoration: none;
+  }
+
+  /* SECTIONS */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .section {
+    padding: 60px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+
+  .section-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    min-width: 40px;
+  }
+
+  .section-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* SVG CONTAINERS */
+  .svg-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 32px 24px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .svg-card-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .svg-card-title::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent2);
+    border-radius: 50%;
+  }
+
+  .svg-wrapper {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .svg-wrapper svg {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+  }
+
+  /* For light-bg SVGs */
+  .svg-light-bg {
+    background: #fff;
+    border-radius: 6px;
+    padding: 16px;
+  }
+
+  /* STATS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 20px 16px;
+    border-radius: 4px;
+    text-align: center;
+  }
+
+  .stat-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* FOOTER */
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 32px 24px;
+    text-align: center;
+  }
+
+  .footer-brand {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+  }
+
+  .footer-brand span { color: var(--accent); }
+
+  .footer-seal {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: rgba(0,200,255,0.3);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+
+  @media (max-width: 600px) {
+    .nav-links { display: none; }
+    .hero { padding: 48px 16px 40px; }
+    .svg-card { padding: 20px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Z-CORE OS IA</div>
+  <ul class="nav-links">
+    <li><a href="#stack">Stack</a></li>
+    <li><a href="#intelligence">Intelligence</a></li>
+    <li><a href="#souverainete">Souveraineté</a></li>
+    <li><a href="#concepts">Concepts</a></li>
+  </ul>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">NetSecurePro IA · Montréal · 2026</div>
+  <h1>Z-CORE<br><span>OS IA</span></h1>
+  <div class="hero-sub">Mohammed Ilyes Zoubirou · Fondateur · Développeur IA</div>
+  <p class="hero-desc">
+    Infrastructure souveraine auto-hébergée avec couche d'intelligence artificielle intégrée. Zero Trust, données 100% locales, conformité médicale PHIPA/PIPEDA.
+  </p>
+  <div class="hero-tags">
+    <span class="tag tag-blue">Kanidm SSO</span>
+    <span class="tag tag-blue">Caddy 2</span>
+    <span class="tag tag-blue">Matrix E2EE</span>
+    <span class="tag tag-blue">Nextcloud</span>
+    <span class="tag tag-blue">Vaultwarden</span>
+    <span class="tag tag-green">Z-CORE IA</span>
+    <span class="tag tag-green">Z-Claude.code</span>
+    <span class="tag tag-green">AIMEDIXAL</span>
+    <span class="tag tag-warn">Zero Trust</span>
+    <span class="tag tag-warn">PHIPA · PIPEDA</span>
+  </div>
+  <a class="hero-contact" href="mailto:milyes@netsecurepro.ca">✉ milyes@netsecurepro.ca</a>
+</div>
+
+<div class="container">
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-val">98</div>
+      <div class="stat-label">Score employabilité</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">3</div>
+      <div class="stat-label">Modes IA actifs</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">2</div>
+      <div class="stat-label">Nœuds Hetzner</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">100%</div>
+      <div class="stat-label">Données locales</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">v2.4</div>
+      <div class="stat-label">AIMEDIXAL</div>
+    </div>
+  </div>
+
+  <!-- SECTION 1 — FULL STACK ACTIVE -->
+  <section class="section" id="stack">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 class="section-title">Z-CORE Full Stack Actif</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="svg-card">
+      <div class="svg-card-title">Architecture complète · 3 modes IA · services souverains</div>
+      <div class="svg-wrapper svg-light-bg">
+        <!-- SVG zcore_full_stack_active embedded -->
+        <svg width="100%" viewBox="0 0 680 780" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="arrow1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M2 1L8 5L2 9" fill="none" stroke="#73726c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</marker>
+</defs>
+<rect width="680" height="780" fill="#fff"/>
+<!-- User -->
+<rect x="240" y="20" width="200" height="44" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+<text x="340" y="42" text-anchor="middle" dominant-baseline="central" fill="#3C3489" font-family="Syne, sans-serif" font-size="14" font-weight="500">Mohammed Ilyes</text>
+<line x1="340" y1="64" x2="340" y2="94" marker-end="url(#arrow1)" stroke="#73726c" stroke-width="1.5"/>
+<!-- Kanidm -->
+<rect x="210" y="94" width="260" height="48" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="340" y="112" text-anchor="middle" dominant-baseline="central" fill="#085041" font-family="Syne, sans-serif" font-size="14" font-weight="500">Kanidm SSO</text>
+<text x="340" y="128" text-anchor="middle" dominant-baseline="central" fill="#0F6E56" font-family="Syne, sans-serif" font-size="12">Authentification unifiée · identité</text>
+<line x1="340" y1="142" x2="340" y2="170" marker-end="url(#arrow1)" stroke="#73726c" stroke-width="1.5"/>
+<!-- Intelligence layer -->
+<rect x="30" y="170" width="620" height="154" rx="12" fill="none" stroke="rgba(31,30,29,0.2)" stroke-width="0.5" stroke-dasharray="5 3"/>
+<text x="50" y="188" fill="#3d3d3a" font-family="Syne, sans-serif" font-size="12">Couche intelligence</text>
+<!-- Z-CORE IA -->
+<rect x="46" y="196" width="180" height="52" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+<text x="136" y="216" text-anchor="middle" dominant-baseline="central" fill="#633806" font-family="Syne, sans-serif" font-size="14" font-weight="500">Z-CORE IA</text>
+<text x="136" y="234" text-anchor="middle" dominant-baseline="central" fill="#854F0B" font-family="Syne, sans-serif" font-size="12">Analyst + Search · FR/EN</text>
+<!-- Z-Claude.code -->
+<rect x="250" y="196" width="180" height="52" rx="8" fill="#EAF3DE" stroke="#3B6D11" stroke-width="0.5"/>
+<text x="340" y="216" text-anchor="middle" dominant-baseline="central" fill="#27500A" font-family="Syne, sans-serif" font-size="14" font-weight="500">Z-Claude.code</text>
+<text x="340" y="234" text-anchor="middle" dominant-baseline="central" fill="#3B6D11" font-family="Syne, sans-serif" font-size="12">Code · scripts · SQL · API</text>
+<!-- Z-Claude.ai -->
+<rect x="454" y="196" width="180" height="52" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+<text x="544" y="216" text-anchor="middle" dominant-baseline="central" fill="#712B13" font-family="Syne, sans-serif" font-size="14" font-weight="500">Z-Claude.ai</text>
+<text x="544" y="234" text-anchor="middle" dominant-baseline="central" fill="#993C1D" font-family="Syne, sans-serif" font-size="12">Apps IA · artifacts · Claude API</text>
+<!-- Status -->
+<circle cx="330" cy="298" r="5" fill="#1D9E75"/>
+<text x="340" y="298" dominant-baseline="central" fill="#1D9E75" font-family="Syne, sans-serif" font-size="12">3 modes actifs · opérationnel</text>
+<!-- Arrows down from intelligence -->
+<line x1="136" y1="248" x2="136" y2="370" marker-end="url(#arrow1)" stroke="#73726c" stroke-width="1.5"/>
+<line x1="220" y1="248" x2="220" y2="370" marker-end="url(#arrow1)" stroke="#73726c" stroke-width="1.5"/>
+<line x1="340" y1="248" x2="340" y2="370" marker-end="url(#arrow1)" stroke="#73726c" stroke-width="1.5"/>
+<line x1="460" y1="248" x2="460" y2="370" marker-end="url(#arrow1)" stroke="#73726c" stroke-width="1.5"/>
+<line x1="544" y1="248" x2="544" y2="370" marker-end="url(#arrow1)" stroke="#73726c" stroke-width="1.5"/>
+<!-- Services label -->
+<text x="30" y="365" fill="#3d3d3a" font-family="Syne, sans-serif" font-size="12">Services</text>
+<!-- Nextcloud -->
+<rect x="30" y="370" width="110" height="80" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+<text x="85" y="395" text-anchor="middle" dominant-baseline="central" fill="#0C447C" font-family="Syne, sans-serif" font-size="13" font-weight="500">Nextcloud</text>
+<text x="85" y="412" text-anchor="middle" dominant-baseline="central" fill="#185FA5" font-family="Syne, sans-serif" font-size="11">Fichiers</text>
+<text x="85" y="426" text-anchor="middle" dominant-baseline="central" fill="#185FA5" font-family="Syne, sans-serif" font-size="11">Calendrier</text>
+<text x="85" y="440" text-anchor="middle" dominant-baseline="central" fill="#185FA5" font-family="Syne, sans-serif" font-size="11">Notes</text>
+<!-- Matrix -->
+<rect x="155" y="370" width="110" height="80" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+<text x="210" y="395" text-anchor="middle" dominant-baseline="central" fill="#0C447C" font-family="Syne, sans-serif" font-size="13" font-weight="500">Matrix</text>
+<text x="210" y="412" text-anchor="middle" dominant-baseline="central" fill="#185FA5" font-family="Syne, sans-serif" font-size="11">Dendrite</text>
+<text x="210" y="426" text-anchor="middle" dominant-baseline="central" fill="#185FA5" font-family="Syne, sans-serif" font-size="11">E2EE chat</text>
+<text x="210" y="440" text-anchor="middle" dominant-baseline="central" fill="#185FA5" font-family="Syne, sans-serif" font-size="11">Rooms</text>
+<!-- Stalwart -->
+<rect x="280" y="370" width="110" height="80" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+<text x="335" y="395" text-anchor="middle" dominant-baseline="central" fill="#0C447C" font-family="Syne, sans-serif" font-size="13" font-weight="500">Stalwart</text>
+<text x="335" y="412" text-anchor="middle" dominant-baseline="central" fill="#185FA5" font-family="Syne, sans-serif" font-size="11">Email</text>
+<text x="335" y="426" text-anchor="middle" dominant-baseline="central" fill="#185FA5" font-family="Syne, sans-serif" font-size="11">IMAP/JMAP</text>
+<text x="335" y="440" text-anchor="middle" dominant-baseline="central" fill="#185FA5" font-family="Syne, sans-serif" font-size="11">TLS</text>
+<!-- Collabora -->
+<rect x="405" y="370" width="110" height="80" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+<text x="460" y="395" text-anchor="middle" dominant-baseline="central" fill="#0C447C" font-family="Syne, sans-serif" font-size="13" font-weight="500">Collabora</text>
+<text x="460" y="412" text-anchor="middle" dominant-baseline="central" fill="#185FA5" font-family="Syne, sans-serif" font-size="11">Documents</text>
+<text x="460" y="426" text-anchor="middle" dominant-baseline="central" fill="#185FA5" font-family="Syne, sans-serif" font-size="11">Édition</text>
+<text x="460" y="440" text-anchor="middle" dominant-baseline="central" fill="#185FA5" font-family="Syne, sans-serif" font-size="11">Temps réel</text>
+<!-- Vault -->
+<rect x="530" y="370" width="110" height="80" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+<text x="585" y="395" text-anchor="middle" dominant-baseline="central" fill="#0C447C" font-family="Syne, sans-serif" font-size="13" font-weight="500">Vault</text>
+<text x="585" y="412" text-anchor="middle" dominant-baseline="central" fill="#185FA5" font-family="Syne, sans-serif" font-size="11">Secrets</text>
+<text x="585" y="426" text-anchor="middle" dominant-baseline="central" fill="#185FA5" font-family="Syne, sans-serif" font-size="11">Read-only</text>
+<text x="585" y="440" text-anchor="middle" dominant-baseline="central" fill="#185FA5" font-family="Syne, sans-serif" font-size="11">Auth SSO</text>
+<!-- Arrows to backend -->
+<line x1="85" y1="450" x2="200" y2="530" marker-end="url(#arrow1)" stroke="#73726c" stroke-width="1.5"/>
+<line x1="335" y1="450" x2="290" y2="530" marker-end="url(#arrow1)" stroke="#73726c" stroke-width="1.5"/>
+<line x1="460" y1="450" x2="420" y2="530" marker-end="url(#arrow1)" stroke="#73726c" stroke-width="1.5"/>
+<!-- Backend label -->
+<text x="30" y="525" fill="#3d3d3a" font-family="Syne, sans-serif" font-size="12">Backend</text>
+<!-- PostgreSQL -->
+<rect x="30" y="530" width="280" height="48" rx="8" fill="#FCEBEB" stroke="#A32D2D" stroke-width="0.5"/>
+<text x="170" y="550" text-anchor="middle" dominant-baseline="central" fill="#791F1F" font-family="Syne, sans-serif" font-size="14" font-weight="500">PostgreSQL 16</text>
+<text x="170" y="566" text-anchor="middle" dominant-baseline="central" fill="#A32D2D" font-family="Syne, sans-serif" font-size="12">Base de données · tous services</text>
+<!-- Redis -->
+<rect x="370" y="530" width="280" height="48" rx="8" fill="#FCEBEB" stroke="#A32D2D" stroke-width="0.5"/>
+<text x="510" y="550" text-anchor="middle" dominant-baseline="central" fill="#791F1F" font-family="Syne, sans-serif" font-size="14" font-weight="500">Redis 7</text>
+<text x="510" y="566" text-anchor="middle" dominant-baseline="central" fill="#A32D2D" font-family="Syne, sans-serif" font-size="12">Sessions · cache · métadonnées</text>
+<!-- Legend -->
+<rect x="30" y="620" width="620" height="50" rx="8" fill="rgba(0,0,0,0.04)" stroke="rgba(0,0,0,0.1)" stroke-width="0.5"/>
+<text x="340" y="638" text-anchor="middle" fill="#888" font-family="Syne, sans-serif" font-size="11">Modules actifs</text>
+<rect x="50" y="650" width="10" height="10" rx="2" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+<text x="65" y="659" dominant-baseline="central" fill="#633806" font-family="Syne, sans-serif" font-size="10">Z-CORE IA</text>
+<rect x="160" y="650" width="10" height="10" rx="2" fill="#EAF3DE" stroke="#3B6D11" stroke-width="0.5"/>
+<text x="175" y="659" dominant-baseline="central" fill="#27500A" font-family="Syne, sans-serif" font-size="10">Z-Claude.code</text>
+<rect x="290" y="650" width="10" height="10" rx="2" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+<text x="305" y="659" dominant-baseline="central" fill="#712B13" font-family="Syne, sans-serif" font-size="10">Z-Claude.ai</text>
+<rect x="420" y="650" width="10" height="10" rx="2" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="435" y="659" dominant-baseline="central" fill="#085041" font-family="Syne, sans-serif" font-size="10">Kanidm SSO</text>
+<rect x="530" y="650" width="10" height="10" rx="2" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+<text x="545" y="659" dominant-baseline="central" fill="#0C447C" font-family="Syne, sans-serif" font-size="10">Services</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2 — AIZ CORE (souveraineté) -->
+  <section class="section" id="souverainete">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2 class="section-title">Zones de Souveraineté</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="svg-card">
+      <div class="svg-card-title">Zone souveraine vs Cloud externe · séparation des zones</div>
+      <div class="svg-wrapper svg-light-bg" id="aiz-svg-container"></div>
+    </div>
+  </section>
+
+  <!-- SECTION 3 — STACK ARCHITECTURE -->
+  <section class="section" id="intelligence">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Stack Architecture Détaillée</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="svg-card">
+      <div class="svg-card-title">Caddy · Kanidm · Services · Backend · Hetzner</div>
+      <div class="svg-wrapper svg-light-bg" id="stack-svg-container"></div>
+    </div>
+  </section>
+
+  <!-- SECTION 4 — DEVELOPER WORLD CONCEPTS -->
+  <section class="section" id="concepts">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2 class="section-title">Monde Développeur 2026</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="svg-card">
+      <div class="svg-card-title">IA · DevOps · Sécurité · Architecture · Data · Self-hosting</div>
+      <div class="svg-wrapper svg-light-bg" id="dev-svg-container"></div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="footer-brand"><span>NetSecurePro IA</span> · netsecurepro.ca · milyes@netsecurepro.ca</div>
+  <div class="footer-seal">Z-CORE OS IA · Sovereign Stack · IA22 · Montréal 2026</div>
+</footer>
+
+<script>
+// Load external SVG files inline
+async function loadSVG(containerId, filename) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  try {
+    const resp = await fetch(filename);
+    const text = await resp.text();
+    container.innerHTML = text;
+    const svg = container.querySelector('svg');
+    if (svg) {
+      svg.style.width = '100%';
+      svg.style.height = 'auto';
+    }
+  } catch(e) {
+    container.innerHTML = '<p style="color:#888;font-size:12px;padding:20px;text-align:center;">SVG: ' + filename + '</p>';
+  }
+}
+
+// These will work when served from same directory
+loadSVG('aiz-svg-container', 'aiz_core_architecture.svg');
+loadSVG('stack-svg-container', 'zcore_stack_architecture.svg');
+loadSVG('dev-svg-container', 'developer_world_concepts__1_.svg');
+</script>
+
+</body>
+</html>
