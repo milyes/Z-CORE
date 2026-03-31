@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZTA + Kanidm — Z-CORE Sovereign Security Stack</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono:wght@400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:        #050c18;
+  --bg2:       #071220;
+  --bg3:       #0a1a2e;
+  --panel:     #071828;
+  --border:    rgba(0,180,255,0.18);
+  --border2:   rgba(0,180,255,0.35);
+  --cyan:      #00c8ff;
+  --cyan-dim:  rgba(0,200,255,0.10);
+  --cyan-glo:  rgba(0,200,255,0.28);
+  --teal:      #00e5b0;
+  --teal-dim:  rgba(0,229,176,0.10);
+  --amber:     #ffb300;
+  --amber-dim: rgba(255,179,0,0.10);
+  --red:       #ff3b3b;
+  --green:     #00e676;
+  --text:      #c8e8ff;
+  --text2:     #7ab0d0;
+  --text3:     #3a6080;
+  --font:      'Rajdhani', sans-serif;
+  --mono:      'Share Tech Mono', monospace;
+  --body:      'DM Sans', sans-serif;
+}
+
+html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;}
+
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:radial-gradient(circle,rgba(0,180,255,0.06) 1px,transparent 1px);
+  background-size:28px 28px;pointer-events:none;z-index:0;
+}
+
+/* ── NAV TABS ── */
+nav{
+  display:flex;align-items:stretch;
+  border-bottom:2px solid var(--border2);
+  background:var(--bg2);
+  position:sticky;top:0;z-index:100;
+}
+.tab-logo{
+  display:flex;align-items:center;gap:10px;
+  padding:0 24px;
+  border-right:1px solid var(--border);
+}
+.logo-mark{
+  width:34px;height:34px;
+  border:1.5px solid var(--cyan);border-radius:5px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:12px;font-weight:700;color:var(--cyan);
+  box-shadow:0 0 14px var(--cyan-glo);
+}
+.logo-text{font-size:14px;font-weight:700;letter-spacing:0.08em;color:#fff;}
+.logo-sub{font-size:10px;color:var(--text3);letter-spacing:0.1em;}
+
+.tabs{display:flex;flex:1;}
+.tab{
+  flex:1;padding:14px 10px;
+  text-align:center;font-family:var(--font);
+  font-size:13px;font-weight:600;letter-spacing:0.08em;
+  text-transform:uppercase;color:var(--text3);
+  cursor:pointer;border:none;background:none;
+  border-bottom:3px solid transparent;
+  transition:all .2s;
+}
+.tab:hover{color:var(--text2);}
+.tab.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+
+/* ── SECTIONS ── */
+.section{display:none;position:relative;z-index:1;}
+.section.active{display:block;}
+
+/* ── PAGE HEADER ── */
+.page-header{
+  text-align:center;padding:32px 20px 24px;
+  border-bottom:1px solid var(--border);
+  background:linear-gradient(180deg,rgba(0,100,200,0.07) 0%,transparent 100%);
+}
+.page-header h1{
+  font-size:clamp(20px,3.5vw,34px);font-weight:700;
+  letter-spacing:0.14em;color:#fff;text-transform:uppercase;
+}
+.page-header .sub{
+  font-size:clamp(12px,2vw,16px);color:var(--cyan);
+  font-weight:600;letter-spacing:0.2em;margin-top:4px;
+}
+.header-line{display:block;height:2px;width:200px;margin:12px auto 0;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);}
+
+/* ── MAIN CONTAINER ── */
+.container{max-width:1300px;margin:0 auto;padding:24px 16px 48px;}
+
+/* ── ZTA GRID ── */
+.outer-grid{
+  display:grid;
+  grid-template-columns:80px 1fr;
+  gap:10px;margin-bottom:20px;
+}
+.zta-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+}
+.pillar{
+  background:var(--panel);border:1px solid var(--border);
+  border-top:3px solid var(--cyan);border-radius:4px;
+  display:flex;flex-direction:column;
+  transition:box-shadow .2s;
+}
+.pillar:hover{box-shadow:0 0 22px var(--cyan-glo);}
+.pillar-head{
+  background:rgba(0,180,255,0.09);border-bottom:1px solid var(--border);
+  padding:10px 8px;text-align:center;
+}
+.pillar-num{font-size:10px;color:var(--cyan);letter-spacing:0.1em;font-weight:600;display:block;margin-bottom:2px;}
+.pillar-title{font-size:clamp(11px,1.3vw,14px);font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:0.05em;line-height:1.2;}
+.pillar-sub{font-size:10px;color:var(--cyan);margin-top:2px;}
+.pillar-body{padding:8px 6px;flex:1;display:flex;flex-direction:column;gap:6px;}
+.pillar-footer{
+  background:rgba(0,100,180,0.14);border-top:1px solid var(--border);
+  padding:7px 8px;font-size:10px;color:var(--text2);text-align:center;line-height:1.3;
+}
+.comp{
+  border:1px solid var(--border);border-radius:3px;
+  padding:7px 6px;cursor:pointer;
+  transition:all .15s;background:rgba(0,50,100,0.22);
+}
+.comp:hover{border-color:var(--cyan);background:var(--cyan-dim);transform:translateY(-1px);}
+.comp-title{font-size:clamp(10px,1vw,12px);font-weight:600;color:#e8f8ff;line-height:1.2;}
+.comp-sub{font-size:9px;color:var(--text2);margin-top:1px;line-height:1.2;}
+.comp-icon{font-size:16px;margin-bottom:3px;display:block;}
+.comp-cyan  {border-left:2px solid var(--cyan);}
+.comp-teal  {border-left:2px solid var(--teal);}
+.comp-amber {border-left:2px solid var(--amber);}
+.comp-red   {border-left:2px solid var(--red);}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.badge-row{display:flex;gap:5px;justify-content:center;margin:4px 0;}
+.badge{font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:3px;border:1px solid;letter-spacing:.05em;}
+.badge-pdp{border-color:var(--cyan);color:var(--cyan);background:rgba(0,200,255,0.07);}
+.badge-pep{border-color:var(--teal);color:var(--teal);background:rgba(0,229,176,0.07);}
+.vpc-badge{font-size:9px;color:var(--cyan);border:1px dashed var(--border2);border-radius:3px;text-align:center;padding:2px 4px;letter-spacing:.07em;margin-bottom:3px;}
+.pdivider{height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);margin:3px 0;}
+.users-col{display:flex;flex-direction:column;gap:16px;justify-content:center;padding:8px 2px;}
+.user-item{text-align:center;cursor:pointer;transition:opacity .15s;}
+.user-item:hover{opacity:.75;}
+.user-icon{font-size:24px;display:block;margin-bottom:3px;}
+.user-label{font-size:10px;color:var(--text2);}
+.user-sub{font-size:9px;color:var(--text3);}
+.bottom-bar{
+  display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;
+  background:rgba(0,100,180,0.10);border:1px solid var(--border);
+  border-radius:4px;padding:12px 16px;
+}
+.bottom-doc{display:flex;align-items:center;gap:8px;cursor:pointer;}
+.doc-icon{font-size:24px;opacity:.8;}
+.arrow-label{font-size:10px;color:var(--cyan);letter-spacing:.07em;}
+.arrow-line{display:block;height:1.5px;background:linear-gradient(90deg,var(--cyan),transparent);margin-top:3px;}
+.arrow-line.rev{background:linear-gradient(90deg,transparent,var(--cyan));}
+.central-policy{
+  background:var(--bg3);border:1px solid var(--border2);border-radius:4px;
+  padding:10px 16px;text-align:center;cursor:pointer;transition:box-shadow .2s;
+}
+.central-policy:hover{box-shadow:0 0 16px var(--cyan-glo);}
+.central-policy .icon{font-size:20px;margin-bottom:3px;display:block;}
+.central-policy h4{font-size:12px;font-weight:700;color:#fff;letter-spacing:.05em;}
+.central-policy p{font-size:9px;color:var(--cyan);}
+
+/* ── KANIDM SECTION ── */
+.kanidm-doc{font-family:var(--body);padding:8px 0;}
+.kanidm-doc h2{
+  font-family:var(--font);font-size:20px;font-weight:700;
+  color:var(--cyan);letter-spacing:.08em;text-transform:uppercase;
+  margin:28px 0 10px;padding-bottom:6px;
+  border-bottom:1px solid var(--border2);
+}
+.kanidm-doc h2:first-child{margin-top:0;}
+.kanidm-doc h3{
+  font-family:var(--font);font-size:15px;font-weight:600;
+  color:var(--teal);letter-spacing:.06em;margin:20px 0 8px;
+}
+.kanidm-doc p{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:10px;}
+.kanidm-doc ul{padding-left:20px;color:var(--text2);font-size:14px;line-height:1.8;margin-bottom:12px;}
+.kanidm-doc li{margin-bottom:3px;}
+.kanidm-doc li::marker{color:var(--cyan);}
+
+pre{
+  background:#040d18;border:1px solid var(--border2);border-radius:6px;
+  padding:16px;overflow-x:auto;font-family:var(--mono);font-size:13px;
+  color:#8ee;line-height:1.6;margin-bottom:14px;
+  position:relative;
+}
+pre .kw{color:var(--cyan);}
+pre .val{color:var(--teal);}
+pre .cmt{color:var(--text3);}
+pre .str{color:var(--amber);}
+
+.copy-btn{
+  position:absolute;top:8px;right:10px;
+  background:rgba(0,180,255,0.12);border:1px solid var(--border2);
+  border-radius:3px;color:var(--cyan);font-family:var(--mono);
+  font-size:10px;padding:3px 8px;cursor:pointer;
+  transition:background .15s;
+}
+.copy-btn:hover{background:rgba(0,180,255,0.25);}
+.copy-btn.copied{color:var(--green);}
+
+table{
+  width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;
+  font-family:var(--body);
+}
+th{background:rgba(0,180,255,0.15);color:var(--cyan);padding:10px 12px;text-align:left;
+  font-family:var(--font);font-weight:600;letter-spacing:.06em;border:1px solid var(--border2);}
+td{border:1px solid var(--border);padding:9px 12px;color:var(--text2);vertical-align:top;}
+tr:nth-child(even) td{background:rgba(0,50,100,0.12);}
+td code{font-family:var(--mono);font-size:12px;color:var(--teal);background:rgba(0,229,176,0.07);
+  padding:1px 5px;border-radius:2px;}
+
+.note{
+  background:rgba(255,179,0,0.07);border-left:3px solid var(--amber);
+  border-radius:0 4px 4px 0;padding:12px 14px;margin:12px 0;
+  font-size:13px;color:var(--text2);font-family:var(--body);line-height:1.65;
+}
+.note strong{color:var(--amber);}
+
+.ok-box{
+  background:rgba(0,230,118,0.06);border-left:3px solid var(--green);
+  border-radius:0 4px 4px 0;padding:12px 14px;margin:12px 0;
+  font-size:13px;color:var(--text2);font-family:var(--body);line-height:1.65;
+}
+.ok-box strong{color:var(--green);}
+
+/* metadata chips */
+.meta-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+.chip{
+  font-family:var(--mono);font-size:11px;
+  padding:4px 10px;border:1px solid var(--border2);border-radius:3px;
+  color:var(--text2);background:rgba(0,100,180,0.12);
+}
+.chip.cyan{border-color:var(--cyan);color:var(--cyan);}
+
+/* ── INFO PANEL ── */
+.info-panel{
+  position:fixed;bottom:20px;right:20px;width:290px;
+  background:var(--bg3);border:1px solid var(--border2);border-top:2px solid var(--cyan);
+  border-radius:6px;padding:14px 16px;
+  box-shadow:0 12px 40px rgba(0,0,0,.7);
+  transform:translateY(120%);transition:transform .25s cubic-bezier(.34,1.56,.64,1);
+  z-index:500;
+}
+.info-panel.show{transform:none;}
+.info-panel h3{font-size:13px;font-weight:700;color:#fff;letter-spacing:.05em;margin-bottom:5px;}
+.info-panel p{font-size:11px;color:var(--text2);line-height:1.6;font-family:var(--body);}
+.info-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px;}
+.info-tag{font-family:var(--mono);font-size:9px;padding:2px 6px;
+  border:1px solid var(--border2);border-radius:2px;color:var(--text3);}
+.close-btn{position:absolute;top:9px;right:11px;background:none;border:none;
+  color:var(--text3);font-size:16px;cursor:pointer;}
+.close-btn:hover{color:#fff;}
+
+/* ── FOOTER ── */
+footer{
+  text-align:center;padding:14px;border-top:1px solid var(--border);
+  font-family:var(--mono);font-size:11px;color:var(--text3);
+  position:relative;z-index:1;background:var(--bg2);
+}
+
+/* responsive */
+@media(max-width:900px){
+  .zta-grid{grid-template-columns:1fr 1fr;}
+  .outer-grid{grid-template-columns:1fr;}
+  .users-col{flex-direction:row;justify-content:space-around;}
+  .bottom-bar{grid-template-columns:1fr;}
+  .info-panel{width:calc(100vw - 24px);right:12px;}
+}
+@media(max-width:500px){
+  .zta-grid{grid-template-columns:1fr;}
+  nav .tab{font-size:11px;padding:10px 4px;}
+}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.section.active{animation:fadeIn .3s ease;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="tab-logo">
+    <div class="logo-mark">ZC</div>
+    <div>
+      <div class="logo-text">Z-CORE</div>
+      <div class="logo-sub">SOVEREIGN SECURITY</div>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('zta',this)">Zero Trust Architecture</button>
+    <button class="tab" onclick="showTab('kanidm',this)">Kanidm SSO — Configuration</button>
+    <button class="tab" onclick="showTab('integration',this)">Intégration ZTA ↔ Kanidm</button>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════
+     TAB 1 — ZTA DIAGRAM
+══════════════════════════════════════════════ -->
+<div id="tab-zta" class="section active">
+  <div class="page-header">
+    <h1>Zero Trust Architecture (ZTA)</h1>
+    <div class="sub">Never Trust, Always Verify</div>
+    <span class="header-line"></span>
+  </div>
+
+  <div class="container">
+    <div class="outer-grid">
+      <!-- Users column -->
+      <div class="users-col">
+        <div class="user-item" onclick="info('users')">
+          <span class="user-icon">👥</span>
+          <div class="user-label">Utilisateurs</div>
+          <div class="user-sub">(Users)</div>
+        </div>
+        <div class="user-item" onclick="info('devices-ext')">
+          <span class="user-icon">💻</span>
+          <div class="user-label">Appareils</div>
+          <div class="user-sub">(Devices)</div>
+        </div>
+        <div class="user-item" onclick="info('admins')">
+          <span class="user-icon">🛡️</span>
+          <div class="user-label">Admins</div>
+          <div class="user-sub"></div>
+        </div>
+      </div>
+
+      <!-- 5 pillars -->
+      <div class="zta-grid">
+
+        <!-- P1: IDENTITY -->
+        <div class="pillar">
+          <div class="pillar-head">
+            <span class="pillar-num">1. IDENTITY TRUST</span>
+            <div class="pillar-title">Kanidm</div>
+          </div>
+          <div class="pillar-body">
+            <div class="two-col">
+              <div class="comp comp-cyan" onclick="info('user-ids')">
+                <span class="comp-icon">🪪</span>
+                <div class="comp-title">User Identities</div>
+              </div>
+              <div class="comp comp-cyan" onclick="info('svc-accounts')">
+                <span class="comp-icon">⚙️</span>
+                <div class="comp-title">Service Accounts</div>
+              </div>
+            </div>
+            <div class="comp comp-cyan" onclick="info('kanidm-sso')" style="text-align:center;padding:9px;">
+              <span class="comp-icon" style="font-size:22px">🔑</span>
+              <div class="comp-title">Kanidm SSO</div>
+              <div class="comp-sub">OIDC / LDAP / WebAuthn</div>
+            </div>
+            <div class="pdivider"></div>
+            <div class="two-col">
+              <div class="comp comp-cyan" onclick="info('user-ids')">
+                <div class="comp-title" style="font-size:9px">User Identities</div>
+              </div>
+              <div class="comp comp-cyan" onclick="info('svc-accounts')">
+                <div class="comp-title" style="font-size:9px">Service Accounts</div>
+              </div>
+            </div>
+          </div>
+          <div class="pillar-footer">Authentication &amp; MFA</div>
+        </div>
+
+        <!-- P2: DEVICE -->
+        <div class="pillar">
+          <div class="pillar-head">
+            <span class="pillar-num">2. DEVICE TRUST</span>
+            <div class="pillar-title">Vérification Appareils</div>
+          </div>
+          <div class="pillar-body">
+            <div class="comp comp-teal" onclick="info('device-health')">
+              <span class="comp-icon">🖥️</span>
+              <div class="comp-title">Device Health &amp; Security Posture</div>
+            </div>
+            <div class="badge-row"><span class="badge badge-pdp">PDP</span></div>
+            <div class="comp comp-teal" onclick="info('device-reg1')">
+              <span class="comp-icon">🗄️</span>
+              <div class="comp-title">Registre d'Appareils</div>
+              <div class="comp-sub">(Device Registry)</div>
+            </div>
+            <div class="comp comp-teal" onclick="info('device-reg2')">
+              <span class="comp-icon">⚙️</span>
+              <div class="comp-title">Registre d'Appareils</div>
+              <div class="comp-sub">(Device Registry)</div>
+            </div>
+          </div>
+          <div class="pillar-footer">Vérification Sécurité Appareil</div>
+        </div>
+
+        <!-- P3: WORKLOAD -->
+        <div class="pillar">
+          <div class="pillar-head">
+            <span class="pillar-num">3. WORKLOAD PROTECTION</span>
+          </div>
+          <div class="pillar-body">
+            <div class="vpc-badge">VPC Private Network</div>
+            <div class="badge-row"><span class="badge badge-pep">PEP</span></div>
+            <div class="two-col">
+              <div class="comp comp-cyan" onclick="info('caddy2')">
+                <span class="comp-icon">🔒</span>
+                <div class="comp-title">Caddy 2</div>
+                <div class="comp-sub">Reverse Proxy, ACME</div>
+              </div>
+              <div class="comp comp-cyan" onclick="info('matrix-syn')">
+                <span class="comp-icon">💬</span>
+                <div class="comp-title">Matrix Synapse</div>
+                <div class="comp-sub">E2EE IM</div>
+              </div>
+            </div>
+            <div class="two-col">
+              <div class="comp comp-teal" onclick="info('app-white')">
+                <span class="comp-icon">✅</span>
+                <div class="comp-title">App Whitelisting</div>
+              </div>
+              <div class="comp comp-amber" onclick="info('ids')">
+                <span class="comp-icon">🔎</span>
+                <div class="comp-title">IDS</div>
+              </div>
+            </div>
+            <div class="two-col">
+              <div class="comp comp-teal" onclick="info('container')">
+                <span class="comp-icon">📦</span>
+                <div class="comp-title">Container Hardening</div>
+              </div>
+              <div class="comp comp-cyan" onclick="info('pg-enc')">
+                <span class="comp-icon">🗃️</span>
+                <div class="comp-title">PostgreSQL Enc.</div>
+              </div>
+            </div>
+          </div>
+          <div class="pillar-footer">Surveillance des Workloads</div>
+        </div>
+
+        <!-- P4: DATA -->
+        <div class="pillar">
+          <div class="pillar-head">
+            <span class="pillar-num">4. DATA PROTECTION</span>
+          </div>
+          <div class="pillar-body">
+            <div class="two-col">
+              <div class="comp comp-cyan" onclick="info('data-rest')">
+                <span class="comp-icon">🔐</span>
+                <div class="comp-title">Data at Rest</div>
+                <div class="comp-sub">PG Encrypted</div>
+              </div>
+              <div class="comp comp-teal" onclick="info('data-transit')">
+                <span class="comp-icon">🔒</span>
+                <div class="comp-title">Data in Transit</div>
+                <div class="comp-sub">E2EE Flows</div>
+              </div>
+            </div>
+            <div class="badge-row">
+              <span class="badge badge-pdp">PDP</span>
+              <span class="badge badge-pep">PEP</span>
+            </div>
+            <div class="comp comp-amber" onclick="info('e2ee-full')" style="text-align:center;">
+              <div class="comp-title">End-to-End Encryption (E2EE)</div>
+            </div>
+            <div class="two-col">
+              <div class="comp comp-teal" onclick="info('matrix-e2ee')">
+                <span class="comp-icon">💬</span>
+                <div class="comp-title">Matrix Synapse</div>
+              </div>
+              <div class="comp comp-cyan" onclick="info('stalwart-mail')">
+                <span class="comp-icon">✉️</span>
+                <div class="comp-title">Stalwart Mail</div>
+                <div class="comp-sub">E2EE Email</div>
+              </div>
+            </div>
+          </div>
+          <div class="pillar-footer">Chiffrement des Données</div>
+        </div>
+
+        <!-- P5: MICRO-SEG -->
+        <div class="pillar">
+          <div class="pillar-head">
+            <span class="pillar-num">5. NETWORK</span>
+            <div class="pillar-title">Micro-Segmentation</div>
+          </div>
+          <div class="pillar-body">
+            <div class="comp comp-teal" onclick="info('frontend')">
+              <span class="comp-icon">🌐</span>
+              <div class="comp-title">Front-end (Caddy)</div>
+            </div>
+            <div class="comp comp-red" onclick="info('firewall')">
+              <span class="comp-icon">🧱</span>
+              <div class="comp-title">Firewall</div>
+              <div class="comp-sub">UFW / nftables</div>
+            </div>
+            <div class="two-col">
+              <div class="comp comp-cyan" onclick="info('middleware')">
+                <span class="comp-icon">⚡</span>
+                <div class="comp-title">Middleware</div>
+                <div class="comp-sub">Matrix, Stalwart</div>
+              </div>
+              <div class="comp comp-amber" onclick="info('zt-pdp')">
+                <span class="comp-icon">⚖️</span>
+                <div class="comp-title">ZT Policy PDP</div>
+              </div>
+            </div>
+            <div class="comp comp-cyan" onclick="info('pg-seg')">
+              <span class="comp-icon">🗃️</span>
+              <div class="comp-title">PostgreSQL — Encrypted DB</div>
+            </div>
+          </div>
+          <div class="pillar-footer">Politiques Micro-segmentation</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="bottom-bar">
+      <div class="bottom-doc" onclick="info('secure-updates')">
+        <span class="doc-icon">📄</span>
+        <div>
+          <div class="arrow-label">Secure access for updates</div>
+          <span class="arrow-line"></span>
+        </div>
+        <span style="font-size:20px">✅</span>
+      </div>
+      <div class="central-policy" onclick="info('central-policy')">
+        <span class="icon">🔐</span>
+        <h4>Politique de Sécurité Centralisée</h4>
+        <p>(Central Security Policy)</p>
+      </div>
+      <div class="bottom-doc" style="justify-content:flex-end" onclick="info('siem')">
+        <div style="text-align:right">
+          <div class="arrow-label">Secure access for the updates</div>
+          <span class="arrow-line rev"></span>
+        </div>
+        <span class="doc-icon">📊</span>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:#fff;font-family:var(--font)">SIEM</div>
+          <div style="font-size:10px;color:var(--text2)">Surveillance Logs</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 2 — KANIDM CONFIG
+══════════════════════════════════════════════ -->
+<div id="tab-kanidm" class="section">
+  <div class="page-header">
+    <h1>Kanidm — Configuration SSO Souverain</h1>
+    <div class="sub">Identity Provider · OIDC · WebAuthn · MFA</div>
+    <span class="header-line"></span>
+  </div>
+
+  <div class="container">
+    <div class="kanidm-doc">
+
+      <div class="meta-chips">
+        <span class="chip cyan">Kanidm v1.9.x</span>
+        <span class="chip">Debian 12</span>
+        <span class="chip">Docker Compose</span>
+        <span class="chip">Caddy 2</span>
+        <span class="chip">Mars 2026</span>
+      </div>
+
+      <h2>1. docker-compose.yml</h2>
+      <div style="position:relative">
+        <pre id="code-dc"><span class="kw">services</span>:
+  <span class="kw">kanidm</span>:
+    <span class="kw">image</span>: <span class="str">kanidm/server:latest</span>
+    <span class="kw">container_name</span>: <span class="str">kanidm</span>
+    <span class="kw">restart</span>: <span class="str">unless-stopped</span>
+    <span class="kw">volumes</span>:
+      - <span class="str">kanidm_data:/data</span>
+    <span class="kw">networks</span>:
+      - <span class="str">sovereign_net</span>
+    <span class="kw">healthcheck</span>:
+      <span class="kw">test</span>: [<span class="str">"CMD"</span>, <span class="str">"kanidmd"</span>, <span class="str">"healthcheck"</span>, <span class="str">"--config"</span>, <span class="str">"/data/server.toml"</span>]
+      <span class="kw">interval</span>: <span class="val">30s</span>
+      <span class="kw">timeout</span>: <span class="val">10s</span>
+      <span class="kw">retries</span>: <span class="val">3</span>
+
+<span class="kw">volumes</span>:
+  <span class="kw">kanidm_data</span>:
+    <span class="kw">driver</span>: <span class="str">local</span></pre>
+        <button class="copy-btn" onclick="copyCode('code-dc',this)">Copier</button>
+      </div>
+
+      <h2>2. server.toml</h2>
+      <div style="position:relative">
+        <pre id="code-toml"><span class="kw">version</span> = <span class="str">"2"</span>
+
+<span class="kw">bindaddress</span> = <span class="str">"[::]:8443"</span>
+
+<span class="kw">domain</span> = <span class="str">"idm.tundomaine.fr"</span>
+<span class="kw">origin</span> = <span class="str">"https://idm.tundomaine.fr"</span>
+
+<span class="kw">trust_x_forward_for</span> = <span class="val">true</span>
+
+<span class="kw">db_path</span> = <span class="str">"/data/kanidm.db"</span>
+<span class="kw">log_level</span> = <span class="str">"info"</span>
+
+[<span class="kw">online_backup</span>]
+<span class="kw">path</span>     = <span class="str">"/data/backups/"</span>
+<span class="kw">schedule</span> = <span class="str">"0 3 * * *"</span>  <span class="cmt"># backup quotidien 3h</span></pre>
+        <button class="copy-btn" onclick="copyCode('code-toml',this)">Copier</button>
+      </div>
+
+      <div class="note">
+        <strong>Important :</strong> <code>origin</code> doit correspondre exactement à l'URL publique vue par le navigateur via Caddy. Toute divergence bloque l'authentification OIDC.
+      </div>
+
+      <h2>3. Configuration Caddy</h2>
+      <div style="position:relative">
+        <pre id="code-caddy"><span class="str">idm.tundomaine.fr</span> {
+    <span class="kw">reverse_proxy</span> kanidm:<span class="val">8443</span> {
+        <span class="kw">header_up</span> X-Forwarded-For   {remote_host}
+        <span class="kw">header_up</span> X-Forwarded-Proto {scheme}
+        <span class="kw">header_up</span> Host              {http.request.host}
+    }
+}</pre>
+        <button class="copy-btn" onclick="copyCode('code-caddy',this)">Copier</button>
+      </div>
+
+      <h2>4. Initialisation (première fois)</h2>
+      <div style="position:relative">
+        <pre id="code-init"><span class="cmt"># Démarrer le conteneur</span>
+docker compose up -d kanidm
+
+<span class="cmt"># Récupérer les comptes admin (affiche les mots de passe initiaux)</span>
+docker exec -it kanidm kanidmd recover-account admin
+docker exec -it kanidm kanidmd recover-account idm_admin
+
+<span class="cmt"># Vérifier le statut</span>
+docker exec -it kanidm kanidmd healthcheck --config /data/server.toml</pre>
+        <button class="copy-btn" onclick="copyCode('code-init',this)">Copier</button>
+      </div>
+
+      <h2>5. Clients OIDC — Création par service</h2>
+      <table>
+        <tr>
+          <th>Service</th>
+          <th>Commande kanidm</th>
+          <th>Notes</th>
+        </tr>
+        <tr>
+          <td>Nextcloud</td>
+          <td><code>kanidm system oauth2 create nextcloud "Nextcloud" https://cloud.tundomaine.fr</code></td>
+          <td>App OIDC native</td>
+        </tr>
+        <tr>
+          <td>Matrix Dendrite</td>
+          <td><code>kanidm system oauth2 create matrix "Matrix" https://chat.tundomaine.fr</code></td>
+          <td>homeserver.yaml</td>
+        </tr>
+        <tr>
+          <td>Stalwart Mail</td>
+          <td>LDAP en mode backend ou Token Introspection</td>
+          <td>LDAP fallback</td>
+        </tr>
+        <tr>
+          <td>Vaultwarden</td>
+          <td><code>kanidm system oauth2 create vaultwarden "Vault" https://pw.tundomaine.fr</code></td>
+          <td>SSO_ENABLED=true</td>
+        </tr>
+        <tr>
+          <td>Jitsi Meet</td>
+          <td><code>kanidm system oauth2 create jitsi "Jitsi" https://meet.tundomaine.fr</code></td>
+          <td>JWT auth</td>
+        </tr>
+        <tr>
+          <td>Collabora</td>
+          <td><code>kanidm system oauth2 create collabora "Collabora" https://office.tundomaine.fr</code></td>
+          <td>Nextcloud intégré</td>
+        </tr>
+      </table>
+
+      <h2>6. Groupes par service</h2>
+      <div style="position:relative">
+        <pre id="code-groups"><span class="cmt"># Créer les groupes d'accès</span>
+kanidm group create nextcloud_users
+kanidm group create matrix_users
+kanidm group create stalwart_users
+kanidm group create vaultwarden_users
+kanidm group create jitsi_users
+kanidm group create admins_sudo
+
+<span class="cmt"># Ajouter un utilisateur à un groupe</span>
+kanidm group add-members nextcloud_users alice
+kanidm group add-members admins_sudo bob
+
+<span class="cmt"># Lier groupe au client OAuth2</span>
+kanidm system oauth2 update-scope-map nextcloud nextcloud_users email profile openid</pre>
+        <button class="copy-btn" onclick="copyCode('code-groups',this)">Copier</button>
+      </div>
+
+      <h2>7. Forcer WebAuthn + MFA</h2>
+      <div style="position:relative">
+        <pre id="code-mfa"><span class="cmt"># Politique MFA obligatoire pour tous</span>
+kanidm system policy account-policy set \
+  --mfa-require true \
+  --webauthn-attest-no-phishing true
+
+<span class="cmt"># Forcer WebAuthn sur un compte spécifique</span>
+kanidm person credential update alice \
+  --add-webauthn "yubikey"</pre>
+        <button class="copy-btn" onclick="copyCode('code-mfa',this)">Copier</button>
+      </div>
+
+      <h2>8. Bonnes pratiques</h2>
+      <ul>
+        <li>Forcer WebAuthn + MFA pour <strong>tous</strong> les utilisateurs dès l'installation</li>
+        <li>Créer un groupe par service — jamais de groupe fourre-tout "all_users"</li>
+        <li>Intégrer les backups <code>/data/backups/</code> dans Restic vers NAS chiffré</li>
+        <li>Monitorer via Prometheus — Kanidm expose des métriques natives</li>
+        <li>Avant mise à jour : <code>docker compose pull</code> → backup → <code>up -d</code></li>
+        <li>Ne jamais exposer le port 8443 directement — toujours passer par Caddy</li>
+        <li>Logs dans Loki/Grafana pour audit des authentifications</li>
+      </ul>
+
+      <div class="ok-box">
+        <strong>✅ Prêt pour la production :</strong> Cette configuration est celle utilisée dans la stack Z-CORE sur Hetzner CPX31, Debian 12, avec Caddy 2 comme reverse proxy et Ansible pour le provisioning idempotent.
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 3 — INTEGRATION
+══════════════════════════════════════════════ -->
+<div id="tab-integration" class="section">
+  <div class="page-header">
+    <h1>Intégration ZTA ↔ Kanidm</h1>
+    <div class="sub">Comment Kanidm implémente chaque pilier ZTA</div>
+    <span class="header-line"></span>
+  </div>
+
+  <div class="container">
+    <div class="kanidm-doc">
+
+      <p>Kanidm est le cœur du Zero Trust Architecture dans Z-CORE. Voici comment il couvre concrètement chacun des 5 piliers ZTA.</p>
+
+      <h2>Pilier 1 — Identity Trust → Kanidm SSO</h2>
+      <table>
+        <tr><th>Exigence ZTA</th><th>Implémentation Kanidm</th></tr>
+        <tr><td>Identité vérifiée à chaque accès</td><td>Token OIDC court-vivant (1h), refresh via session Kanidm</td></tr>
+        <tr><td>MFA obligatoire</td><td>TOTP + WebAuthn natif, policy enforced</td></tr>
+        <tr><td>Comptes de service isolés</td><td>Service Accounts avec secrets rotatifs automatiquement</td></tr>
+        <tr><td>Fédération d'identité</td><td>OIDC pour Nextcloud/Matrix/Vault, LDAP pour Stalwart</td></tr>
+        <tr><td>Audit de toutes les authentifications</td><td>Logs structurés → Loki → Grafana</td></tr>
+      </table>
+
+      <h2>Pilier 2 — Device Trust → Certificats Kanidm</h2>
+      <table>
+        <tr><th>Exigence ZTA</th><th>Implémentation</th></tr>
+        <tr><td>Enregistrement appareil</td><td>Certificat client émis par Kanidm CA interne</td></tr>
+        <tr><td>Health check appareil</td><td>Attributs de session conditionnels (appareil vérifié)</td></tr>
+        <tr><td>Révocation immédiate</td><td><code>kanidm device revoke &lt;id&gt;</code> — effectif instantanément</td></tr>
+      </table>
+
+      <h2>Pilier 3 — Workload → PDP + PEP via Kanidm</h2>
+      <div style="position:relative">
+        <pre id="code-flow"><span class="cmt"># Flux d'authentification Zero Trust complet</span>
+
+<span class="cmt">1. Client → Caddy (TLS 1.3)</span>
+<span class="cmt">2. Caddy → Kanidm (OIDC authorize endpoint)</span>
+<span class="cmt">3. Kanidm → MFA challenge (WebAuthn / TOTP)</span>
+<span class="cmt">4. Kanidm → Token JWT signé (claims: groups, device, mfa_level)</span>
+<span class="cmt">5. Caddy → Service (avec token dans header Authorization)</span>
+<span class="cmt">6. Service → Kanidm token introspection (validation)</span>
+<span class="cmt">7. Service → Accès accordé ou refusé (PEP enforcement)</span></pre>
+        <button class="copy-btn" onclick="copyCode('code-flow',this)">Copier</button>
+      </div>
+
+      <h2>Pilier 4 — Data Protection → Chiffrement + Kanidm</h2>
+      <ul>
+        <li>Kanidm gère les <strong>clés de chiffrement</strong> pour Vaultwarden (AES-256)</li>
+        <li>Accès PostgreSQL conditionnel au token Kanidm valide (mTLS + RBAC)</li>
+        <li>Matrix E2EE : Kanidm comme <strong>key backup</strong> pour les clés de session</li>
+        <li>Stalwart : certificats S/MIME liés aux comptes Kanidm</li>
+      </ul>
+
+      <h2>Pilier 5 — Micro-segmentation → Groupes Kanidm</h2>
+      <div style="position:relative">
+        <pre id="code-seg"><span class="cmt"># Chaque segment réseau = un groupe Kanidm</span>
+<span class="cmt"># Seuls les membres du groupe accèdent au service correspondant</span>
+
+kanidm system oauth2 update-scope-map nextcloud  nextcloud_users  openid email profile
+kanidm system oauth2 update-scope-map matrix     matrix_users     openid email profile
+kanidm system oauth2 update-scope-map stalwart   stalwart_users   openid email
+kanidm system oauth2 update-scope-map vaultwarden vault_users     openid email
+kanidm system oauth2 update-scope-map jitsi      jitsi_users      openid email
+
+<span class="cmt"># Un utilisateur sans groupe n'a accès à rien — Zero Trust par défaut</span></pre>
+        <button class="copy-btn" onclick="copyCode('code-seg',this)">Copier</button>
+      </div>
+
+      <h2>Schéma de flux complet</h2>
+      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:20px;font-family:var(--mono);font-size:12px;color:var(--text2);line-height:2;">
+        <div style="color:var(--cyan)">[ Client / Appareil ]</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;↓ HTTPS / TLS 1.3</div>
+        <div style="color:var(--teal)">[ Caddy 2 — Reverse Proxy ]</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;↓ OIDC Redirect</div>
+        <div style="color:var(--cyan)">[ Kanidm SSO — PDP ]</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;↓ WebAuthn / TOTP MFA</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;↓ JWT Token (groups + device + mfa_level)</div>
+        <div style="color:var(--teal)">[ Caddy — PEP enforcement ]</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;↓ Token Introspection</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;">
+          <div style="border:1px solid var(--border2);border-radius:3px;padding:8px;color:var(--amber)">Nextcloud 30<br><span style="color:var(--text3);font-size:10px">nextcloud_users</span></div>
+          <div style="border:1px solid var(--border2);border-radius:3px;padding:8px;color:var(--amber)">Matrix Dendrite<br><span style="color:var(--text3);font-size:10px">matrix_users</span></div>
+          <div style="border:1px solid var(--border2);border-radius:3px;padding:8px;color:var(--amber)">Stalwart Mail<br><span style="color:var(--text3);font-size:10px">stalwart_users</span></div>
+        </div>
+        <div style="margin-top:8px">&nbsp;&nbsp;&nbsp;&nbsp;↓ Données chiffrées LUKS</div>
+        <div style="color:var(--red)">[ PostgreSQL 16 + Redis 7 ]</div>
+      </div>
+
+      <div class="ok-box" style="margin-top:20px">
+        <strong>✅ Architecture validée :</strong> Cette intégration ZTA + Kanidm est opérationnelle dans Z-CORE sur Debian 12 + Hetzner. Kanidm couvre les 5 piliers Zero Trust sans outil tiers supplémentaire.
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer>
+  Z-CORE · Zero Trust Architecture · Kanidm SSO · NetSecurePro IA · Mohammed Ilyes Zoubirou &nbsp;|&nbsp;
+  <span style="color:var(--teal)">Données 100% souveraines · Self-hosted · Montréal 🇨🇦</span>
+</footer>
+
+<!-- INFO PANEL -->
+<div class="info-panel" id="panel">
+  <button class="close-btn" onclick="closePanel()">×</button>
+  <h3 id="p-title"></h3>
+  <p id="p-desc"></p>
+  <div class="info-tags" id="p-tags"></div>
+</div>
+
+<script>
+/* ── TABS ── */
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+  closePanel();
+}
+
+/* ── COPY ── */
+function copyCode(id, btn) {
+  const el = document.getElementById(id);
+  navigator.clipboard.writeText(el.innerText).then(() => {
+    btn.textContent = '✓ Copié';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+/* ── INFO DATA ── */
+const D = {
+  users:          {title:"Utilisateurs (Users)",desc:"Toutes les identités humaines accédant au système. Authentification obligatoire via Kanidm SSO avec MFA TOTP ou WebAuthn. Aucun accès implicite.",tags:["OIDC","MFA","WebAuthn","Zero Trust"]},
+  'devices-ext':  {title:"Appareils (Devices)",desc:"Terminaux enregistrés dans le Device Registry. Chaque appareil doit satisfaire la posture de sécurité avant tout accès au système.",tags:["Device Registry","Health Check","Posture"]},
+  admins:         {title:"Administrateurs",desc:"Accès privilégiés via tunnel WireGuard uniquement. SSH par clé + MFA obligatoire. Toutes les actions sont auditées via auditd.",tags:["WireGuard","SSH keys","MFA","audit"]},
+  'user-ids':     {title:"User Identities — Kanidm",desc:"Comptes utilisateurs dans Kanidm. Attributs: email, groupes, rôles. Rotation automatique des tokens. Sync SCIM possible.",tags:["Kanidm","SCIM","groupes","rotation"]},
+  'svc-accounts': {title:"Service Accounts",desc:"Comptes machine pour inter-communication services. Credentials rotatifs, portée minimale.",tags:["machine accounts","rotation","least privilege"]},
+  'kanidm-sso':   {title:"Kanidm SSO — OIDC/LDAP",desc:"Fournisseur d'identité central en Rust. OIDC pour tous les services. LDAP fallback Stalwart. WebAuthn natif. MFA obligatoire.",tags:["OIDC","OAuth2","LDAP","WebAuthn","MFA","Rust"]},
+  'device-health':{title:"Device Health & Security Posture",desc:"Vérification que chaque appareil respecte la politique: OS à jour, disque chiffré, certificat valide. Refus si posture insuffisante.",tags:["posture","OS","encryption","certificat"]},
+  'device-reg1':  {title:"Registre d'Appareils",desc:"Base centralisée des appareils autorisés. Chaque device a un certificat unique. Révocation immédiate possible.",tags:["Device Registry","certificat","révocation","Kanidm"]},
+  'device-reg2':  {title:"Device Registry — Services",desc:"Couche d'enregistrement au niveau applicatif. Confiance conditionnelle: droits différents selon l'appareil utilisé.",tags:["conditional access","trust level","per-device"]},
+  caddy2:         {title:"Caddy 2 — Reverse Proxy",desc:"Point d'entrée TLS unique. Certificats automatiques ACME. HTTP/3, rate-limiting, HSTS, CSP. Routing par sous-domaine.",tags:["TLS","ACME","HTTP/3","HSTS","rate-limit"]},
+  'matrix-syn':   {title:"Matrix Synapse — E2EE IM",desc:"Messagerie instantanée avec chiffrement bout-en-bout natif (MegOlm/Olm). Dendrite (Go). Element Web comme client.",tags:["Matrix","E2EE","MegOlm","Dendrite","Element"]},
+  'app-white':    {title:"Application Whitelisting",desc:"Seules les apps approuvées s'exécutent. Enforced via seccomp, AppArmor, listes blanches Docker.",tags:["seccomp","AppArmor","whitelist","hardening"]},
+  ids:            {title:"Intrusion Detection (IDS)",desc:"Surveillance temps réel: brute-force, scans ports, anomalies trafic. CrowdSec + Fail2ban. Alertes Grafana.",tags:["CrowdSec","Fail2ban","IDS","anomalie","alerte"]},
+  container:      {title:"Container Hardening",desc:"Conteneurs rootless, read-only FS, capabilities minimales, seccomp profiles. Scans Trivy. Volumes LUKS séparés.",tags:["rootless","seccomp","distroless","Trivy","LUKS"]},
+  'pg-enc':       {title:"PostgreSQL — Encrypted DB",desc:"Volumes Docker LUKS (AES-256). Connexions TLS mutual auth. Utilisateurs PG par service avec permissions minimales.",tags:["LUKS","TLS","mTLS","RBAC","PostgreSQL 16"]},
+  'data-rest':    {title:"Data at Rest",desc:"Volumes Docker chiffrés LUKS AES-256. Clés gérées séparément. Backups chiffrés Restic vers NAS distant.",tags:["LUKS","AES-256","Restic","backup chiffré"]},
+  'data-transit': {title:"Data in Transit",desc:"Tout trafic chiffré TLS 1.3 minimum. mTLS inter-services dans le VPC privé. WireGuard pour l'administration.",tags:["TLS 1.3","mTLS","WireGuard","VPC"]},
+  'e2ee-full':    {title:"End-to-End Encryption (E2EE)",desc:"Données déchiffrées côté client uniquement. Matrix: MegOlm/Olm. Stalwart: S/MIME et PGP. Zéro connaissance serveur.",tags:["E2EE","MegOlm","S/MIME","PGP","zero-knowledge"]},
+  'matrix-e2ee':  {title:"Matrix — E2EE",desc:"MegOlm (rooms groupe) + Olm (1-to-1). Clés stockées localement ou dans Kanidm key backup.",tags:["MegOlm","Olm","key backup","E2EE"]},
+  'stalwart-mail':{title:"Stalwart Mail — E2EE",desc:"Serveur email Rust. S/MIME + PGP. SMTP, IMAP, JMAP. DKIM, SPF, DMARC. Chiffrement at-rest mailboxes.",tags:["Stalwart","S/MIME","PGP","DKIM","JMAP","Rust"]},
+  frontend:       {title:"Front-end — Caddy",desc:"Couche présentation micro-segmentée. Chaque sous-domaine = segment réseau isolé avec règles propres.",tags:["Caddy","micro-segment","TLS","isolation"]},
+  firewall:       {title:"Firewall — UFW / nftables",desc:"Ports 80, 443, WireGuard uniquement exposés. Tout le reste bloqué en entrée. Règles inter-conteneurs Docker.",tags:["UFW","nftables","deny-by-default","micro-segmentation"]},
+  middleware:     {title:"Middleware — Matrix, Stalwart",desc:"Services communication dans segments réseau Docker isolés avec firewall interne.",tags:["Matrix","Stalwart","Docker network","isolation"]},
+  'zt-pdp':       {title:"Zero Trust Policy Decision Point",desc:"Moteur de décision: identité + appareil + contexte + politique → autoriser ou refuser. Implémenté dans Kanidm.",tags:["PDP","PEP","policy engine","Kanidm"]},
+  'pg-seg':       {title:"PostgreSQL — Segment Données",desc:"DB dans le segment le plus protégé. Accessible uniquement depuis middlewares autorisés. TLS + certificat.",tags:["isolation","TLS","certificat","PostgreSQL 16"]},
+  'central-policy':{title:"Politique de Sécurité Centralisée",desc:"Document maître ZTA. Gérée via Ansible IaC pour reproductibilité totale.",tags:["CSP","Ansible","IaC","audit"]},
+  'secure-updates':{title:"Secure Access for Updates",desc:"Seul Ansible via WireGuard peut pousser des changements. Signature des paquets. Changelog audité.",tags:["Ansible","WireGuard","signature","apt"]},
+  siem:           {title:"SIEM / Surveillance Logs",desc:"Agrégation logs: Caddy, Kanidm, PostgreSQL, Matrix, CrowdSec. Prometheus + Grafana + Loki. Alerting. Rétention 30j.",tags:["SIEM","Prometheus","Grafana","Loki","alerting","30j"]}
+};
+
+function info(k){
+  const d=D[k];if(!d)return;
+  document.getElementById('p-title').textContent=d.title;
+  document.getElementById('p-desc').textContent=d.desc;
+  document.getElementById('p-tags').innerHTML=d.tags.map(t=>`<span class="info-tag">${t}</span>`).join('');
+  document.getElementById('panel').classList.add('show');
+}
+function closePanel(){document.getElementById('panel').classList.remove('show');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel();});
+</script>
+</body>
+</html>
