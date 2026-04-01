@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IA Parkinson Logic • Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Outfit:wght@500;600&amp;family=DM+Mono&amp;display=swap');
+        
+        :root {
+            --tw-color-primary: #5b8fff;
+            --tw-color-accent: #3dffc0;
+        }
+        
+        * {
+            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms;
+        }
+        
+        .tailwind-ready * {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .logo-font {
+            font-family: 'Outfit', sans-serif;
+        }
+        
+        .code-font {
+            font-family: 'DM Mono', monospace;
+        }
+        
+        .dashboard-grid {
+            animation: fadeIn 0.6s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .waveform {
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            height: 64px;
+        }
+        
+        .bar {
+            width: 6px;
+            background: linear-gradient(180deg, #3dffc0, #5b8fff);
+            animation: soundwave 1.2s ease-in-out infinite;
+            border-radius: 9999px;
+        }
+        
+        .bar:nth-child(2) { animation-delay: 150ms; height: 30%; }
+        .bar:nth-child(3) { animation-delay: 300ms; height: 70%; }
+        .bar:nth-child(4) { animation-delay: 100ms; height: 45%; }
+        .bar:nth-child(5) { animation-delay: 400ms; height: 85%; }
+        .bar:nth-child(6) { animation-delay: 250ms; height: 35%; }
+        
+        .recording .bar {
+            animation-play-state: running;
+        }
+        
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 25px 50px -12px rgb(59 130 246 / 0.15);
+        }
+    </style>
+</head>
+<body class="tailwind-ready bg-zinc-950 text-zinc-100 min-h-screen flex">
+    <!-- SIDEBAR -->
+    <div class="w-72 bg-zinc-900 border-r border-zinc-800 flex flex-col">
+        <!-- Logo -->
+        <div class="px-8 py-8 border-b border-zinc-800 flex items-center gap-x-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-[#5b8fff] to-[#3dffc0] rounded-2xl flex items-center justify-center shadow-inner">
+                <span class="text-white text-3xl drop-shadow-md">🧠</span>
+            </div>
+            <div>
+                <h1 class="logo-font text-3xl font-semibold tracking-[-1px]">Parkinson Logic</h1>
+                <p class="text-xs text-[#3dffc0] tracking-[1px] font-medium -mt-1">IA • v24.03</p>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 px-4 py-6 space-y-1">
+            <button onclick="navigateTo('dashboard')" 
+                    id="nav-dashboard"
+                    class="nav-item w-full flex items-center gap-x-3 px-6 py-4 text-left rounded-3xl hover:bg-white/5 text-white font-medium active">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1v-5m10-10l2 2m-2-2v10a1 1 0 01-1 1v-5m-6 0a1 1 0 001-1v5" />
+                </svg>
+                <span>Tableau de bord</span>
+            </button>
+
+            <button onclick="navigateTo('vocale')" 
+                    id="nav-vocale"
+                    class="nav-item w-full flex items-center gap-x-3 px-6 py-4 text-left rounded-3xl hover:bg-white/5 text-white/70 font-medium">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m-.5-15a3.5 3.5 0 10-7 0v4a3.5 3.5 0 007 0V6z" />
+                </svg>
+                <span>Analyse vocale</span>
+            </button>
+
+            <button onclick="navigateTo('scoring')" 
+                    id="nav-scoring"
+                    class="nav-item w-full flex items-center gap-x-3 px-6 py-4 text-left rounded-3xl hover:bg-white/5 text-white/70 font-medium">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span>Scoring risque IA</span>
+            </button>
+
+            <div class="px-6 pt-8 text-xs uppercase tracking-widest text-zinc-500 font-medium">Historique</div>
+            <div onclick="showHistory()" class="flex items-center gap-x-3 px-6 py-3 mx-2 rounded-3xl hover:bg-white/5 cursor-pointer">
+                <div class="text-sm">Patient • Jean Dupont</div>
+                <div class="ml-auto text-[#3dffc0] text-xs font-medium">14 mars</div>
+            </div>
+            <div onclick="showHistory()" class="flex items-center gap-x-3 px-6 py-3 mx-2 rounded-3xl hover:bg-white/5 cursor-pointer">
+                <div class="text-sm">Patient • Marie Leclerc</div>
+                <div class="ml-auto text-[#3dffc0] text-xs font-medium">12 mars</div>
+            </div>
+
+            <!-- Quick stats -->
+            <div class="mt-auto px-6 py-6 border-t border-zinc-800">
+                <div class="flex justify-between text-xs">
+                    <div class="text-zinc-400">Patients suivis</div>
+                    <div class="font-semibold text-[#5b8fff]">18</div>
+                </div>
+                <div class="h-2 bg-zinc-800 rounded-3xl mt-3 overflow-hidden">
+                    <div class="h-2 w-[78%] bg-gradient-to-r from-[#5b8fff] to-[#3dffc0]"></div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Footer user -->
+        <div class="px-6 py-6 border-t border-zinc-800 flex items-center gap-x-3">
+            <div class="w-9 h-9 bg-[#3dffc0]/10 text-[#3dffc0] rounded-2xl flex items-center justify-center text-xl">👨‍⚕️</div>
+            <div class="flex-1">
+                <div class="font-medium">Dr. Mohammed Ilyes Zoubirou</div>
+                <div class="text-zinc-500 text-sm">Neurologue • Montréal</div>
+            </div>
+            <button onclick="logout()" class="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-white">
+                ⚙️
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="flex-1 flex flex-col">
+        
+        <!-- TOP BAR -->
+        <header class="h-16 border-b border-zinc-800 bg-zinc-900 px-8 flex items-center justify-between">
+            <div class="flex items-center gap-x-4">
+                <h2 id="page-title" class="text-2xl font-semibold logo-font tracking-tight">Tableau de bord</h2>
+                <div class="px-3 py-1 text-xs font-medium bg-emerald-400/10 text-emerald-400 rounded-3xl flex items-center">
+                    <div class="w-2 h-2 bg-emerald-400 rounded-full mr-1 animate-pulse"></div>
+                    IA en ligne
+                </div>
+            </div>
+
+            <div class="flex items-center gap-x-6">
+                <!-- Search -->
+                <div class="relative">
+                    <input id="search-input" 
+                           type="text" 
+                           placeholder="Rechercher un patient ou une analyse..."
+                           class="bg-zinc-800 border border-transparent focus:border-[#5b8fff] w-80 rounded-3xl py-3 px-5 text-sm outline-none placeholder:text-zinc-400">
+                    <span class="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-400">⌘K</span>
+                </div>
+
+                <!-- Notifications -->
+                <button onclick="fakeNotification()" class="relative w-9 h-9 flex items-center justify-center text-xl hover:scale-110">
+                    🛎️
+                    <span id="notif-dot" class="absolute top-1 right-1 w-3 h-3 bg-[#3dffc0] rounded-full ring-2 ring-zinc-900"></span>
+                </button>
+
+                <!-- Dark mode toggle (toujours sombre mais fun) -->
+                <div onclick="toggleTheme()" class="cursor-pointer text-2xl">🌙</div>
+
+                <!-- Avatar -->
+                <div class="flex items-center gap-x-2">
+                    <div class="text-right">
+                        <div class="text-sm font-medium">Dr. Zoubirou</div>
+                        <div class="text-xs text-zinc-400">Connecté • 03:58</div>
+                    </div>
+                    <div class="w-9 h-9 bg-gradient-to-br from-[#5b8fff] to-[#3dffc0] text-white rounded-2xl flex items-center justify-center text-2xl shadow-inner">🧬</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- PAGE CONTENT CONTAINER -->
+        <div class="flex-1 p-8 overflow-auto" id="content-area">
+
+            <!-- DASHBOARD SECTION -->
+            <div id="section-dashboard" class="dashboard-grid">
+                <div class="flex justify-between items-end mb-8">
+                    <div>
+                        <p class="text-emerald-400 text-sm font-medium">Bonjour, Dr. Zoubirou 👋</p>
+                        <h1 class="text-4xl font-semibold logo-font tracking-[-2px]">Vue d'ensemble IA</h1>
+                        <p class="text-zinc-400 mt-1">Dernière synchronisation : il y a 3 minutes</p>
+                    </div>
+                    
+                    <button onclick="refreshDashboard()" 
+                            class="flex items-center gap-x-2 bg-white/5 hover:bg-white/10 text-white px-6 py-3 rounded-3xl text-sm font-medium">
+                        <span>🔄</span>
+                        <span>Actualiser l'IA</span>
+                    </button>
+                </div>
+
+                <!-- KPI Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                    <!-- Card 1 -->
+                    <div class="bg-zinc-900 rounded-3xl p-6 card-hover border border-transparent hover:border-[#5b8fff]/30">
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-xs uppercase text-zinc-400 tracking-widest">Score risque global</p>
+                                <div id="global-score" class="text-6xl font-semibold text-[#5b8fff] mt-2">38%</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="inline-flex items-center text-emerald-400 text-sm font-medium">
+                                    ↓ 12% <span class="ml-1">depuis hier</span>
+                                </div>
+                                <div class="mt-8 w-20 h-20 relative">
+                                    <svg class="w-20 h-20 -rotate-12" viewBox="0 0 42 42">
+                                        <circle cx="21" cy="21" r="15" fill="none" stroke="#27272a" stroke-width="6"></circle>
+                                        <circle cx="21" cy="21" r="15" fill="none" stroke="#5b8fff" stroke-width="6" 
+                                                stroke-dasharray="94.2" stroke-dashoffset="23" stroke-linecap="round"></circle>
+                                    </svg>
+                                    <div class="absolute inset-0 flex items-center justify-center text-xs font-bold text-[#5b8fff]">38</div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-xs text-zinc-400 mt-6">Modéré • Surveillance recommandée</p>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="bg-zinc-900 rounded-3xl p-6 card-hover border border-transparent hover:border-[#3dffc0]/30">
+                        <p class="text-xs uppercase text-zinc-400 tracking-widest">Analyse vocale récente</p>
+                        <div class="flex items-baseline gap-x-3 mt-6">
+                            <span class="text-6xl font-semibold">92</span>
+                            <span class="text-2xl text-[#3dffc0]">/100</span>
+                        </div>
+                        <p class="text-sm mt-1 text-emerald-400">Aucune anomalie majeure détectée</p>
+                        
+                        <div class="mt-8 flex items-center text-xs">
+                            <div class="flex-1 h-2 bg-zinc-800 rounded-full overflow-hidden">
+                                <div class="h-2 bg-gradient-to-r from-[#3dffc0] to-[#5b8fff] w-4/5"></div>
+                            </div>
+                            <span class="ml-4 font-medium text-[#3dffc0]">Il y a 14 min</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="bg-zinc-900 rounded-3xl p-6 card-hover border border-transparent hover:border-[#5b8fff]/30">
+                        <p class="text-xs uppercase text-zinc-400 tracking-widest">Patients en alerte</p>
+                        <div class="text-6xl font-semibold mt-4 text-amber-400">3</div>
+                        <div class="flex gap-2 mt-8">
+                            <div class="text-xs bg-amber-400/10 text-amber-400 px-4 py-2 rounded-3xl">Tremblements</div>
+                            <div class="text-xs bg-amber-400/10 text-amber-400 px-4 py-2 rounded-3xl">Rigidité</div>
+                        </div>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="bg-zinc-900 rounded-3xl p-6 card-hover border border-transparent hover:border-[#3dffc0]/30 flex flex-col justify-between">
+                        <div>
+                            <p class="text-xs uppercase text-zinc-400 tracking-widest">Précision IA</p>
+                            <div class="text-6xl font-semibold text-[#3dffc0]">98.7%</div>
+                        </div>
+                        <div class="text-xs flex items-center text-emerald-400">
+                            <span class="bg-emerald-400 text-emerald-950 text-[10px] px-2 py-px rounded">+0.4%</span>
+                            <span class="ml-2">ce mois-ci</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-8 bg-zinc-900 rounded-3xl p-8">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="font-semibold">Évolution du score de risque (30 jours)</h3>
+                            <select class="bg-transparent text-sm border border-zinc-700 rounded-3xl px-4 py-2 text-zinc-300">
+                                <option>Tous les patients</option>
+                                <option>Jean Dupont</option>
+                            </select>
+                        </div>
+                        <canvas id="riskChart" class="h-80"></canvas>
+                    </div>
+
+                    <div class="lg:col-span-4 bg-zinc-900 rounded-3xl p-8 flex flex-col">
+                        <h3 class="font-semibold mb-6">Symptômes détectés récemment</h3>
+                        <div class="space-y-6 flex-1">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-x-4">
+                                    <span class="text-3xl">👐</span>
+                                    <div>
+                                        <p class="font-medium">Tremblement de repos</p>
+                                        <p class="text-xs text-zinc-400">Détecté à 87% de confiance</p>
+                                    </div>
+                                </div>
+                                <span class="text-[#5b8fff] font-mono text-xl">+14%</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-x-4">
+                                    <span class="text-3xl">🚶</span>
+                                    <div>
+                                        <p class="font-medium">Trouble de la marche</p>
+                                        <p class="text-xs text-zinc-400">Détecté à 64% de confiance</p>
+                                    </div>
+                                </div>
+                                <span class="text-[#3dffc0] font-mono text-xl">-9%</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-x-4">
+                                    <span class="text-3xl">🗣️</span>
+                                    <div>
+                                        <p class="font-medium">Dysarthrie légère</p>
+                                        <p class="text-xs text-zinc-400">Analyse vocale</p>
+                                    </div>
+                                </div>
+                                <span class="text-amber-400 font-mono text-xl">Stable</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ANALYSE VOCALE SECTION -->
+            <div id="section-vocale" class="dashboard-grid hidden">
+                <h1 class="text-4xl font-semibold logo-font tracking-[-1px] mb-8">Analyse vocale en temps réel</h1>
+                
+                <div class="max-w-2xl mx-auto bg-zinc-900 rounded-3xl p-10">
+                    <div id="voice-status" class="text-center">
+                        <div class="mx-auto w-32 h-32 rounded-full border-8 border-[#3dffc0]/20 flex items-center justify-center mb-8">
+                            <button onclick="startVoiceAnalysis()" 
+                                    id="record-btn"
+                                    class="w-24 h-24 bg-gradient-to-br from-[#5b8fff] to-[#3dffc0] rounded-full flex items-center justify-center text-5xl shadow-2xl hover:scale-110 active:scale-95">
+                                🎤
+                            </button>
+                        </div>
+                        <p id="voice-instruction" class="text-xl font-medium">Appuyez pour enregistrer 15 secondes de parole</p>
+                        <p class="text-zinc-400 text-sm mt-3">L'IA détecte tremblements vocaux, dysarthrie et prosodie</p>
+                    </div>
+
+                    <!-- Waveform -->
+                    <div id="waveform-container" class="hidden mt-8">
+                        <div class="waveform recording mx-auto" id="waveform">
+                            <div class="bar h-3"></div>
+                            <div class="bar h-8"></div>
+                            <div class="bar h-12"></div>
+                            <div class="bar h-5"></div>
+                            <div class="bar h-14"></div>
+                            <div class="bar h-9"></div>
+                            <div class="bar h-4"></div>
+                        </div>
+                        <div class="text-center text-xs text-[#3dffc0] font-medium mt-4" id="recording-timer">00:15</div>
+                    </div>
+
+                    <!-- Résultats -->
+                    <div id="voice-results" class="hidden mt-8 space-y-6">
+                        <div class="bg-black/30 rounded-3xl p-6">
+                            <p class="uppercase text-xs mb-4 text-zinc-400">Transcription IA</p>
+                            <p id="transcription-text" class="italic">"Bonjour docteur, je me sens un peu raide aujourd’hui et ma voix tremble légèrement quand je parle."</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-4 text-center">
+                            <div class="bg-zinc-950 rounded-3xl py-5">
+                                <div class="text-[#3dffc0] text-4xl font-semibold">87%</div>
+                                <p class="text-xs mt-2">Dysarthrie</p>
+                            </div>
+                            <div class="bg-zinc-950 rounded-3xl py-5">
+                                <div class="text-[#5b8fff] text-4xl font-semibold">62%</div>
+                                <p class="text-xs mt-2">Prosodie altérée</p>
+                            </div>
+                            <div class="bg-zinc-950 rounded-3xl py-5">
+                                <div class="text-amber-400 text-4xl font-semibold">41%</div>
+                                <p class="text-xs mt-2">Tremblement vocal</p>
+                            </div>
+                        </div>
+                        
+                        <button onclick="resetVoiceAnalysis()" 
+                                class="w-full py-6 bg-white/5 hover:bg-white/10 rounded-3xl text-lg font-medium">
+                            Nouvelle analyse
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCORING RISQUE SECTION -->
+            <div id="section-scoring" class="dashboard-grid hidden">
+                <h1 class="text-4xl font-semibold logo-font tracking-[-1px] mb-8">Scoring risque Parkinson IA</h1>
+                
+                <div class="max-w-4xl mx-auto">
+                    <div class="bg-zinc-900 rounded-3xl p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Formulaire -->
+                        <div>
+                            <h3 class="font-medium text-lg mb-6">Données patient</h3>
+                            
+                            <div class="space-y-8">
+                                <div>
+                                    <label class="text-xs block mb-2 text-zinc-400">ÂGE</label>
+                                    <input id="age-input" type="number" value="68" 
+                                           class="w-full bg-zinc-800 border-0 rounded-3xl py-6 px-8 text-3xl font-medium focus:ring-2 focus:ring-[#5b8fff]">
+                                </div>
+
+                                <div>
+                                    <label class="text-xs block mb-3 text-zinc-400">SYMPTÔMES PRÉSENTS</label>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <label class="flex items-center gap-x-3 bg-zinc-800 hover:bg-zinc-700 rounded-3xl px-6 py-4 cursor-pointer">
+                                            <input type="checkbox" checked class="w-5 h-5 accent-[#3dffc0]">
+                                            <span>Tremblement</span>
+                                        </label>
+                                        <label class="flex items-center gap-x-3 bg-zinc-800 hover:bg-zinc-700 rounded-3xl px-6 py-4 cursor-pointer">
+                                            <input type="checkbox" class="w-5 h-5 accent-[#3dffc0]">
+                                            <span>Rigidité</span>
+                                        </label>
+                                        <label class="flex items-center gap-x-3 bg-zinc-800 hover:bg-zinc-700 rounded-3xl px-6 py-4 cursor-pointer">
+                                            <input type="checkbox" checked class="w-5 h-5 accent-[#3dffc0]">
+                                            <span>Bradykinésie</span>
+                                        </label>
+                                        <label class="flex items-center gap-x-3 bg-zinc-800 hover:bg-zinc-700 rounded-3xl px-6 py-4 cursor-pointer">
+                                            <input type="checkbox" class="w-5 h-5 accent-[#3dffc0]">
+                                            <span>Trouble postural</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="text-xs block mb-2 text-zinc-400">DURÉE DES SYMPTÔMES (mois)</label>
+                                    <input type="range" min="1" max="120" value="28" id="duration-slider"
+                                           class="w-full accent-[#5b8fff]">
+                                    <div class="flex justify-between text-xs text-zinc-400 mt-1">
+                                        <span>1</span>
+                                        <span id="duration-value" class="font-medium">28 mois</span>
+                                        <span>120</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Résultat IA -->
+                        <div class="bg-gradient-to-br from-zinc-950 to-black rounded-3xl p-8 flex flex-col justify-center">
+                            <div class="text-center">
+                                <p class="uppercase text-xs tracking-[2px] text-[#3dffc0]">Score IA calculé</p>
+                                <div id="ia-score-display" class="text-[120px] font-semibold leading-none text-transparent bg-clip-text bg-gradient-to-br from-[#5b8fff] via-[#3dffc0] to-[#5b8fff] mt-2">64</div>
+                                <p class="text-zinc-400">Risque modéré – Stade probable 2</p>
+                            </div>
+
+                            <button onclick="calculateRiskScore()" 
+                                    class="mt-12 w-full py-7 bg-gradient-to-r from-[#5b8fff] to-[#3dffc0] text-white text-xl font-semibold rounded-3xl flex items-center justify-center gap-x-3">
+                                <span>CALCULER AVEC L’IA</span>
+                                <span class="text-3xl">→</span>
+                            </button>
+
+                            <div id="score-explanation" class="hidden mt-8 text-sm text-zinc-300 leading-relaxed">
+                                L’algorithme multimodal (voix + symptômes + historique) estime un risque de 64 %. 
+                                Recommandation : IRM et suivi vocal tous les 15 jours.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" onclick="this.classList.add('hidden')" 
+         class="hidden fixed bottom-6 right-6 bg-zinc-800 border border-[#3dffc0] text-white px-6 py-4 rounded-3xl shadow-2xl flex items-center gap-x-3">
+        <span>✅</span>
+        <span id="toast-text" class="font-medium"></span>
+    </div>
+
+    <script>
+        /**
+         * Z-Claude.code — Code propre, moderne, professionnel
+         * Page complète IA Parkinson Logic
+         * React 19 + Tailwind 4 style simulé en HTML autonome (2026 best practices)
+         * Dark mode natif, accents #5b8fff / #3dffc0, responsive, accessible
+         * Commentaires en français uniquement
+         */
+
+        // Configuration Tailwind
+        function initializeTailwind() {
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            primary: '#5b8fff',
+                            accent: '#3dffc0'
+                        },
+                        fontFamily: {
+                            sans: ['Inter', 'system-ui'],
+                            logo: ['Outfit']
+                        }
+                    }
+                }
+            }
+            console.log('%c✅ IA Parkinson Logic chargée avec succès (React-like)', 'color:#3dffc0; font-family:DM Mono; font-size:10px')
+        }
+
+        // Navigation entre sections
+        let currentSection = 'dashboard'
+        
+        function navigateTo(section) {
+            // Masquer toutes les sections
+            document.querySelectorAll('#content-area > div').forEach(div => div.classList.add('hidden'))
+            
+            // Afficher la section demandée
+            const target = document.getElementById(`section-${section}`)
+            if (target) target.classList.remove('hidden')
+            
+            // Mise à jour du titre
+            const titleEl = document.getElementById('page-title')
+            if (section === 'dashboard') titleEl.textContent = 'Tableau de bord'
+            else if (section === 'vocale') titleEl.textContent = 'Analyse vocale'
+            else if (section === 'scoring') titleEl.textContent = 'Scoring risque IA'
+            
+            // Mise à jour état navigation
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active', 'text-white'))
+            document.getElementById(`nav-${section}`).classList.add('active', 'text-white')
+            
+            currentSection = section
+        }
+
+        // Graphique risque (Chart.js)
+        let riskChartInstance = null
+        
+        function createRiskChart() {
+            const ctx = document.getElementById('riskChart')
+            if (!ctx) return
+            
+            if (riskChartInstance) riskChartInstance.destroy()
+            
+            riskChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['2 mars', '6 mars', '10 mars', '14 mars', '18 mars', '22 mars', '26 mars', '30 mars'],
+                    datasets: [{
+                        label: 'Score risque (%)',
+                        data: [52, 48, 55, 41, 39, 44, 37, 38],
+                        borderColor: '#5b8fff',
+                        borderWidth: 4,
+                        tension: 0.3,
+                        pointBackgroundColor: '#3dffc0',
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }]
+                },
+                options: {
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { min: 20, max: 70, grid: { color: '#27272a' }, ticks: { color: '#a1a1aa', font: { size: 13 } } },
+                        x: { grid: { color: '#27272a' }, ticks: { color: '#a1a1aa', font: { size: 13 } } }
+                    }
+                }
+            })
+        }
+
+        // Simulation analyse vocale
+        let recordingInterval = null
+        
+        function startVoiceAnalysis() {
+            const recordBtn = document.getElementById('record-btn')
+            const instruction = document.getElementById('voice-instruction')
+            const waveformContainer = document.getElementById('waveform-container')
+            const results = document.getElementById('voice-results')
+            
+            // Animation enregistrement
+            recordBtn.innerHTML = `⏹️`
+            recordBtn.style.background = 'linear-gradient(to bottom right, #f59e0b, #ef4444)'
+            instruction.textContent = 'Enregistrement en cours…'
+            waveformContainer.classList.remove('hidden')
+            results.classList.add('hidden')
+            
+            // Timer 15 secondes
+            let timeLeft = 15
+            const timerEl = document.getElementById('recording-timer')
+            timerEl.textContent = `00:${timeLeft}`
+            
+            recordingInterval = setInterval(() => {
+                timeLeft--
+                timerEl.textContent = `00:${timeLeft < 10 ? '0' : ''}${timeLeft}`
+                if (timeLeft <= 0) {
+                    clearInterval(recordingInterval)
+                    finishVoiceAnalysis()
+                }
+            }, 1000)
+        }
+        
+        function finishVoiceAnalysis() {
+            const recordBtn = document.getElementById('record-btn')
+            const waveformContainer = document.getElementById('waveform-container')
+            const results = document.getElementById('voice-results')
+            
+            recordBtn.innerHTML = `🎤`
+            recordBtn.style.background = ''
+            waveformContainer.classList.add('hidden')
+            results.classList.remove('hidden')
+            
+            // Fake transcription
+            document.getElementById('transcription-text').textContent = 
+                `"Bonjour docteur, je me sens un peu raide aujourd’hui et ma voix tremble légèrement quand je parle."`
+            
+            showToast("Analyse vocale terminée – Résultats générés par l’IA", 3000)
+        }
+        
+        function resetVoiceAnalysis() {
+            // Reset complet
+            document.getElementById('voice-results').classList.add('hidden')
+            document.getElementById('waveform-container').classList.add('hidden')
+            const instruction = document.getElementById('voice-instruction')
+            instruction.textContent = 'Appuyez pour enregistrer 15 secondes de parole'
+            navigateTo('vocale') // refresh
+        }
+
+        // Calcul scoring risque
+        function calculateRiskScore() {
+            const age = parseInt(document.getElementById('age-input').value) || 68
+            const duration = parseInt(document.getElementById('duration-slider').value)
+            
+            // Simulation IA intelligente
+            let score = Math.max(20, Math.min(95, 
+                Math.floor((age - 40) * 1.1) + 
+                Math.floor(duration / 3) + 
+                (document.querySelectorAll('input[type="checkbox"]:checked').length * 12)
+            ))
+            
+            document.getElementById('ia-score-display').textContent = score
+            document.getElementById('score-explanation').classList.remove('hidden')
+            
+            showToast(`Score IA calculé : ${score}% – Modèle multimodal activé`, 2800)
+            
+            // Effet visuel
+            setTimeout(() => {
+                document.getElementById('ia-score-display').classList.add('scale-110')
+                setTimeout(() => document.getElementById('ia-score-display').classList.remove('scale-110'), 400)
+            }, 100)
+        }
+
+        // Mise à jour slider durée
+        function initSlider() {
+            const slider = document.getElementById('duration-slider')
+            const valueEl = document.getElementById('duration-value')
+            if (!slider) return
+            slider.addEventListener('input', () => {
+                valueEl.textContent = `${slider.value} mois`
+            })
+        }
+
+        // Rafraîchissement dashboard
+        function refreshDashboard() {
+            const scoreEl = document.getElementById('global-score')
+            scoreEl.style.transitionDuration = '800ms'
+            scoreEl.textContent = '35%'
+            
+            setTimeout(() => {
+                scoreEl.textContent = '38%'
+                createRiskChart()
+                showToast('Données IA actualisées en temps réel', 2200)
+            }, 1200)
+        }
+
+        // Toast système
+        function showToast(message, duration = 2500) {
+            const toast = document.getElementById('toast')
+            const text = document.getElementById('toast-text')
+            text.textContent = message
+            toast.style.display = 'flex'
+            
+            setTimeout(() => {
+                toast.style.display = 'none'
+            }, duration)
+        }
+
+        // Fake notification
+        function fakeNotification() {
+            const dot = document.getElementById('notif-dot')
+            dot.style.display = 'none'
+            
+            showToast('🧬 Nouvelle alerte IA : score vocal Jean Dupont en hausse', 4000)
+            
+            setTimeout(() => {
+                dot.style.display = 'block'
+            }, 6000)
+        }
+
+        // Simulation historique
+        function showHistory() {
+            showToast('📂 Ouverture du dossier patient dans l’IA…', 1500)
+            setTimeout(() => navigateTo('dashboard'), 1600)
+        }
+
+        // Toggle thème (toujours sombre mais effet fun)
+        function toggleTheme() {
+            const body = document.body
+            if (body.style.filter === 'invert(1) hue-rotate(180deg)') {
+                body.style.filter = ''
+                showToast('🌙 Mode sombre restauré (design 2026)', 1500)
+            } else {
+                body.style.filter = 'invert(1) hue-rotate(180deg)'
+                showToast('☀️ Mode lumière inversé (expérimental)', 1500)
+            }
+        }
+
+        function logout() {
+            if (confirm('Déconnexion de l’IA Parkinson Logic ?')) {
+                window.location.reload()
+            }
+        }
+
+        // Initialisation complète de l’application
+        window.onload = function () {
+            initializeTailwind()
+            createRiskChart()
+            initSlider()
+            
+            console.log('%c🚀 Z-Claude.code • Page IA Parkinson Logic prête (React 19 + Tailwind 4 style)', 'background:#3dffc0;color:#000;font-weight:bold;padding:1px 4px;border-radius:2px')
+            
+            // Focus recherche clavier
+            document.getElementById('search-input').addEventListener('keydown', function(e) {
+                if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
+                    e.preventDefault()
+                    this.focus()
+                }
+            })
+            
+            console.log('✅ Tout est optimisé pour performance et lisibilité.')
+        }
+    </script>
+</body>
+</html>
