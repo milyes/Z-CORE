@@ -1,35 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Z-CORE - Phase 01 Progress</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 40px; background: #0f0f0f; color: #e0e0e0; }
+        h1 { color: #00ff9d; }
+        h2 { color: #00cc7a; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; }
+        th { background: #1a1a1a; }
+        .done { color: #00ff9d; }
+        .inprogress { color: #ffcc00; }
+        .todo { color: #ff6666; }
+    </style>
+</head>
+<body>
 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap');
-*{box-sizing:border-box;margin:0;padding:0;}
-body{background:#040a0f;color:#c8f0d0;font-family:'Rajdhani',sans-serif;padding:20px;}
-.header{border-bottom:1px solid #00ff8822;padding-bottom:16px;margin-bottom:20px;}
-.logo{font-family:'Share Tech Mono',monospace;font-size:10px;color:#00ff8866;letter-spacing:3px;}
-h1{font-size:22px;font-weight:700;color:#fff;margin-top:4px;}
-h1 span{color:#00ff88;}
-.files{display:flex;flex-direction:column;gap:8px;}
-.file{background:#060e14;border:1px solid #00ff8820;border-left:3px solid #00ff88;padding:14px 16px;display:flex;align-items:center;gap:12px;}
-.file.orange{border-left-color:#ff8c00;}
-.file.red{border-left-color:#ff4466;}
-.file.blue{border-left-color:#00ccff;}
-.file.gray{border-left-color:#445544;}
-.file-icon{font-size:18px;min-width:24px;text-align:center;}
-.file-info{flex:1;}
-.file-name{font-family:'Share Tech Mono',monospace;font-size:13px;color:#e0f0e8;}
-.file-desc{font-size:12px;color:#607060;margin-top:2px;}
-.badge{font-family:'Share Tech Mono',monospace;font-size:9px;padding:2px 8px;border-radius:1px;letter-spacing:2px;}
-.badge.done{background:#00ff8822;color:#00ff88;border:1px solid #00ff8444;}
-.badge.wip{background:#ff8c0022;color:#ff8c00;border:1px solid #ff8c0044;}
-</style>
-<div class="header">
-  <div class="logo">⬡ PHASE 01 — GITHUB STRUCTURE & READMEs</div>
-  <h1>Fichiers en cours de <span>génération</span></h1>
-</div>
-<div class="files">
-  <div class="file"><span class="file-icon">📁</span><div class="file-info"><div class="file-name">netsecurepro-ia/</div><div class="file-desc">Structure racine du dépôt global</div></div><span class="badge done">✓ CRÉÉ</span></div>
-  <div class="file"><span class="file-icon">📄</span><div class="file-info"><div class="file-name">README.md — NetSecurePro IA (Global)</div><div class="file-desc">Présentation globale du projet · FR + EN</div></div><span class="badge done">✓ CRÉÉ</span></div>
-  <div class="file orange"><span class="file-icon">📄</span><div class="file-info"><div class="file-name">README.md — Z-CORE OS IA</div><div class="file-desc">Terminal souverain · Architecture · FR + EN</div></div><span class="badge done">✓ CRÉÉ</span></div>
-  <div class="file red"><span class="file-icon">📄</span><div class="file-info"><div class="file-name">README.md — GRONDIN v2</div><div class="file-desc">Intelligence médicale · Workflows · FR + EN</div></div><span class="badge done">✓ CRÉÉ</span></div>
-  <div class="file blue"><span class="file-icon">📄</span><div class="file-info"><div class="file-name">README.md — DZROUGE TERMINAL</div><div class="file-desc">Défense réseau · Sécurité · FR + EN</div></div><span class="badge done">✓ CRÉÉ</span></div>
-  <div class="file gray"><span class="file-icon">📄</span><div class="file-info"><div class="file-name">GITHUB_STRUCTURE.md</div><div class="file-desc">Arborescence complète recommandée</div></div><span class="badge done">✓ CRÉÉ</span></div>
-</div>
+<h1>Z-CORE - Suivi de Progression Phase 01</h1>
+<p><strong>Date de mise à jour :</strong> Avril 2026</p>
+
+<h2>Objectif de la Phase 01</h2>
+<p>Structurer le repository, consolider la documentation et poser les bases techniques des projets principaux (NetSecurePro IA et ORBITRON.IA).</p>
+
+<h2>Avancement Général</h2>
+
+<table>
+    <tr>
+        <th>Élément</th>
+        <th>Statut</th>
+        <th>Commentaires</th>
+    </tr>
+    <tr>
+        <td>README principal (Z-CORE)</td>
+        <td class="done">✅ Terminé</td>
+        <td>Version améliorée et professionnelle rédigée</td>
+    </tr>
+    <tr>
+        <td>Structure du repository</td>
+        <td class="inprogress">🔄 En cours</td>
+        <td>Dossiers à créer : projects/, docs/, architecture/, interfaces/</td>
+    </tr>
+    <tr>
+        <td>NetSecurePro IA - Master Plan</td>
+        <td class="inprogress">🔄 En cours</td>
+        <td>Plan détaillé en cours de rédaction</td>
+    </tr>
+    <tr>
+        <td>ORBITRON.IA Documentation</td>
+        <td class="done">✅ Terminé</td>
+        <td>Présent dans le README principal</td>
+    </tr>
+    <tr>
+        <td>gitZ-CORE Interface (AI Studio)</td>
+        <td class="done">✅ Terminé</td>
+        <td>Interface futuriste déjà créée</td>
+    </tr>
+    <tr>
+        <td>z-Claude Cowork Concept</td>
+        <td class="todo">⏳ À faire</td>
+        <td>Concept initial seulement</td>
+    </tr>
+</table>
+
+<h2>Détails par Projet</h2>
+
+<h3>1. NetSecurePro IA</h3>
+<ul>
+    <li>✅ Architecture globale définie</li>
+    <li>✅ Fonctionnalités clés identifiées (Impossible Travel, Géolocalisation, VPN detection)</li>
+    <li>🔄 Feature Engineering avec Snowpark en cours de conception</li>
+    <li>⏳ Implémentation des UDFs et calcul de vitesse à faire</li>
+    <li>⏳ Prototype de détection Impossible Travel à développer</li>
+</ul>
+
+<h3>2. ORBITRON.IA</h3>
+<ul>
+    <li>✅ Pipeline MLOps sur Snowflake décrit</li>
+    <li>✅ Validation Snowflake ML Lab obtenue</li>
+    <li>🔄 Documentation FHIR et UDFs sécurisées à approfondir</li>
+</ul>
+
+<h3>3. Infrastructure & Organisation</h3>
+<ul>
+    <li>✅ README principal mis à jour</li>
+    <li>🔄 Nettoyage de la racine du repository (déplacer les fichiers HTML)</li>
+    <li>🔄 Création des dossiers structurés (projects/, docs/, architecture/)</li>
+</ul>
+
+<h2>Prochaines Actions Prioritaires</h2>
+<ol>
+    <li>Créer la structure de dossiers complète du repository</li>
+    <li>Rédiger le Master Plan détaillé de NetSecurePro IA</li>
+    <li>Implémenter les premiers scripts Snowpark (UDF Géolocalisation + Impossible Travel)</li>
+    <li>Ajouter des diagrammes d’architecture (Mermaid)</li>
+    <li>Nettoyer la racine et organiser les fichiers HTML dans /interfaces/</li>
+</ol>
+
+<p><strong>Prochaine mise à jour prévue :</strong> Dès que la structure des dossiers sera finalisée.</p>
+
+<hr>
+<p style="text-align: center; color: #666;">
+    Z-CORE — Projet souverain en développement actif<br>
+    Mohammed Ilyes Zoubirou — Avril 2026
+</p>
+
+</body>
+</html>

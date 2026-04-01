@@ -1,303 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Z-CORE - NetSecurePro IA Master Plan</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 40px; background: #0a0a0a; color: #e0e0e0; line-height: 1.6; }
+        h1 { color: #00ff9d; }
+        h2 { color: #00cc7a; border-bottom: 2px solid #00cc7a; padding-bottom: 8px; }
+        h3 { color: #00ffbb; }
+        ul { line-height: 1.8; }
+        .section { background: #1a1a1a; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .status { font-weight: bold; }
+        .done { color: #00ff9d; }
+        .progress { color: #ffcc00; }
+        .todo { color: #ff6666; }
+    </style>
+</head>
+<body>
 
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap');
+<h1>NetSecurePro IA - Master Plan</h1>
+<p><strong>Projet Cybersécurité Intelligent • Z-CORE</strong><br>
+Date : Avril 2026 | Auteur : Mohammed Ilyes Zoubirou</p>
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: #040a0f;
-    color: #c8f0d0;
-    font-family: 'Rajdhani', sans-serif;
-    min-height: 100vh;
-    padding: 24px;
-  }
-
-  .scan-line {
-    position: fixed; top: 0; left: 0; width: 100%; height: 2px;
-    background: linear-gradient(90deg, transparent, #00ff88, transparent);
-    animation: scan 4s linear infinite;
-    pointer-events: none; z-index: 100;
-  }
-  @keyframes scan { 0%{top:0%} 100%{top:100%} }
-
-  .header {
-    text-align: center;
-    padding: 20px 0 32px;
-    border-bottom: 1px solid #00ff8822;
-    margin-bottom: 32px;
-  }
-
-  .logo {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 11px;
-    color: #00ff88;
-    letter-spacing: 4px;
-    margin-bottom: 6px;
-    opacity: 0.7;
-  }
-
-  h1 {
-    font-size: 30px;
-    font-weight: 700;
-    color: #fff;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
-
-  h1 span { color: #00ff88; }
-
-  .subtitle {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 11px;
-    color: #00ff8866;
-    margin-top: 8px;
-    letter-spacing: 2px;
-  }
-
-  .lang-badge {
-    display: inline-block;
-    margin-top: 12px;
-    padding: 4px 16px;
-    border: 1px solid #00ff8844;
-    border-radius: 2px;
-    font-size: 12px;
-    color: #00ff88;
-    letter-spacing: 3px;
-  }
-
-  .grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 24px;
-  }
-
-  .card {
-    background: #060e14;
-    border: 1px solid #00ff8820;
-    border-left: 3px solid #00ff88;
-    padding: 20px;
-    position: relative;
-    transition: border-color 0.2s, background 0.2s;
-    cursor: pointer;
-  }
-  .card:hover { background: #091520; border-color: #00ff8866; }
-
-  .card-tag {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 3px;
-    color: #00ff8888;
-    margin-bottom: 6px;
-    text-transform: uppercase;
-  }
-
-  .card h2 { font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 10px; }
-
-  .deliverable {
-    display: flex; align-items: center; gap: 8px;
-    padding: 6px 0;
-    border-bottom: 1px solid #00ff8810;
-    font-size: 13px;
-    color: #a0d0b0;
-  }
-  .deliverable:last-child { border-bottom: none; }
-
-  .dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: #00ff88;
-    flex-shrink: 0;
-    animation: pulse 2s ease-in-out infinite;
-  }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-  .dot.orange { background: #ff8c00; }
-  .dot.blue { background: #00ccff; }
-  .dot.red { background: #ff4466; }
-
-  .card.orange { border-left-color: #ff8c00; }
-  .card.blue { border-left-color: #00ccff; }
-  .card.red { border-left-color: #ff4466; }
-
-  .card.orange .card-tag, .card.orange .dot-accent { color: #ff8c00aa; }
-  .card.blue .card-tag { color: #00ccffaa; }
-  .card.red .card-tag { color: #ff4466aa; }
-
-  .status-row {
-    display: flex; gap: 12px; flex-wrap: wrap;
-    margin-bottom: 24px;
-  }
-
-  .status-item {
-    background: #060e14;
-    border: 1px solid #00ff8820;
-    padding: 14px 20px;
-    flex: 1;
-    min-width: 140px;
-    text-align: center;
-  }
-
-  .status-num {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 28px;
-    color: #00ff88;
-    display: block;
-  }
-
-  .status-label {
-    font-size: 11px;
-    color: #607060;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-top: 2px;
-  }
-
-  .timeline {
-    background: #060e14;
-    border: 1px solid #00ff8820;
-    padding: 20px;
-    margin-bottom: 24px;
-  }
-
-  .timeline h3 {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 3px;
-    color: #00ff88;
-    margin-bottom: 16px;
-  }
-
-  .phase {
-    display: flex; align-items: flex-start; gap: 16px;
-    padding: 10px 0;
-    border-bottom: 1px solid #00ff8808;
-  }
-  .phase:last-child { border-bottom: none; }
-
-  .phase-num {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 20px;
-    color: #00ff8844;
-    min-width: 32px;
-    line-height: 1;
-  }
-
-  .phase-title { font-size: 15px; font-weight: 600; color: #e0f0e8; }
-  .phase-desc { font-size: 12px; color: #607060; margin-top: 2px; }
-
-  .cta {
-    background: transparent;
-    border: 1px solid #00ff88;
-    color: #00ff88;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 3px;
-    padding: 12px 24px;
-    cursor: pointer;
-    text-transform: uppercase;
-    width: 100%;
-    transition: background 0.2s;
-  }
-  .cta:hover { background: #00ff8811; }
-
-  .corner {
-    position: absolute; top: 8px; right: 8px;
-    width: 12px; height: 12px;
-    border-top: 2px solid currentColor;
-    border-right: 2px solid currentColor;
-    opacity: 0.3;
-  }
-
-  @media (max-width: 560px) {
-    .grid { grid-template-columns: 1fr; }
-  }
-</style>
-<div class="scan-line"></div>
-
-<div class="header">
-  <div class="logo">⬡ NETSECUREPRO IA — CLAUDE COWORK ⬡</div>
-  <h1>Plan <span>Maître</span> du Projet</h1>
-  <div class="subtitle">Master Project Plan · Mohammed Ilyes Zoubirou</div>
-  <div class="lang-badge">FR · EN</div>
+<div class="section">
+<h2>🎯 Objectif Général</h2>
+<p>Développer un système de détection de menaces en temps réel basé sur l’analyse avancée de logs réseau, utilisant Snowflake comme plateforme principale et Snowpark pour le traitement scalable et sécurisé des données.</p>
 </div>
 
-<div class="status-row">
-  <div class="status-item"><span class="status-num">4</span><span class="status-label">Projets</span></div>
-  <div class="status-item"><span class="status-num">4</span><span class="status-label">Livrables</span></div>
-  <div class="status-item"><span class="status-num">2</span><span class="status-label">Langues</span></div>
-  <div class="status-item"><span class="status-num">∞</span><span class="status-label">Cowork</span></div>
+<div class="section">
+<h2>🔑 Fonctionnalités Clés</h2>
+<ul>
+    <li><strong>Enrichissement Géolocalisation</strong> : Conversion des IPs en données contextuelles (pays, ville, ASN, risque régional)</li>
+    <li><strong>Détection Impossible Travel</strong> : Calcul de vitesse de déplacement entre deux connexions et détection d’anomalies (> 900 km/h)</li>
+    <li><strong>Filtrage VPN vs Attaque</strong> : Distinction intelligente entre changement légitime de VPN et compromission de compte</li>
+    <li><strong>Threat Intelligence Integration</strong> : Croisement avec des feeds d’IPs malveillantes</li>
+    <li><strong>Feature Engineering Avancé</strong> : Entropie, fenêtres glissantes, séquences d’événements</li>
+    <li><strong>Scoring de Risque Contextuel</strong> : Modèle IA qui combine toutes les features pour générer un score de menace</li>
+</ul>
 </div>
 
-<div class="grid">
-  <div class="card">
-    <div class="corner" style="color:#00ff88"></div>
-    <div class="card-tag">MODULE 01 · PRINCIPAL</div>
-    <h2>🛡️ Z-CORE OS IA</h2>
-    <div class="deliverable"><span class="dot"></span> Doc technique · Architecture</div>
-    <div class="deliverable"><span class="dot"></span> README.md GitHub bilingue</div>
-    <div class="deliverable"><span class="dot"></span> Rapport PDF/Word</div>
-    <div class="deliverable"><span class="dot"></span> Slides de présentation</div>
-  </div>
-  <div class="card orange">
-    <div class="corner" style="color:#ff8c00"></div>
-    <div class="card-tag">MODULE 02 · MÉDICAL</div>
-    <h2>🧠 GRONDIN v2</h2>
-    <div class="deliverable"><span class="dot orange"></span> Doc technique · Workflows</div>
-    <div class="deliverable"><span class="dot orange"></span> README.md GitHub bilingue</div>
-    <div class="deliverable"><span class="dot orange"></span> Rapport PDF/Word</div>
-    <div class="deliverable"><span class="dot orange"></span> Slides de présentation</div>
-  </div>
-  <div class="card red">
-    <div class="corner" style="color:#ff4466"></div>
-    <div class="card-tag">MODULE 03 · DÉFENSE</div>
-    <h2>🔒 DZROUGE TERMINAL</h2>
-    <div class="deliverable"><span class="dot red"></span> Doc technique · Sécurité</div>
-    <div class="deliverable"><span class="dot red"></span> README.md GitHub bilingue</div>
-    <div class="deliverable"><span class="dot red"></span> Rapport PDF/Word</div>
-    <div class="deliverable"><span class="dot red"></span> Slides de présentation</div>
-  </div>
-  <div class="card blue">
-    <div class="corner" style="color:#00ccff"></div>
-    <div class="card-tag">MODULE 04 · GLOBAL</div>
-    <h2>⬡ NetSecurePro IA</h2>
-    <div class="deliverable"><span class="dot blue"></span> Vue d'ensemble du projet</div>
-    <div class="deliverable"><span class="dot blue"></span> Structure GitHub complète</div>
-    <div class="deliverable"><span class="dot blue"></span> Rapport global PDF/Word</div>
-    <div class="deliverable"><span class="dot blue"></span> Pitch deck · Présentation</div>
-  </div>
+<div class="section">
+<h2>🛠️ Architecture Technique</h2>
+<h3>Plateforme Principale</h3>
+<ul>
+    <li>Snowflake Data Cloud (Snowpark Python + UDFs)</li>
+    <li>Tables : RAW_LOGS → ENRICHED_LOGS → FEATURE_STORE → INFERENCE_RESULTS</li>
+</ul>
+
+<h3>Composants Clés</h3>
+<ul>
+    <li><strong>Ingestion</strong> : Logs réseau (NetFlow, Firewall, SIEM) chargés via Snowpipe ou COPY</li>
+    <li><strong>Enrichissement</strong> : UDFs pour Géolocalisation (MaxMind GeoIP2)</li>
+    <li><strong>Feature Engineering</strong> : Window Functions + UDFs pour Impossible Travel et entropie</li>
+    <li><strong>Modèle IA</strong> : Modèle d’anomalie (Isolation Forest / Autoencoder) ou classification supervisée</li>
+    <li><strong>Output</strong> : Alertes en temps réel vers SIEM ou système de blocage</li>
+</ul>
 </div>
 
-<div class="timeline">
-  <h3>▶ SÉQUENCE DE LIVRAISON · DELIVERY SEQUENCE</h3>
-  <div class="phase">
-    <div class="phase-num">01</div>
-    <div>
-      <div class="phase-title">Structure GitHub & READMEs</div>
-      <div class="phase-desc">Arborescence complète · README bilingues · badges · ORCID</div>
-    </div>
-  </div>
-  <div class="phase">
-    <div class="phase-num">02</div>
-    <div>
-      <div class="phase-title">Documentation Technique</div>
-      <div class="phase-desc">Architecture · API · Modules · Diagrammes pour chaque outil</div>
-    </div>
-  </div>
-  <div class="phase">
-    <div class="phase-num">03</div>
-    <div>
-      <div class="phase-title">Rapports PDF / Word</div>
-      <div class="phase-desc">Rapports professionnels bilingues prêts à distribuer</div>
-    </div>
-  </div>
-  <div class="phase">
-    <div class="phase-num">04</div>
-    <div>
-      <div class="phase-title">Présentation Complète</div>
-      <div class="phase-desc">Pitch deck · slides pour chaque projet · présentation globale</div>
-    </div>
-  </div>
+<div class="section">
+<h2>📅 Phases de Développement</h2>
+
+<h3>Phase 1 – Fondation (En cours)</h3>
+<ul>
+    <li class="done">✅ Définition de l’architecture et des fonctionnalités</li>
+    <li class="done">✅ Rédaction du Master Plan</li>
+    <li class="progress">🔄 Conception des UDFs Géolocalisation et Impossible Travel</li>
+    <li class="todo">⏳ Création des tables et vues dans Snowflake</li>
+</ul>
+
+<h3>Phase 2 – Feature Engineering</h3>
+<ul>
+    <li class="todo">Implémentation complète des UDFs Snowpark (Géolocalisation, Entropie, VPN Check)</li>
+    <li class="todo">Développement du calcul Impossible Travel avec gestion des faux positifs</li>
+    <li class="todo">Création du Feature Store</li>
+</ul>
+
+<h3>Phase 3 – Modèle & Inférence</h3>
+<ul>
+    <li class="todo">Entraînement / choix du modèle d’anomalie</li>
+    <li class="todo">Intégration du scoring de risque contextuel</li>
+    <li class="todo">Pipeline complet : Raw → Features → Inférence</li>
+</ul>
+
+<h3>Phase 4 – Production & Observabilité</h3>
+<ul>
+    <li class="todo">Déploiement en environnement de test</li>
+    <li class="todo">Mise en place de l’observabilité (drift, performance des alertes)</li>
+    <li class="todo">Intégration avec système d’alerte externe</li>
+</ul>
 </div>
 
-<button class="cta" onclick="sendPrompt('Commence par la Phase 01 : Structure GitHub et READMEs bilingues pour tous les projets NetSecurePro IA')">▶ DÉMARRER LA PHASE 01 — GITHUB & READMEs</button>
+<div class="section">
+<h2>🧪 Technologies & Outils</h2>
+<ul>
+    <li>Snowflake + Snowpark Python</li>
+    <li>UDFs sécurisées (Python)</li>
+    <li>MaxMind GeoIP2 ou IP2Location</li>
+    <li>Threat Intelligence Feeds (open source ou commerciaux)</li>
+    <li>Python (pandas, scikit-learn pour prototypage)</li>
+    <li>Git + GitHub (Z-CORE)</li>
+</ul>
+</div>
+
+<div class="section">
+<h2>🎯 Prochaines Actions Immédiates</h2>
+<ol>
+    <li>Créer la structure de dossiers dans le repo Z-CORE (<code>projects/netsecurepro/</code>)</li>
+    <li>Implémenter l’UDF de géolocalisation avec MaxMind</li>
+    <li>Développer le script Snowpark pour le calcul Impossible Travel</li>
+    <li>Créer un jeu de données de test synthétique</li>
+    <li>Ajouter un diagramme d’architecture Mermaid dans le dossier architecture/</li>
+</ol>
+</div>
+
+<hr>
+<p style="text-align: center; color: #666;">
+    NetSecurePro IA — Partie intégrante de Z-CORE<br>
+    Mohammed Ilyes Zoubirou — Avril 2026
+</p>
+
+</body>
+</html>
