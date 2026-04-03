@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEURONA | SOVEREIGN OS</title>
+    <style>
+        :root {
+            --neon: #00f2ff;
+            --danger: #ff0055;
+            --glass: rgba(15, 15, 25, 0.85);
+            --border: rgba(0, 242, 255, 0.2);
+        }
+
+        body, html {
+            margin: 0; padding: 0; height: 100%;
+            background: #020205;
+            color: #fff;
+            font-family: 'Segoe UI', 'Consolas', monospace;
+            overflow: hidden;
+        }
+
+        /* Background Matrix Effect */
+        #canvas { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.15; }
+
+        /* Interface Layout */
+        .wrapper {
+            display: flex; flex-direction: column; height: 100vh;
+            backdrop-filter: blur(4px);
+        }
+
+        header {
+            height: 50px; background: var(--glass);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 20px; border-bottom: 1px solid var(--border);
+            text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem;
+        }
+
+        .main-grid {
+            display: grid; grid-template-columns: 280px 1fr 300px;
+            gap: 15px; padding: 15px; flex: 1; overflow: hidden;
+        }
+
+        .panel {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            display: flex; flex-direction: column;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+        }
+
+        /* Terminal Area */
+        #console-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        #output {
+            flex: 1; padding: 15px; overflow-y: auto;
+            font-family: 'Courier New', monospace; font-size: 0.9rem;
+            line-height: 1.4; color: var(--neon);
+        }
+
+        .input-area {
+            background: rgba(0,0,0,0.5); padding: 12px;
+            display: flex; align-items: center; border-top: 1px solid var(--border);
+        }
+
+        input {
+            background: transparent; border: none; color: #fff;
+            flex: 1; margin-left: 10px; outline: none; font-family: inherit;
+        }
+
+        /* Components */
+        .widget { padding: 15px; border-bottom: 1px solid var(--border); }
+        .progress-cont { height: 4px; background: #111; margin-top: 8px; border-radius: 2px; }
+        .progress-bar { height: 100%; background: var(--neon); width: 0%; transition: 0.4s; }
+        
+        .pulse { animation: pulse-red 2s infinite; }
+        @keyframes pulse-red { 
+            0% { color: var(--neon); } 
+            50% { color: var(--danger); text-shadow: 0 0 10px var(--danger); } 
+            100% { color: var(--neon); } 
+        }
+
+        .btn {
+            background: transparent; border: 1px solid var(--neon); color: var(--neon);
+            padding: 8px; margin-top: 5px; cursor: pointer; font-size: 0.7rem; width: 100%;
+            transition: 0.3s;
+        }
+        .btn:hover { background: var(--neon); color: #000; }
+
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas"></canvas>
+
+    <div class="wrapper">
+        <header>
+            <div style="color: var(--neon); font-weight: bold;">NEURONA // CORE_V2.6</div>
+            <div id="clock">00:00:00</div>
+            <div class="pulse">SECURE_LINK: ACTIVE</div>
+        </header>
+
+        <main class="main-grid">
+            <aside class="panel">
+                <div class="widget">
+                    <label>CPU LOAD</label>
+                    <div class="progress-cont"><div id="cpu-bar" class="progress-bar" style="width: 22%"></div></div>
+                </div>
+                <div class="widget">
+                    <label>NEURAL SYNC</label>
+                    <div class="progress-cont"><div id="sync-bar" class="progress-bar" style="width: 88%; background: #bc13fe"></div></div>
+                </div>
+                <div class="widget" style="flex: 1">
+                    <small>LOGS SYSTEME</small>
+                    <div id="sys-logs" style="font-size: 0.7rem; color: #666; margin-top: 10px;"></div>
+                </div>
+            </aside>
+
+            <section class="panel" id="console-container">
+                <div id="output"></div>
+                <div class="input-area">
+                    <span style="color: var(--neon)">USR@NEURONA:~$</span>
+                    <input type="text" id="cmd-input" autofocus autocomplete="off">
+                </div>
+            </section>
+
+            <aside class="panel">
+                <div class="widget">
+                    <h3>MODULES</h3>
+                    <button class="btn" onclick="execute('firewall --on')">FIREWALL</button>
+                    <button class="btn" onclick="execute('crypto --refresh')">ROTATION CLES</button>
+                    <button class="btn" onclick="execute('stealth --enable')">MODE FURTIF</button>
+                </div>
+                <div class="widget">
+                    <h3>RESEAU</h3>
+                    <div id="net-status" style="font-size: 0.8rem;">
+                        IP: 192.168.1.104<br>
+                        VPN: <span style="color: #00ff00">CONNECTED</span><br>
+                        GATEWAY: SECURE
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <script>
+        const output = document.getElementById('output');
+        const input = document.getElementById('cmd-input');
+
+        // Matrix Effect
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()*&^%";
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#00f2ff";
+            ctx.font = fontSize + "px arial";
+            for (let i = 0; i < drops.length; i++) {
+                const text = letters[Math.floor(Math.random() * letters.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 50);
+
+        // Logic
+        function print(text, color = "var(--neon)") {
+            const line = document.createElement('div');
+            line.style.color = color;
+            line.innerHTML = `> ${text}`;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function execute(cmd) {
+            if (!cmd) return;
+            print(cmd, "#fff");
+            
+            const action = cmd.toLowerCase().trim();
+            setTimeout(() => {
+                if(action.includes('firewall')) print("Pare-feu activé. Trafic filtré via tunnel AES.");
+                else if(action.includes('scan')) print("Scan en cours... Menaces : 0 | Ports ouverts : 2");
+                else if(action.includes('clear')) output.innerHTML = '';
+                else if(action.includes('help')) print("Commandes: help, scan, clear, firewall, status");
+                else print("Commande inconnue. Accès restreint.", "var(--danger)");
+            }, 500);
+        }
+
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                execute(input.value);
+                input.value = '';
+            }
+        });
+
+        // UI Updates
+        setInterval(() => {
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+            const cpu = Math.floor(Math.random() * 40) + 10;
+            document.getElementById('cpu-bar').style.width = cpu + "%";
+        }, 1000);
+
+        window.onload = () => {
+            print("NEURONA KERNEL v2.6 BOOTING...");
+            setTimeout(() => print("INITIALISATION DES PROTOCOLES SECURISE..."), 1000);
+            setTimeout(() => print("SYSTEME PRET. BIENVENUE OPERATEUR."), 2000);
+        };
+    </script>
+</body>
+</html>
