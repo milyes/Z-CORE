@@ -1,0 +1,150 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&family=DM+Mono&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  .zc{background:#04060d;color:#c8dff0;font-family:'Exo 2',sans-serif;padding:16px;min-height:100vh;position:relative;overflow:hidden}
+  .grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(0,212,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.04) 1px,transparent 1px);background-size:32px 32px;pointer-events:none}
+  .title{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;color:#00d4ff;letter-spacing:3px;text-transform:uppercase;text-align:center;margin-bottom:4px}
+  .subtitle{font-family:'DM Mono',monospace;font-size:10px;color:#5a7a9a;text-align:center;letter-spacing:1px;margin-bottom:16px}
+  .status-bar{display:flex;justify-content:space-between;align-items:center;background:#070c18;border:0.5px solid #00d4ff33;border-radius:6px;padding:8px 12px;margin-bottom:14px}
+  .status-dot{width:7px;height:7px;border-radius:50%;background:#00ffb3;box-shadow:0 0 6px #00ffb3;animation:pulse 2s infinite}
+  .status-txt{font-family:'DM Mono',monospace;font-size:10px;color:#00d4ff;letter-spacing:1px}
+  .status-time{font-family:'DM Mono',monospace;font-size:10px;color:#5a7a9a}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+  .section-label{font-family:'Orbitron',sans-serif;font-size:9px;color:#5a7a9a;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;margin-top:14px}
+  .modules-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+  .mod{background:#070c18;border-radius:8px;padding:10px 12px;position:relative;overflow:hidden}
+  .mod::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+  .mod-zh::before{background:#00d4ff}
+  .mod-bat::before{background:#00ffb3}
+  .mod-roboox::before{background:#ffd700}
+  .mod-nsp::before{background:#ff6b35}
+  .mod-name{font-family:'Orbitron',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+  .mod-zh .mod-name{color:#00d4ff}
+  .mod-bat .mod-name{color:#00ffb3}
+  .mod-roboox .mod-name{color:#ffd700}
+  .mod-nsp .mod-name{color:#ff6b35}
+  .mod-stat{font-family:'DM Mono',monospace;font-size:10px;color:#c8dff0;margin-bottom:2px}
+  .mod-stat span{color:#5a7a9a;font-size:9px}
+  .badge{display:inline-block;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1.5px;padding:2px 6px;border-radius:3px;margin-top:4px;text-transform:uppercase}
+  .badge-ok{background:#00ffb333;color:#00ffb3;border:0.5px solid #00ffb355}
+  .badge-ghost{background:#00d4ff22;color:#00d4ff;border:0.5px solid #00d4ff44}
+  .badge-gold{background:#ffd70022;color:#ffd700;border:0.5px solid #ffd70044}
+  .badge-sec{background:#ff6b3522;color:#ff6b35;border:0.5px solid #ff6b3544}
+  .metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+  .metric{background:#070c18;border:0.5px solid #0b1225;border-radius:6px;padding:10px 8px;text-align:center}
+  .metric-val{font-family:'Orbitron',sans-serif;font-size:18px;font-weight:700;color:#00d4ff}
+  .metric-lbl{font-family:'Exo 2',sans-serif;font-size:9px;color:#5a7a9a;text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+  .ev-card{background:#070c18;border:0.5px solid #00ffb333;border-radius:8px;padding:10px 12px;margin-bottom:8px}
+  .ev-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+  .ev-label{font-family:'Exo 2',sans-serif;font-size:11px;color:#c8dff0}
+  .ev-val{font-family:'DM Mono',monospace;font-size:11px;color:#00ffb3}
+  .bar-track{background:#0b1225;border-radius:4px;height:4px;margin-top:4px}
+  .bar-fill{height:4px;border-radius:4px;background:linear-gradient(90deg,#00d4ff,#00ffb3)}
+  .audit-item{font-family:'DM Mono',monospace;font-size:9px;color:#5a7a9a;padding:4px 0;border-bottom:0.5px solid #0b1225;display:flex;gap:8px}
+  .audit-ts{color:#00d4ff44}
+  .audit-event{color:#c8dff0aa}
+  .footer{font-family:'DM Mono',monospace;font-size:8px;color:#5a7a9a33;text-align:center;margin-top:16px;letter-spacing:1px}
+  .corner{position:absolute;width:8px;height:8px}
+  .corner-tl{top:0;left:0;border-top:1.5px solid #00d4ff;border-left:1.5px solid #00d4ff}
+  .corner-tr{top:0;right:0;border-top:1.5px solid #00d4ff;border-right:1.5px solid #00d4ff}
+  .corner-bl{bottom:0;left:0;border-bottom:1.5px solid #00d4ff;border-left:1.5px solid #00d4ff}
+  .corner-br{bottom:0;right:0;border-bottom:1.5px solid #00d4ff;border-right:1.5px solid #00d4ff}
+</style>
+
+<div class="zc">
+  <div class="grid-bg"></div>
+  <div class="corner corner-tl"></div>
+  <div class="corner corner-tr"></div>
+  <div class="corner corner-bl"></div>
+  <div class="corner corner-br"></div>
+
+  <div class="title">Z-CORE Sovereign Stack</div>
+  <div class="subtitle">NETSECUREPRO IA · MONTRÉAL · 2026-04-20</div>
+
+  <div class="status-bar">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="status-dot"></div>
+      <span class="status-txt">FULL AUTONOME · GHOST MODE</span>
+    </div>
+    <span class="status-time">09:00 · Termux/Android</span>
+  </div>
+
+  <div class="section-label">Modules actifs</div>
+  <div class="modules-grid">
+    <div class="mod mod-zh">
+      <div class="mod-name">Z-H202.ia</div>
+      <div class="mod-stat">6 <span>expériences</span></div>
+      <div class="mod-stat">15 <span>décisions</span></div>
+      <div class="mod-stat">18 <span>audit ledger</span></div>
+      <span class="badge badge-ghost">OPÉRATIONNEL</span>
+    </div>
+    <div class="mod mod-roboox">
+      <div class="mod-name">ROBOOX Ultra</div>
+      <div class="mod-stat">PID 28403 <span>sentinel</span></div>
+      <div class="mod-stat">v2 <span>dashboard</span></div>
+      <div class="mod-stat">Zpuce <span>intégration</span></div>
+      <span class="badge badge-gold">TRAINING</span>
+    </div>
+    <div class="mod mod-bat">
+      <div class="mod-name">IA_AUTO_BAT</div>
+      <div class="mod-stat">95.2% <span>SoH actuel</span></div>
+      <div class="mod-stat">89.3% <span>prédiction 3ans</span></div>
+      <div class="mod-stat">80% <span>charge opti</span></div>
+      <span class="badge badge-ok">Z-TESLA</span>
+    </div>
+    <div class="mod mod-nsp">
+      <div class="mod-name">NetSecurePro</div>
+      <div class="mod-stat">Shield <span>MAXIMUM</span></div>
+      <div class="mod-stat">TLS 1.3 <span>actif</span></div>
+      <div class="mod-stat">Zero-Trust <span>natif</span></div>
+      <span class="badge badge-sec">SOUVERAIN</span>
+    </div>
+  </div>
+
+  <div class="section-label">Métriques globales</div>
+  <div class="metrics-row">
+    <div class="metric">
+      <div class="metric-val">18</div>
+      <div class="metric-lbl">Décisions scellées</div>
+    </div>
+    <div class="metric">
+      <div class="metric-val" style="color:#00ffb3">538</div>
+      <div class="metric-lbl">Range km (100%)</div>
+    </div>
+    <div class="metric">
+      <div class="metric-val" style="color:#ffd700">6</div>
+      <div class="metric-lbl">Expériences</div>
+    </div>
+  </div>
+
+  <div class="section-label">Batterie · État courant</div>
+  <div class="ev-card">
+    <div class="ev-row">
+      <span class="ev-label">SoH</span>
+      <span class="ev-val">95.2%</span>
+    </div>
+    <div class="bar-track"><div class="bar-fill" style="width:95.2%"></div></div>
+    <div class="ev-row" style="margin-top:8px">
+      <span class="ev-label">Prédiction 3 ans</span>
+      <span class="ev-val">89.3%</span>
+    </div>
+    <div class="bar-track"><div class="bar-fill" style="width:89.3%;background:linear-gradient(90deg,#ffd700,#00ffb3)"></div></div>
+    <div class="ev-row" style="margin-top:8px">
+      <span class="ev-label">Recommandation charge</span>
+      <span class="ev-val">MAX 80%</span>
+    </div>
+    <div class="bar-track"><div class="bar-fill" style="width:80%;background:#ff6b35"></div></div>
+  </div>
+
+  <div class="section-label">Audit log · Dernières entrées</div>
+  <div style="background:#070c18;border-radius:8px;padding:8px 12px">
+    <div class="audit-item"><span class="audit-ts">2026-04-17 22:40</span><span class="audit-event">GHOST_HEARTBEAT → STABLE</span></div>
+    <div class="audit-item"><span class="audit-ts">2026-04-18 04:36</span><span class="audit-event">SYNC completed · 18 décisions</span></div>
+    <div class="audit-item"><span class="audit-ts">2026-04-19 10:33</span><span class="audit-event">IA_AUTO_BAT · SoH log saved</span></div>
+    <div class="audit-item"><span class="audit-ts">2026-04-19 12:20</span><span class="audit-event">RECOMMANDATION charge → 80%</span></div>
+    <div class="audit-item" style="border:none"><span class="audit-ts">2026-04-20 09:00</span><span class="audit-event">ROBOOX ULTRA boot · OPÉRATIONNEL</span></div>
+  </div>
+
+  <div class="footer">© Mohammed Ilyes Zoubirou · NetSecurePro IA · Z-CORE v1.0 · SOUVERAIN · OFFLINE-FIRST</div>
+</div>
