@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Z-CORE API v2.4 - NetSecurePro IA22</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', system-ui, sans-serif; }
+        .chat-bubble-user { background: linear-gradient(135deg, #4f46e5, #6366f1); }
+        .chat-bubble-ai { background: linear-gradient(135deg, #1e2937, #334155); }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen">
+
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-72 bg-black border-r border-gray-800 flex flex-col">
+            <div class="p-6 border-b border-gray-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-xl font-bold">ZC</div>
+                    <div>
+                        <h1 class="text-2xl font-bold">Z-CORE</h1>
+                        <p class="text-xs text-emerald-400">v2.4.0 • LOCAL_ONLY</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4">
+                <div id="auth-status" class="bg-gray-900 rounded-2xl p-4 mb-6">
+                    <!-- Mis à jour par JS -->
+                </div>
+
+                <nav class="space-y-1">
+                    <a href="#" onclick="switchTab(0)" class="tab-btn active flex items-center gap-3 px-4 py-3 rounded-xl text-white">
+                        <i class="fas fa-robot"></i> Zpuce Intelligence
+                    </a>
+                </nav>
+            </div>
+
+            <div class="mt-auto p-6">
+                <button onclick="logout()" class="w-full py-3 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-xl text-sm flex items-center justify-center gap-2">
+                    <i class="fas fa-sign-out-alt"></i> Déconnexion
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col">
+            <header class="bg-gray-900 border-b border-gray-800 px-8 py-5 flex items-center justify-between">
+                <h2 id="tab-title" class="text-2xl font-semibold">Zpuce • Intelligence Souveraine</h2>
+                <div id="connection-status" class="text-xs px-4 py-2 rounded-full flex items-center gap-2"></div>
+            </header>
+
+            <!-- Login Modal -->
+            <div id="login-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+                <div class="bg-gray-900 rounded-3xl p-8 w-full max-w-md">
+                    <h3 class="text-2xl font-bold mb-6">Authentification Z-CORE</h3>
+                    <input id="username" type="text" placeholder="Nom d'utilisateur" value="ilyes" 
+                           class="w-full mb-4 bg-gray-800 border border-gray-700 rounded-2xl px-6 py-4 focus:outline-none focus:border-indigo-500">
+                    <input id="password" type="password" placeholder="Mot de passe" value="zcore2026"
+                           class="w-full mb-6 bg-gray-800 border border-gray-700 rounded-2xl px-6 py-4 focus:outline-none focus:border-indigo-500">
+                    <button onclick="login()" 
+                            class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 py-4 rounded-2xl font-semibold">
+                        Se connecter avec JWT
+                    </button>
+                    <p class="text-center text-xs text-gray-500 mt-4">Endpoint : /token ou /login</p>
+                </div>
+            </div>
+
+            <!-- Chat Area -->
+            <div id="chat-area" class="flex-1 overflow-y-auto p-8 space-y-8 bg-[radial-gradient(#1f2937_1px,transparent_1px)] [background-size:20px_20px]">
+            </div>
+
+            <!-- Input -->
+            <div class="p-6 border-t border-gray-800 bg-gray-900">
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex gap-3">
+                        <input id="user-input" type="text" placeholder="Posez votre question à Zpuce..." 
+                               class="flex-1 bg-gray-800 border border-gray-700 rounded-2xl px-6 py-5 focus:outline-none focus:border-indigo-500 text-lg"
+                               onkeypress="if(event.key === 'Enter') sendMessage()">
+                        <button onclick="sendMessage()" 
+                                class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 px-10 rounded-2xl font-semibold flex items-center gap-3">
+                            <i class="fas fa-paper-plane"></i> Envoyer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "http://127.0.0.1:8000";
+        let token = localStorage.getItem('zcore_jwt') || null;
+        const chatArea = document.getElementById('chat-area');
+
+        function updateAuthStatus() {
+            const statusEl = document.getElementById('auth-status');
+            const connEl = document.getElementById('connection-status');
+            
+            if (token) {
+                statusEl.innerHTML = `
+                    <div class="flex items-center gap-2 text-emerald-400">
+                        <i class="fas fa-check-circle"></i>
+                        <span class="font-medium">Authentifié (JWT)</span>
+                    </div>
+                    <div class="text-xs text-gray-400 mt-1">ilyes@localhost</div>
+                `;
+                connEl.innerHTML = `<div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div> Connecté avec JWT`;
+            } else {
+                statusEl.innerHTML = `<button onclick="showLogin()" class="text-indigo-400 hover:text-indigo-300">Se connecter</button>`;
+                connEl.innerHTML = `<span class="text-amber-400">Non authentifié</span>`;
+            }
+        }
+
+        function showLogin() {
+            document.getElementById('login-modal').classList.remove('hidden');
+        }
+
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                // Essaye plusieurs endpoints courants pour FastAPI JWT
+                const endpoints = ['/token', '/login', '/auth/token'];
+                let success = false;
+
+                for (let endpoint of endpoints) {
+                    const res = await fetch(API_BASE + endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        token = data.access_token || data.token || data.jwt;
+                        if (token) {
+                            localStorage.setItem('zcore_jwt', token);
+                            success = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (success) {
+                    document.getElementById('login-modal').classList.add('hidden');
+                    updateAuthStatus();
+                    addMessage("✅ Authentification JWT réussie. Vous êtes maintenant connecté en tant que Génie.", false);
+                } else {
+                    alert("Échec de l'authentification. Vérifiez vos identifiants ou l'endpoint JWT dans le backend.");
+                }
+            } catch (e) {
+                alert("Impossible de contacter l'API. Assurez-vous que le serveur tourne.");
+            }
+        }
+
+        function logout() {
+            if (confirm("Déconnexion ?")) {
+                localStorage.removeItem('zcore_jwt');
+                token = null;
+                updateAuthStatus();
+                addMessage("👋 Déconnexion effectuée.", false);
+            }
+        }
+
+        function addMessage(text, isUser) {
+            const msg = document.createElement('div');
+            msg.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
+            msg.innerHTML = `
+                <div class="${isUser ? 'chat-bubble-user' : 'chat-bubble-ai'} max-w-[75%] rounded-3xl px-6 py-4 text-white">
+                    <p class="leading-relaxed whitespace-pre-wrap">${text}</p>
+                </div>
+            `;
+            chatArea.appendChild(msg);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const query = input.value.trim();
+            if (!query) return;
+
+            addMessage(query, true);
+            input.value = '';
+
+            const loadingId = 'loading-' + Date.now();
+            const loading = document.createElement('div');
+            loading.id = loadingId;
+            loading.className = 'flex justify-start';
+            loading.innerHTML = `<div class="chat-bubble-ai max-w-[75%] rounded-3xl px-6 py-4"><p class="italic">Zpuce analyse...</p></div>`;
+            chatArea.appendChild(loading);
+            chatArea.scrollTop = chatArea.scrollHeight;
+
+            try {
+                const res = await fetch(API_BASE + "/zpuce/query", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        ...(token && { "Authorization": `Bearer ${token}` })
+                    },
+                    body: JSON.stringify({ query: query, additionalProp: {} })
+                });
+
+                document.getElementById(loadingId).remove();
+
+                if (res.status === 401) {
+                    addMessage("🔐 Authentification requise ou token expiré.", false);
+                    showLogin();
+                    return;
+                }
+
+                const data = await res.json();
+                let responseText = data.response || data.message || JSON.stringify(data, null, 2);
+                addMessage(responseText, false);
+
+            } catch (err) {
+                document.getElementById(loadingId).remove();
+                addMessage("❌ Erreur de connexion à l’API.", false);
+            }
+        }
+
+        // Initialisation
+        window.onload = () => {
+            updateAuthStatus();
+            addMessage("Bonjour Génie.<br>Je suis <strong>Zpuce</strong>.<br>Authentification JWT activée.", false);
+            
+            // Auto-login avec token sauvegardé
+            if (token) {
+                addMessage("✅ Session JWT restaurée.", false);
+            }
+        };
+    </script>
+</body>
+</html>
