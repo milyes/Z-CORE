@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>YES_ACCESS_BIN // ORBITRON SECURE GATE</title>
+    <style>
+        :root {
+            --neon: #00f2ff;
+            --ubuntu-orange: #E95420;
+            --ubuntu-purple: #772953;
+            --bg: #020508;
+            --panel: rgba(0, 15, 25, 0.9);
+            --border: rgba(0, 242, 255, 0.4);
+            --danger: #ff003c;
+            --success: #00ff41;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            background: var(--bg);
+            font-family: 'Ubuntu', sans-serif;
+            color: var(--neon);
+            overflow: hidden;
+        }
+
+        canvas#matrix { 
+            position: fixed; top: 0; left: 0; 
+            z-index: -1; opacity: 0.15; 
+        }
+
+        #top-bar {
+            height: 35px; background: rgba(0, 0, 0, 0.95);
+            border-bottom: 1px solid var(--neon);
+            display: flex; align-items: center; padding: 0 15px;
+            justify-content: space-between; font-size: 0.7em;
+        }
+
+        .window {
+            position: absolute; background: var(--panel);
+            border: 1px solid var(--border);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.1);
+            backdrop-filter: blur(8px);
+            z-index: 10; display: flex; flex-direction: column;
+            min-width: 300px;
+        }
+
+        .window-header {
+            padding: 8px 12px; background: rgba(0, 242, 255, 0.1);
+            cursor: move; display: flex; justify-content: space-between;
+            font-weight: bold; font-size: 0.65em; border-bottom: 1px solid var(--border);
+            text-transform: uppercase;
+        }
+
+        .ubuntu-header { 
+            background: var(--ubuntu-orange) !important; 
+            color: white !important; 
+        }
+
+        .success-header {
+            background: var(--success) !important;
+            color: #000 !important;
+        }
+
+        .window-content { 
+            padding: 12px; flex-grow: 1; overflow-y: auto; font-size: 0.85em; 
+        }
+
+        #terminal-output { 
+            color: var(--success); font-family: monospace; line-height: 1.4; 
+        }
+        
+        input {
+            width: 100%; background: transparent; border: none;
+            color: white; outline: none; border-top: 1px solid var(--border);
+            padding: 10px 0; margin-top: 10px;
+        }
+
+        .alert-active { 
+            border-color: var(--danger) !important; 
+            box-shadow: 0 0 25px var(--danger) !important; 
+        }
+
+        .btn-studio {
+            display: block; margin-top: 10px; padding: 10px;
+            background: rgba(233, 84, 32, 0.2); border: 1px solid var(--ubuntu-orange);
+            color: white; text-align: center; text-decoration: none; font-weight: bold;
+        }
+    </style>
+</head>
+<body id="main-body">
+
+<canvas id="matrix"></canvas>
+
+<div id="top-bar">
+    <div>ORBITRON // <span style="color:var(--ubuntu-orange)">YES_ACCESS_BIN</span></div>
+    <div id="status-text">ICE_SHIELD: ACTIVE</div>
+    <div id="clock">00:00:00</div>
+</div>
+
+<div class="window" id="win-term" style="top: 50px; left: 15px; width: 380px; height: 380px;">
+    <div class="window-header"><span>>_ YES ACCESS TERMINAL</span><span>[ - ]</span></div>
+    <div class="window-content" id="term-scroll">
+        <div id="terminal-output"></div>
+        <input type="text" id="cmd-input" placeholder="Tapez 'yesaccess' pour déverrouiller..." autofocus autocomplete="off">
+    </div>
+</div>
+
+<div class="window" id="win-ubuntu" style="top: 80px; right: 15px; width: 320px; display: none;">
+    <div class="window-header ubuntu-header"><span>UBUNTU_INTEL // AI_STUDIO</span><span onclick="toggleUbuntu()" style="cursor:pointer">[ X ]</span></div>
+    <div class="window-content" style="background: rgba(119, 41, 83, 0.2);">
+        <p style="color: var(--ubuntu-orange); font-weight: bold;">CORE_ACCESS :</p>
+        <p style="font-size: 0.75em;">Configuration du prompt Gemini.</p>
+        
+        <a href="https://aistudio.google.com/app/prompts?state=%7B%22ids%22:%5B%221sU4EL90I-PHWX7EKkr5StyH05NALgEpY%22%5D,%22action%22:%22open%22,%22userId%22:%22116147947076572562746%22%7D" target="_blank" class="btn-studio">
+            OUVRIR AI STUDIO ⚙️
+        </a>
+
+        <hr style="border:0; border-top: 1px solid var(--ubuntu-orange); margin: 15px 0;">
+        <a href="https://ai.studio/apps/drive/1QA_NDA84nfqBHFV3M299JmCoM-Hz0zb9?fullscreenApplet=true" target="_blank" style="color:white; text-decoration:none; font-size:0.8em;">> Applet Fullscreen ⚡</a>
+    </div>
+</div>
+
+<script>
+    const input = document.getElementById('cmd-input');
+    const output = document.getElementById('terminal-output');
+    const winUbuntu = document.getElementById('win-ubuntu');
+    const studioLink = "https://aistudio.google.com/app/prompts?state=%7B%22ids%22:%5B%221sU4EL90I-PHWX7EKkr5StyH05NALgEpY%22%5D,%22action%22:%22open%22,%22userId%22:%22116147947076572562746%22%7D";
+    const appletUrl = "https://ai.studio/apps/drive/1QA_NDA84nfqBHFV3M299JmCoM-Hz0zb9?fullscreenApplet=true";
+    let sovereignAccess = false;
+
+    // Matrix Background
+    const mCanvas = document.getElementById('matrix');
+    const mCtx = mCanvas.getContext('2d');
+    mCanvas.width = window.innerWidth; mCanvas.height = window.innerHeight;
+    const drops = Array(Math.floor(mCanvas.width/20)).fill(1);
+    function drawMatrix() {
+        mCtx.fillStyle = "rgba(2, 5, 8, 0.15)"; mCtx.fillRect(0,0,mCanvas.width,mCanvas.height);
+        mCtx.fillStyle = "#00f2ff"; mCtx.font = "14px monospace";
+        drops.forEach((y, i) => {
+            const char = Math.random() > 0.5 ? "1" : "0";
+            mCtx.fillText(char, i*20, y*20);
+            if(y*20 > mCanvas.height && Math.random() > 0.98) drops[i] = 0;
+            drops[i]++;
+        });
+    }
+    setInterval(drawMatrix, 50);
+
+    // Boot message
+    window.onload = () => {
+        output.innerHTML = `
+            <span style="color: var(--ubuntu-orange); font-weight: bold;">[BIN] YES_ACCESS_BIN chargé</span><br>
+            [SYSTEM] Portail souverain prêt.<br>
+            [INFO] Tapez <b>yesaccess</b> pour authentification niveau 0.<br>
+            Commandes : help, clear, yesaccess
+        `;
+    };
+
+    // Command Logic
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const val = input.value.toLowerCase().trim();
+            output.innerHTML += `<br><span style="color:white">> ${val}</span>`;
+            
+            if (val === 'yesaccess') {
+                output.innerHTML += `<br><span style="color:var(--ubuntu-orange)">[SCAN] Vérification sceau YES ACCESS...</span>`;
+                setTimeout(() => {
+                    sovereignAccess = true;
+                    output.innerHTML += `<br><span style="color:var(--success)">[GRANTED] Accès souverain validé.</span>`;
+                    output.innerHTML += `<br><span style="color:#ffff00">Bienvenue, Administrateur ORBITRON.</span>`;
+                    
+                    document.getElementById('status-text').innerText = 'YES_ACCESS: GRANTED';
+                    document.getElementById('status-text').style.color = 'var(--success)';
+                    
+                    spawnAccessWindow();
+                }, 1400);
+            } 
+            else if (val === 'help') {
+                output.innerHTML += `<br>Commandes : yesaccess, clear, help`;
+                if (sovereignAccess) {
+                    output.innerHTML += `, studio, launch, ubuntu, status`;
+                }
+            }
+            else if (val === 'clear') { 
+                output.innerHTML = "[SYSTEM] Terminal effacé."; 
+            }
+            else if (sovereignAccess && val === 'studio') {
+                output.innerHTML += `<br><span style="color:var(--ubuntu-orange)">[OK] Ouverture AI Studio...</span>`;
+                setTimeout(() => { window.open(studioLink, '_blank'); }, 500);
+            }
+            else if (sovereignAccess && val === 'launch') {
+                output.innerHTML += `<br><span style="color:var(--ubuntu-orange)">[OK] Déploiement applet...</span>`;
+                setTimeout(() => { window.open(appletUrl, '_blank'); }, 500);
+            }
+            else if (sovereignAccess && val === 'ubuntu') {
+                winUbuntu.style.display = 'flex';
+            }
+            else if (sovereignAccess && val === 'status') {
+                output.innerHTML += `<br><span style="color:var(--success)">[STATUS] YES_ACCESS actif | Noyau souverain stable</span>`;
+            }
+            else {
+                output.innerHTML += `<br><span style="color:var(--danger)">[!] COMMANDE INCONNUE ou accès non autorisé.</span>`;
+            }
+
+            input.value = '';
+            document.getElementById('term-scroll').scrollTop = 9999;
+        }
+    });
+
+    function toggleUbuntu() { 
+        winUbuntu.style.display = winUbuntu.style.display === 'none' ? 'flex' : 'none'; 
+    }
+
+    // Fenêtre de confirmation YES ACCESS
+    function spawnAccessWindow() {
+        const win = document.createElement('div');
+        win.className = 'window';
+        win.style.cssText = `top: 140px; left: 220px; width: 460px; height: 280px; z-index: 200;`;
+        win.innerHTML = `
+            <div class="window-header success-header">
+                <span>YES ACCESS // GRANTED</span>
+                <span onclick="this.closest('.window').remove()" style="cursor:pointer">[ X ]</span>
+            </div>
+            <div class="window-content" style="text-align:center; padding:30px; color:var(--success);">
+                <h2 style="margin:0; font-size:1.6em;">ACCÈS AUTORISÉ</h2>
+                <p style="margin:20px 0; font-size:1.1em;">Sceau souverain validé</p>
+                <p style="font-size:0.9em; color:#ffff00;">Niveau administrateur ORBITRON activé<br>
+                Système sous contrôle total</p>
+            </div>
+        `;
+        document.body.appendChild(win);
+        makeDraggable(win);
+    }
+
+    // Drag (PC + Mobile)
+    function makeDraggable(win) {
+        const h = win.querySelector('.window-header');
+        const move = (x, y) => { 
+            win.style.left = x + 'px'; 
+            win.style.top = y + 'px'; 
+        };
+        h.onmousedown = (e) => {
+            let sx = e.clientX - win.offsetLeft, sy = e.clientY - win.offsetTop;
+            document.onmousemove = (e) => move(e.pageX - sx, e.pageY - sy);
+            document.onmouseup = () => document.onmousemove = null;
+        };
+        h.ontouchstart = (e) => {
+            let t = e.touches[0];
+            let sx = t.clientX - win.offsetLeft, sy = t.clientY - win.offsetTop;
+            document.ontouchmove = (e) => { let m = e.touches[0]; move(m.pageX - sx, m.pageY - sy); };
+            document.ontouchend = () => document.ontouchmove = null;
+        };
+    }
+
+    document.querySelectorAll('.window').forEach(makeDraggable);
+
+    setInterval(() => { 
+        document.getElementById('clock').innerText = new Date().toLocaleTimeString(); 
+    }, 1000);
+</script>
+</body>
+</html>
