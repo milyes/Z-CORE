@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>ORBITRON OS // GEMINI_2.6_PRO_CORE</title>
+    <style>
+        :root { --neon: #00f2ff; --ubuntu: #E95420; --bg: #020508; --border: rgba(0, 242, 255, 0.4); }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg); font-family: 'Consolas', monospace; color: var(--neon); overflow: hidden; }
+        canvas#matrix { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.1; }
+        #top-bar { height: 30px; background: #000; border-bottom: 1px solid var(--neon); display: flex; align-items: center; padding: 0 15px; justify-content: space-between; font-size: 11px; z-index: 2000; }
+        .window { position: absolute; background: rgba(2, 5, 8, 0.98); border: 1px solid var(--border); box-shadow: 0 0 30px rgba(0, 242, 255, 0.2); display: flex; flex-direction: column; border-radius: 4px; }
+        .window-header { padding: 8px 12px; cursor: move; display: flex; justify-content: space-between; font-size: 11px; border-bottom: 1px solid var(--border); background: rgba(0, 242, 255, 0.1); text-transform: uppercase; }
+        .terminal-body { padding: 15px; height: 450px; overflow-y: auto; font-size: 13px; color: #00ff41; line-height: 1.5; }
+        .input-line { display: flex; padding: 10px 15px; border-top: 1px solid #222; background: #000; }
+        .prompt { color: var(--ubuntu); margin-right: 10px; font-weight: bold; }
+        input { background: transparent; border: none; color: #fff; outline: none; flex-grow: 1; font-family: 'Consolas', monospace; }
+        .asst-msg { color: #ffff00; font-style: italic; margin: 5px 0; }
+        iframe { width: 100%; height: 100%; border: none; }
+    </style>
+</head>
+<body>
+
+<canvas id="matrix"></canvas>
+<div id="top-bar">
+    <div>KERNEL: GEMINI-2.6-PRO</div>
+    <div id="status" style="color:var(--neon)">SOVEREIGN_DAEMON: ACTIVE</div>
+    <div id="clock">00:00:00</div>
+</div>
+
+<script>
+    let winCount = 0;
+    const coreFiles = ["ShieldConsole.tsx", "GhostProtocol.tsx", "Dashboard.tsx", "ComplianceDocs.tsx"]; // 
+
+    // --- MATRIX ANIMATION ---
+    const mCanvas = document.getElementById('matrix');
+    const mCtx = mCanvas.getContext('2d');
+    mCanvas.width = window.innerWidth; mCanvas.height = window.innerHeight;
+    const drops = Array(Math.floor(mCanvas.width/20)).fill(1);
+    function drawMatrix() {
+        mCtx.fillStyle = "rgba(2, 5, 8, 0.15)"; mCtx.fillRect(0,0,mCanvas.width,mCanvas.height);
+        mCtx.fillStyle = "#00f2ff"; mCtx.font = "14px monospace";
+        drops.forEach((y, i) => {
+            mCtx.fillText(Math.random() > 0.5 ? "1":"0", i*20, y*20);
+            if(y*20 > mCanvas.height && Math.random() > 0.98) drops[i] = 0;
+            drops[i]++;
+        });
+    }
+    setInterval(drawMatrix, 50);
+
+    // --- TERMINAL ENGINE ---
+    function spawnTerminal() {
+        winCount++;
+        const id = `term-${winCount}`;
+        const win = document.createElement('div');
+        win.className = 'window'; win.id = id;
+        win.style = `top: 50px; left: 50px; width: 750px; z-index: 100;`;
+        win.innerHTML = `
+            <div class="window-header"><span>Gemini Sovereign Console</span><span onclick="this.closest('.window').remove()" style="cursor:pointer">[ X ]</span></div>
+            <div class="window-content">
+                <div class="terminal-body" id="out-${id}">
+                    [BOOT] Sovereign Cognitive Kernel 2.6 PRO Initialized...<br>
+                    [SYSTEM] All components verified: GhostProtocol, ShieldConsole, Dashboard. <br>
+                    [INFO] Type 'help' for assistant commands.<br><br>
+                </div>
+                <div class="input-line">
+                    <span class="prompt">root@gemini-core:~#</span>
+                    <input type="text" id="in-${id}" autocomplete="off" autofocus>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(win);
+        handleTerminal(id);
+        makeDraggable(win);
+    }
+
+    function handleTerminal(winId) {
+        const input = document.getElementById(`in-${winId}`);
+        const output = document.getElementById(`out-${winId}`);
+
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const cmd = input.value.trim().toLowerCase();
+                output.innerHTML += `<span style="color:white">${input.value}</span><br>`;
+                
+                // Assistant Logic inside Terminal
+                if (cmd === 'help') {
+                    output.innerHTML += `<div class="asst-msg">Assistant: Commandes disponibles : 'ls', 'status', 'ubuntu', 'clear'.</div>`;
+                } else if (cmd === 'ls') {
+                    output.innerHTML += coreFiles.join("  ") + "<br>";
+                } else if (cmd === 'status') {
+                    output.innerHTML += `<div class="asst-msg">Assistant: Kernel Gemini 2.6 PRO opérationnel. ShieldConsole active. [cite: 2]</div>`;
+                } else if (cmd === 'ubuntu') {
+                    output.innerHTML += `Initialisation de l'interface souveraine...<br>`;
+                    spawnSovereignIA();
+                } else if (cmd === 'clear') {
+                    output.innerHTML = "";
+                }
+
+                input.value = '';
+                output.scrollTop = output.scrollHeight;
+            }
+        });
+    }
+
+    // --- INTERNAL SOVEREIGN IA (IFRAME) ---
+    function spawnSovereignIA() {
+        winCount++;
+        const id = `ia-${winCount}`;
+        const win = document.createElement('div');
+        win.className = 'window'; win.id = id;
+        win.style = `top: 80px; left: 180px; width: 1000px; height: 650px; z-index: 1000;`;
+        win.innerHTML = `
+            <div class="window-header" style="background:var(--ubuntu); color:white;"><span>Sovereign IA - Gemini 2.6 PRO</span><span onclick="this.closest('.window').remove()" style="cursor:pointer">[ X ]</span></div>
+            <div class="window-content">
+                <iframe src="https://g.co/gemini/share/cabfeac2df87"></iframe> </div>
+        `;
+        document.body.appendChild(win);
+        makeDraggable(win);
+    }
+
+    function makeDraggable(win) {
+        const h = win.querySelector('.window-header');
+        h.onmousedown = (e) => {
+            win.style.zIndex = 3000 + winCount++;
+            let sx = e.clientX - win.offsetLeft, sy = e.clientY - win.offsetTop;
+            document.onmousemove = (e) => { win.style.left = e.pageX - sx + 'px'; win.style.top = e.pageY - sy + 'px'; };
+            document.onmouseup = () => document.onmousemove = null;
+        };
+    }
+
+    window.onload = () => {
+        spawnTerminal();
+        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
+    };
+</script>
+</body>
+</html>
