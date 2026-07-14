@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Z-CORE OS IA — Mohammed Ilyes Zoubirou</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #030810;
+    --bg2: #060f1e;
+    --accent: #00c8ff;
+    --accent2: #00ff9d;
+    --warn: #ff6b35;
+    --purple: #c084fc;
+    --text: #e8f4f8;
+    --muted: #4a7a8a;
+    --border: rgba(0,200,255,0.12);
+    --card: rgba(6,20,40,0.85);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,200,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,200,255,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(3,8,16,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-brand {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 24px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--accent); }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    z-index: 1;
+    padding: 80px 24px 60px;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,200,255,0.06);
+    border: 1px solid rgba(0,200,255,0.2);
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    padding: 5px 14px;
+    border-radius: 2px;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+  }
+
+  .hero-badge::before {
+    content: '●';
+    color: var(--accent2);
+    animation: blink 2s infinite;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.0;
+    margin-bottom: 12px;
+  }
+
+  .hero h1 span { color: var(--accent); }
+
+  .hero-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .hero-desc {
+    font-size: 16px;
+    color: #8ab8c8;
+    line-height: 1.7;
+    max-width: 600px;
+    margin: 0 auto 36px;
+  }
+
+  .hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 40px;
+  }
+
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    padding: 4px 12px;
+    border-radius: 2px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .tag-blue { background: rgba(0,200,255,0.08); border: 1px solid rgba(0,200,255,0.2); color: var(--accent); }
+  .tag-green { background: rgba(0,255,157,0.06); border: 1px solid rgba(0,255,157,0.18); color: var(--accent2); }
+  .tag-warn { background: rgba(255,107,53,0.07); border: 1px solid rgba(255,107,53,0.2); color: var(--warn); }
+
+  .hero-contact {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,255,157,0.06);
+    border: 1px solid rgba(0,255,157,0.2);
+    color: var(--accent2);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    padding: 8px 18px;
+    border-radius: 2px;
+    text-decoration: none;
+  }
+
+  /* SECTIONS */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .section {
+    padding: 60px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+
+  .section-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    min-width: 40px;
+  }
+
+  .section-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* SVG CONTAINERS */
+  .svg-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 32px 24px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .svg-card-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .svg-card-title::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent2);
+    border-radius: 50%;
+  }
+
+  .svg-wrapper {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .svg-wrapper svg {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+  }
+
+  .svg-light-bg {
+    background: #fff;
+    border-radius: 6px;
+    padding: 16px;
+  }
+
+  /* STATS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 20px 16px;
+    border-radius: 4px;
+    text-align: center;
+  }
+
+  .stat-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* --- ENJEUX RÉGLEMENTAIRES (Problème / Solution) --- */
+  .ps-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .ps-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ps-card h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .ps-problem h3 { color: var(--warn); }
+  .ps-problem h3::before { content: '⚠'; font-size: 16px; }
+  
+  .ps-solution h3 { color: var(--accent2); }
+  .ps-solution h3::before { content: '✦'; font-size: 16px; }
+
+  .ps-card p {
+    font-size: 14px;
+    color: #8ab8c8;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    flex: 1;
+  }
+
+  .ps-list {
+    list-style: none;
+    margin-bottom: 24px;
+  }
+
+  .ps-list li {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ps-list li::before {
+    content: '→';
+    color: var(--accent);
+    font-size: 10px;
+  }
+
+  .ps-problem .ps-list li::before { color: var(--warn); }
+
+  .cta-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--accent2);
+    color: var(--bg);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 12px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+  }
+
+  .cta-button:hover {
+    background: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 255, 157, 0.2);
+  }
+
+  /* --- ÉCOSYSTÈME DE PRODUITS --- */
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+  }
+
+  .product-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.3s;
+  }
+
+  .product-card:hover {
+    border-color: var(--accent);
+  }
+
+  .product-featured {
+    border-color: rgba(192, 132, 252, 0.25) !important;
+    background: rgba(20, 10, 40, 0.85) !important;
+  }
+
+  .product-featured:hover {
+    border-color: var(--purple) !important;
+  }
+
+  .product-icon {
+    font-size: 28px;
+    margin-bottom: 16px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .product-card h3 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  .product-type {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 16px;
+  }
+
+  .product-card p {
+    font-size: 13px;
+    color: #8ab8c8;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    flex: 1;
+  }
+
+  .product-tag {
+    align-self: flex-start;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    padding: 3px 10px;
+    border-radius: 2px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* FOOTER */
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 32px 24px;
+    text-align: center;
+  }
+
+  .footer-brand {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+  }
+
+  .footer-brand span { color: var(--accent); }
+
+  .footer-seal {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: rgba(0,200,255,0.3);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+
+  @media (max-width: 700px) {
+    .ps-grid { grid-template-columns: 1fr; }
+    .products-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 600px) {
+    .nav-links { display: none; }
+    .hero { padding: 48px 16px 40px; }
+    .svg-card { padding: 20px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Z-CORE OS IA</div>
+  <ul class="nav-links">
+    <li><a href="#enjeux">Enjeux</a></li>
+    <li><a href="#produits">Produits</a></li>
+    <li><a href="#stack">Stack</a></li>
+    <li><a href="#souverainete">Souveraineté</a></li>
+    <li><a href="#concepts">Concepts</a></li>
+  </ul>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">NetSecurePro IA · Montréal · 2026</div>
+  <h1>Z-CORE<br><span>OS IA</span></h1>
+  <div class="hero-sub">Mohammed Ilyes Zoubirou · Fondateur · Développeur IA</div>
+  <p class="hero-desc">
+    Infrastructure souveraine auto-hébergée avec couche d'intelligence artificielle intégrée. Zero Trust, données 100% locales, conformité médicale PHIPA/PIPEDA.
+  </p>
+  <div class="hero-tags">
+    <span class="tag tag-blue">Kanidm SSO</span>
+    <span class="tag tag-blue">Caddy 2</span>
+    <span class="tag tag-blue">Matrix E2EE</span>
+    <span class="tag tag-blue">Nextcloud</span>
+    <span class="tag tag-blue">Vaultwarden</span>
+    <span class="tag tag-green">Z-CORE IA</span>
+    <span class="tag tag-green">Z-Claude.code</span>
+    <span class="tag tag-green">AIMEDIXAL</span>
+    <span class="tag tag-warn">Zero Trust</span>
+    <span class="tag tag-warn">PHIPA · PIPEDA</span>
+  </div>
+  <a class="hero-contact" href="mailto:milyes@netsecurepro.ca">✉ milyes@netsecurepro.ca</a>
+</div>
+
+<div class="container">
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-val">98</div>
+      <div class="stat-label">Score employabilité</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">3</div>
+      <div class="stat-label">Modes IA actifs</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">2</div>
+      <div class="stat-label">Nœuds Hetzner</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">100%</div>
+      <div class="stat-label">Données locales</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">v2.4</div>
+      <div class="stat-label">AIMEDIXAL</div>
+    </div>
+  </div>
+
+  <!-- SECTION 00 : ENJEUX RÉGLEMENTAIRES -->
+  <section class="section" id="enjeux">
+    <div class="section-header">
+      <span class="section-num">00</span>
+      <h2 class="section-title">Enjeux Réglementaires</h2>
+      <div class="section-line"></div>
+    </div>
+    
+    <div class="ps-grid">
+      <div class="ps-card ps-problem">
+        <h3>Le Shadow AI en santé</h3>
+        <p>L'utilisation non contrôlée d'outils d'IA générative (ChatGPT, Copilot) par les professionnels de la santé expose vos institutions à un risque juridique et réputationnel majeur. Les données sortent du Canada.</p>
+        <ul class="ps-list">
+          <li>Violation directe du PHIPA & PIPEDA</li>
+          <li>Fuite de dossiers patients hors juridiction</li>
+          <li>Aucune traçabilité des prompts saisies</li>
+          <li>Amendes sévères et perte de confiance</li>
+        </ul>
+      </div>
+
+      <div class="ps-card ps-solution">
+        <h3>Z-CORE : Le confinement souverain</h3>
+        <p>Z-CORE élimine le risque en fournissant une intelligence artificielle d'entreprise confinée dans votre propre infrastructure. La puissance de l'IA, sans la fuite de données.</p>
+        <ul class="ps-list">
+          <li>Données 100% locales et chiffrées (E2EE)</li>
+          <li>Proxy IA avec anonymisation avant traitement</li>
+          <li>Architecture Zero Trust (Kanidm SSO)</li>
+          <li>Conformité médicale "By Design"</li>
+        </ul>
+        <a href="#" class="cta-button">Réserver une démo technique →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 00.B : ÉCOSYSTÈME DE PRODUITS -->
+  <section class="section" id="produits">
+    <div class="section-header">
+      <span class="section-num">00.B</span>
+      <h2 class="section-title">Écosystème de Produits</h2>
+      <div class="section-line"></div>
+    </div>
+    
+    <div class="products-grid">
+      <!-- Produit 1 : Le Moteur R&D -->
+      <div class="product-card product-featured">
+        <div class="product-icon" style="color: var(--purple);">◈</div>
+        <h3>IAIA22A_SUPRER.ia</h3>
+        <p class="product-type">Moteur Cognitif R&D</p>
+        <p>Le cœur algorithmique. Intègre une <strong>conscience logique</strong> permettant à l'IA d'auto-évaluer ses déductions, d'auditer sa propre chaîne de pensée et de garantir une cohérence éthique absolue.</p>
+        <span class="product-tag" style="background: rgba(192,132,252,0.1); border: 1px solid rgba(192,132,252,0.3); color: var(--purple);">Core Engine</span>
+      </div>
+
+      <!-- Produit 2 : L'Infrastructure -->
+      <div class="product-card">
+        <div class="product-icon" style="color: var(--accent);">⬡</div>
+        <h3>Z-CORE OS IA</h3>
+        <p class="product-type">Infrastructure Souveraine</p>
+        <p>Le système d'exploitation auto-hébergé. Remplace le SaaS US par un stack sécurisé, chiffré E2EE et conforme (Zero Trust, SSO, données 100% locales).</p>
+        <span class="product-tag tag-blue">Pour les DSI</span>
+      </div>
+
+      <!-- Produit 3 : L'App Métier -->
+      <div class="product-card">
+        <div class="product-icon" style="color: var(--accent2);">✚</div>
+        <h3>AIMEDIXAL</h3>
+        <p class="product-type">Application Santé IA</p>
+        <p>L'interface médicale propulsée par SUPRER. Assistant intelligent pour les dossiers patients, dont le raisonnement est validé par la conscience logique du moteur.</p>
+        <span class="product-tag tag-green">Pour les Médecins</span>
+      </div>
+
+      <!-- Produit 4 : L'Outil Dev -->
+      <div class="product-card">
+        <div class="product-icon" style="color: var(--warn);">⟐</div>
+        <h3>MCL_MILYES</h3>
+        <p class="product-type">Librairie Guardrails</p>
+        <p>Wrapper open-source pour développeurs. Protège n'importe quel agent LLM contre les prompt injections, fuites PII et hallucinations critiques.</p>
+        <span class="product-tag tag-warn">Pour les Devs</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 1 — FULL STACK ACTIVE -->
+  <section class="section" id="stack">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 class="section-title">Z-CORE Full Stack Actif</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="svg-card">
+      <div class="svg-card-title">Architecture complète · 3 modes IA · services souverains</div>
+      <div class="svg-wrapper svg-light-bg">
+        <svg width="100%" viewBox="0 0 680 780" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#73726c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<rect width="680" height="780" fill="#fff"/>
+<rect x="240" y="20" width="200" height="44" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/><text x="340" y="42" text-anchor="middle" dominant-baseline="central" fill="#3C3489" font-family="Syne, sans-serif" font-size="14" font-weight="500">Mohammed Ilyes</text>
+<line x1="340" y1="64" x2="340" y2="94" marker-end="url(#arrow1)" stroke="#73726c" stroke-width="1.5"/>
+<rect x="210" y="94" width="260" height="48" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="340" y="112" text-anchor="middle" dominant-baseline="central" fill="#085041" font-family="Syne, sans-serif" font-size="14" font-weight="500">Kanidm SSO</text><text x="340" y="128" text-anchor="middle" dominant-baseline="central" fill="#0F6E56" font-family="Syne, sans-serif" font-size="12">Authentification unifiée · identité</text>
+<line x1="340" y1="142" x2="340" y2="170" marker-end="url(#arrow1)" stroke="#73726c" stroke-width="1.5"/>
+<rect x="30" y="170" width="620" height="154" rx="12" fill="none" stroke="rgba(31,30,29,0.2)" stroke-width="0.5" stroke-dasharray="5 3"/><text x="50" y="188" fill="#3d3d3a" font-family="Syne, sans-serif" font-size="12">Couche intelligence</text>
+<rect x="46" y="196" width="180" height="52" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/><text x="136" y="216" text-anchor="middle" dominant-baseline="central" fill="#633806" font-family="Syne, sans-serif" font-size="14" font-weight="500">Z-CORE IA</text><text x="136" y="234" text-anchor="middle" dominant-baseline="central" fill="#854F0B" font-family="Syne, sans-serif" font-size="12">Analyst + Search · FR/EN</text>
+<rect x="250" y="196" width="180" height="52" rx="8" fill="#EAF3DE" stroke="#3B6D11" stroke-width="0.5"/><text x="340" y="216" text-anchor="middle" dominant-baseline="central" fill="#27500A" font-family="Syne, sans-serif" font-size="14" font-weight="500">Z-Claude.code</text><text x="340" y="234" text-anchor="middle" dominant-baseline="central" fill="#3B6D11" font-family="Syne, sans-serif" font-size="12">Code · scripts · SQL · API</text>
+<rect x="454" y="196" width="180" height="52" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/><text x="544" y="216" text-anchor="middle" dominant-baseline="central" fill="#712B13" font-family="Syne, sans-serif" font-size="14" font-weight="500">Z-Claude.ai</text><text x="544" y="234" text-anchor="middle" dominant-baseline="central" fill="#993C1D" font-family="Syne, sans-serif" font-size="12">Apps IA · artifacts · Claude API</text>
+<circle cx="330" cy="298" r="5" fill="#1D9E75"/><text x="340" y="298" dominant-baseline="central" fill="#1D9E75" font-family="Syne, sans-serif" font-size=
