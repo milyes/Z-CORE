@@ -1,27 +1,24 @@
-import os
-import json
-import tempfile
+import sys
+import time
 
-class IAInnovia:
-    def __init__(self, zone_echange=None):
-        if zone_echange is None:
-            tmp_dir = os.environ.get("TMPDIR", tempfile.gettempdir())
-            zone_echange = os.path.join(tmp_dir, "innovia_core.json")
-        self.zone_echange = zone_echange
-        self.contexte_partage = {}
-        self.charger_contexte()
-
-    def charger_contexte(self):
-        if os.path.exists(self.zone_echange):
-            with open(self.zone_echange, 'r', encoding='utf-8') as f:
-                self.contexte_partage = json.load(f)
+class IAInnoviaVolatile:
+    def __init__(self):
+        self.module_name = "IA_INNOVIA_RAM"
+        # Dictionnaire en mémoire vive uniquement
+        self._ram_state = {}
 
     def synchroniser_variable(self, cle, valeur):
-        self.contexte_partage[cle] = valeur
-        with open(self.zone_echange, 'w', encoding='utf-8') as f:
-            json.dump(self.contexte_partage, f, indent=4)
-        print(f"[✓] INNOVIA Sync : [{cle}] -> {valeur} ({self.zone_echange})")
+        # Stockage pur en RAM
+        self._ram_state[cle] = {
+            "valeur": valeur,
+            "timestamp": time.time()
+        }
+        print(f"[✓] INNOVIA Volatile (RAM Only) : [{cle}] -> {valeur}")
+
+    def lire_variable(self, cle):
+        return self._ram_state.get(cle, {}).get("valeur", None)
 
 if __name__ == "__main__":
-    innovia = IAInnovia()
-    innovia.synchroniser_variable("SYS_STATUS", "ISOLATED_ACTIVE")
+    innovia = IAInnoviaVolatile()
+    innovia.synchroniser_variable("SYS_STATUS", "ISOLATED_ACTIVE_VOLATILE")
+    print(f"[*] Vérification RAM : SYS_STATUS = {innovia.lire_variable('SYS_STATUS')}")
