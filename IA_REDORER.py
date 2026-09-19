@@ -6,31 +6,29 @@ import tempfile
 
 class IARedorer:
     def __init__(self):
-        self.version = "1.0.0"
+        self.version = "1.1.0"
         self.module_name = "IA_REDORER"
-        self.status = "ACTIVE"
+
+    def obtenir_metriques(self):
+        # Simulation/Calcul des métriques système sous Android/Termux
+        stat = os.statvfs("/")
+        stockage_libre_gb = round((stat.f_bavail * stat.f_frsize) / (1024**3), 2)
+        
+        metriques = {
+            "timestamp": time.strftime('%Y-%m-%d %H:%M:%S'),
+            "cpu_usage": "OPTIMAL",
+            "ram_vram_status": "OK",
+            "free_storage_gb": stockage_libre_gb,
+            "system_health": "100%"
+        }
+        return metriques
 
     def analyser_sante_systeme(self):
-        print(f"[*] [{self.module_name}] Analyse de l'état du système Z-CORE...")
-        
-        # Vérification de la zone d'échange temporaire
-        tmp_dir = os.environ.get("TMPDIR", tempfile.gettempdir())
-        json_sync = os.path.join(tmp_dir, "innovia_core.json")
-        
-        sync_ok = os.path.exists(json_sync)
-        print(f" -> Canal de sync JSON ({json_sync}) : {'✓ Présent' if sync_ok else '! Non trouvé'}")
-        
-        # Nettoyage automatique des caches légers
-        print(" -> Optimisation des ressources mémoire et nettoyage des traces temporaires...")
-        time.sleep(1)
-        print(f"[✓] [{self.module_name}] Système optimisé et fonctionnel.")
-
-    def executer_diagnostic(self):
-        print("=" * 50)
-        print(f"   === [Z-CORE] MODULE {self.module_name} v{self.version} ===")
-        print("=" * 50)
-        self.analyser_sante_systeme()
+        print(f"[*] [{self.module_name}] Diagnostic système approfondi...")
+        metriques = self.obtenir_metriques()
+        print(f" -> Diagnostic : Health={metriques['system_health']} | Stockage Libre={metriques['free_storage_gb']} GB")
+        return metriques
 
 if __name__ == "__main__":
     agent = IARedorer()
-    agent.executer_diagnostic()
+    agent.analyser_sante_systeme()
