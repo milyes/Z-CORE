@@ -11,6 +11,6 @@ fi
 
 git config user.name "milyes"
 git add .
-git commit -m "Core(update): Alignement d'infrastructure souveraine"
+git commit -m "Core(update): Orchestrateur maître et suite Z-CORE v3.1.0 complète"
 git branch -M main
 git push -u origin main --force && echo "[✓] Chantier Z-CORE synchronisé sur github.com/milyes/Z-CORE"
