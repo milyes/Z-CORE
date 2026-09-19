@@ -1,7 +1,7 @@
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 import os
 
-PORT = 8080
+PORT = 8085
 DIRECTORY = "./dist_payload/www" if os.path.exists("./dist_payload/www") else "."
 
 class ZCoreServerHandler(SimpleHTTPRequestHandler):

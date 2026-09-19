@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Z-CORE v3.1.0 — Dashboard</title>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: system-ui, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .card {
+            background: #1e293b;
+            border: 1px solid #0284c7;
+            border-radius: 12px;
+            padding: 24px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        h1 { color: #38bdf8; font-size: 1.5rem; margin-top: 0; }
+        .status {
+            display: inline-block;
+            background: #0369a1;
+            color: #e0f2fe;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        ul { list-style: none; padding: 0; margin-top: 20px; }
+        li {
+            background: #0f172a;
+            margin: 8px 0;
+            padding: 10px 14px;
+            border-radius: 6px;
+            border-left: 3px solid #38bdf8;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🟦 Z-CORE v3.1.0</h1>
+        <span class="status">SERVEUR LOCAL ACTIF</span>
+        <p style="color: #94a3b8; font-size: 0.9rem;">Environnement Souverain Confiné</p>
+        
+        <h3>Modules Déployés</h3>
+        <ul>
+            <li>✓ ZCoreKernel.py</li>
+            <li>✓ ZCoreTunnel.py</li>
+            <li>✓ IAInnovia.py</li>
+            <li>✓ ZCoreServer.py</li>
+            <li>✓ teleport_binary.sh</li>
+            <li>✓ deploy_ghpages.sh</li>
+        </ul>
+    </div>
+</body>
+</html>

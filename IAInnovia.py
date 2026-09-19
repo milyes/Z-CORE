@@ -1,8 +1,12 @@
 import os
 import json
+import tempfile
 
 class IAInnovia:
-    def __init__(self, zone_echange="/tmp/innovia_core.json"):
+    def __init__(self, zone_echange=None):
+        if zone_echange is None:
+            tmp_dir = os.environ.get("TMPDIR", tempfile.gettempdir())
+            zone_echange = os.path.join(tmp_dir, "innovia_core.json")
         self.zone_echange = zone_echange
         self.contexte_partage = {}
         self.charger_contexte()
@@ -16,7 +20,7 @@ class IAInnovia:
         self.contexte_partage[cle] = valeur
         with open(self.zone_echange, 'w', encoding='utf-8') as f:
             json.dump(self.contexte_partage, f, indent=4)
-        print(f"[✓] INNOVIA Sync : [{cle}] -> {valeur}")
+        print(f"[✓] INNOVIA Sync : [{cle}] -> {valeur} ({self.zone_echange})")
 
 if __name__ == "__main__":
     innovia = IAInnovia()
