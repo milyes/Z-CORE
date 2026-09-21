@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>AIMEDIXAL v4-PRO | Z-CORE Zero Trust</title>
+<style>
+body{font-family:system-ui;background:#0a0a0a;color:#e0e0e0;max-width:900px;margin:40px auto;padding:20px}
+h1{color:#00ff88} h2{color:#00ccff;border-bottom:1px solid #333}
+code{background:#1a1a1a;padding:2px 6px;border-radius:4px}
+pre{background:#111;padding:16px;border-radius:8px;overflow-x:auto}
+.ok{color:#00ff88} .warn{color:#ffaa00}
+</style>
+</head>
+<body>
+<h1>AIMEDIXAL v4-PRO</h1>
+<h2>Z-CORE : Zero Trust Local Core</h2>
+<p><span class="ok">Cloud: DISABLED</span> | <span class="ok">Network: LOCALHOST ONLY</span> | <span class="ok">Audit: VALID</span></p>
+
+<h2>1. Le Problème</h2>
+<p>Les IA cloud coûtent 0.03$/1k tokens + risque Loi25 Art.17 en cas de fuite ePHI.</p>
+
+<h2>2. La Solution</h2>
+<p>IA de triage qwen2.5:7b qui tourne 100% on-device sur Android/tablette.</p>
+<ul>
+<li>Purge RAM <5s</li>
+<li>Audit SHA-256 Chaîné</li>
+<li>0 dépendance externe</li>
+<li>ROI <6 mois</li>
+</ul>
+
+<h2>3. Démonstration Live</h2>
+<pre><code>POST /zh202/decision
+{"symptomes":["douleur thoracique"],"age":65}
+
+RESPONSE:
+decision_id: 40e194d0-eaaa-4518-b2c1-98f23865f97d
+audit_hash: 1db36c006da03ca4ef221e814dc40afa433eccd726317fec12a73c64cb8e26cb
+cloud: false</code></pre>
+
+<h2>4. API</h2>
+<code>GET /health</code> <code>GET /status</code> <code>POST /zh202/decision</code> <code>GET /audit/verify</code>
+
+<h2>5. Télécharger</h2>
+<p><a href="milyes_ia_zero_trust.py">milyes_ia_zero_trust.py</a></p>
+</body>
+</html>
