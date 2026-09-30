@@ -1,48 +1,9 @@
-<!DOCTYPE html>
-<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NetSecurePro - 7 Slides - Navier-Stokes → Agents Auditables</title>
-<style>
-:root{--blue:#0a2a5a;--blue2:#1a5bb5;--orange:#e67e22;--bg:#ffffff;--card:#f8fafc}
-*{box-sizing:border-box;margin:0;padding:0;font-family:Inter,Arial,sans-serif}
-body{background:#eef2f7;padding:20px}
-.pack{max-width:900px;margin:auto;display:grid;gap:24px}
-.slide{background:var(--bg);border-radius:20px;padding:32px 36px;box-shadow:0 8px 30px rgba(0,0,0,.08);border:1px solid #e2e8f0;position:relative;overflow:hidden}
-.badge{display:inline-block;background:var(--blue);color:#fff;padding:4px 12px;border-radius:99px;font-size:12px;font-weight:700;letter-spacing:.5px;margin-bottom:16px}
-h1{font-size:32px;line-height:1.1;color:var(--blue);margin-bottom:8px}
-h2{font-size:28px;line-height:1.15;color:#000;margin-bottom:12px}
-.sub{color:var(--blue2);font-size:16px;margin-bottom:20px;font-weight:500}
-.split{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:10px}
-.col{padding:16px;border-radius:12px}
-.col.lisse{background:#eef6ff;border:1px solid #bfdbfe}
-.col.sing{background:#fff3e6;border:1px solid #fed7aa}
-.flow{height:80px;background:repeating-linear-gradient(90deg, transparent 0 10px, var(--blue2) 10px 11px);opacity:.6;margin:12px 0;border-radius:8px}
-.vortex{width:100%;height:80px;background:radial-gradient(circle at 50% 80%, var(--orange) 0%, transparent 60%);position:relative}
-.vortex:after{content:"↑∞";position:absolute;top:0;left:50%;transform:translateX(-50%);font-weight:900;color:var(--orange);font-size:22px}
-ul{margin:10px 0 0 18px;font-size:13px;line-height:1.5;color:#1e293b}
-.footer{margin-top:24px;display:flex;justify-content:flex-end;align-items:center;gap:8px;color:var(--blue);font-weight:800;font-size:14px;border-top:1px dashed #cbd5e1;padding-top:12px}
-.shield{width:22px;height:22px;border:2px solid var(--blue);border-radius:6px;display:grid;place-items:center;font-size:12px}
-.balance{display:flex;justify-content:space-between;align-items:flex-end;margin:20px 0}
-.pan{flex:1;text-align:center;padding:20px;border-radius:12px}
-.pan.light{background:#f1f5f9}
-.pan.heavy{background:var(--blue);color:#fff;transform:scale(1.08);box-shadow:0 10px 20px rgba(10,42,90,.3)}
-.zero{font-family:monospace;background:#0f172a;color:#22c55e;padding:12px;border-radius:8px;font-size:11px;margin-top:12px}
-</style></head><body>
-<div class="pack">
-
-<div class="slide"><span class="badge">SLIDE 1/7 - CTO HOOK</span><h1>90 ans de maths. 1 image.</h1><h2>Est-ce que l'eau peut devenir infinie ?</h2><div class="sub">Navier-Stokes — Problème du Millénaire à 1M$</div><div class="zero">[AI22-LOGIC] input=fluide_propre | check=regularité → UNKNOWN 90y | status=OPEN</div><div class="footer"><div class="shield">🛡</div> NetSecurePro</div></div>
-
-<div class="slide"><span class="badge">SLIDE 2/7 - INFOGRAPHIE TECHNIQUE</span><h1 style="font-size:22px">FLUIDE LISSE vs SINGULARITÉ</h1><div class="split"><div class="col lisse"><b>FLUIDE LISSE</b><div class="flow"></div><ul><li>Flux laminaire : régulier</li><li>Lignes parallèles : uniforme</li><li>Viscosité stable</li></ul></div><div class="col sing"><b style="color:var(--orange)">SINGULARITÉ</b><div class="vortex"></div><ul><li>Effondrement du flux</li><li>Vortex turbulent</li><li>Gradient infini : pic ∞</li></ul></div></div><div class="zero">[ZERO-TRUST] verify(flow)=PASS | verify(vortex)=FAIL → isolation_required | audit=Lean</div><div class="footer"><div class="shield">🛡</div> NetSecurePro</div></div>
-
-<div class="slide"><span class="badge">SLIDE 3/7 - LA PREUVE</span><h1>La preuve</h1><div class="sub">Un système OpenAI + formalisation Lean</div><div class="zero">Lean Check: ∀e∈NavierStokes, ∃proof: verifiable_by_machine = true<br>Papier + Code 【entity-GitHub¦canonical_name=GitHub】 Apache-2.0 | 10k agents | 88h</div><div class="footer"><div class="shield">🛡</div> NetSecurePro</div></div>
-
-<div class="slide"><span class="badge">SLIDE 4/7 - LE VRAI SHIFT</span><h1>Le modèle c'est 20%</h1><div class="sub">L'orchestration + la preuve = 80%</div><div class="split"><div class="col lisse" style="flex:0.25"><b>20% Modèle</b></div><div class="col sing" style="flex:1;background:#0a2a5a;color:#fff"><b>80% Orchestration, Audit, État, Résilience</b></div></div><div class="footer"><div class="shield">🛡</div> NetSecurePro</div></div>
-
-<div class="slide"><span class="badge">SLIDE 5/7 - LOI 25</span><h1>Pourquoi ça compte pour la santé</h1><div class="sub">Loi 25 : Traçabilité + Auditabilité + Résilience</div><ul><li>✅ Traçabilité : Qui, quoi, quand</li><li>✅ Auditabilité : Journaux immuables</li><li>✅ Résilience : Pas d'état nul</li></ul><div class="zero">[AI22-ZERO-TRUST] Agent→Dossier: encrypt → audit_log.append() → Loi25_check=PASS</div><div class="footer"><div class="shield">🛡</div> NetSecurePro</div></div>
-
-<div class="slide"><span class="badge">SLIDE 6/7 - STACK 2026</span><h1>La nouvelle stack Agent 2026</h1><div class="zero">1.LLM 20% : raisonne | 2.Orchestration : tools | 3.État : mémoire résiliente | 4.Audit/Preuve Lean : vérifiable<br>[NATIVE-LOGIC] if !audit then !prod</div><div class="footer"><div class="shield">🛡</div> NetSecurePro</div></div>
-
-<div class="slide"><span class="badge">SLIDE 7/7 - CONCLUSION</span><h1>Sans auditabilité = pas de confiance</h1><div class="balance"><div class="pan light"><b>Vitesse / Hype</b><br>🚀</div><div class="pan heavy"><b>Audit / Preuve / Loi 25</b><br>⚖️ Pèse plus lourd</div></div><div class="sub">Le modèle c'est l'essence. L'auditabilité c'est le moteur.</div><div class="footer"><div class="shield">🛡</div> NetSecurePro</div></div>
-
-</div>
-</body></html>
-
+<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NetSecurePro - 7 Slides - Z-CORE</title><style>:root{--blue:#0a2a5a;--bg:#fff}*{box-sizing:border-box;margin:0;padding:0;font-family:Inter,Arial}body{background:#eef2f7;padding:20px}.pack{max-width:900px;margin:auto;display:grid;gap:28px}.slide{background:#fff;border-radius:20px;padding:32px 36px;box-shadow:0 8px 30px rgba(0,0,0,.08);border:1px solid #e2e8f0}.badge{display:inline-block;background:#0a2a5a;color:#fff;padding:5px 14px;border-radius:99px;font-size:12px;font-weight:800;margin-bottom:16px}.zero{font-family:ui-monospace,monospace;background:#0f172a;color:#22c55e;padding:12px;border-radius:10px;font-size:12px;margin-top:14px;white-space:pre-wrap}.footer{margin-top:24px;display:flex;justify-content:space-between;font-weight:800;color:#0a2a5a;border-top:1px dashed #cbd5e1;padding-top:14px}</style></head><body><div class="pack">
+<div class="slide"><span class="badge">SLIDE 1/7</span><h2>90 ans de maths. 1 image.</h2><div class="zero">[AI22-LOGIC] input=fluide_propre | check=régularité → UNKNOWN 90y | status=OPEN</div><div class="footer"><span>Auditabilité = confiance</span><span>🛡 NetSecurePro</span></div></div>
+<div class="slide"><span class="badge">SLIDE 2/7 - FLUIDE LISSE vs SINGULARITÉ</span><h2>FLUIDE LISSE vs SINGULARITÉ</h2><div class="zero">[ZERO-TRUST] verify(flow)=PASS | verify(vortex)=FAIL → isolation_required</div><div class="footer"><span>Comparatif CTO</span><span>🛡 NetSecurePro</span></div></div>
+<div class="slide"><span class="badge">SLIDE 3/7</span><h2>La preuve - OpenAI + Lean</h2><div class="zero">Lean Check: verifiable_by_machine = true | 10k agents | 88h</div><div class="footer"><span>【entity-GitHub¦canonical_name=GitHub】 Apache-2.0</span><span>🛡 NetSecurePro</span></div></div>
+<div class="slide"><span class="badge">SLIDE 4/7 - LE VRAI SHIFT</span><h2>Le modèle c'est 20%</h2><div class="zero">[AI22-NATIVE] model=20% | orchestration=80% | if !audit then !prod</div><div class="footer"><span>Shift 2026</span><span>🛡 NetSecurePro</span></div></div>
+<div class="slide"><span class="badge">SLIDE 5/7 - LOI 25</span><h2>Pourquoi santé</h2><div class="zero">[AI22-ZERO-TRUST] Agent→Dossier: encrypt → audit_log.append() → Loi25_check=PASS</div><div class="footer"><span>Loi 25 compliant</span><span>🛡 NetSecurePro</span></div></div>
+<div class="slide"><span class="badge">SLIDE 6/7</span><h2>Stack 2026</h2><div class="zero">1_LLM 20% | 2_Orch | 3_État | 4_Audit/Preuve Lean - if !audit then !prod</div><div class="footer"><span>Stack CTO</span><span>🛡 NetSecurePro</span></div></div>
+<div class="slide"><span class="badge">SLIDE 7/7 - CONCLUSION</span><h2>Sans auditabilité = pas de confiance</h2><div class="footer"><span>© NetSecurePro</span><span>🛡 NetSecurePro</span></div></div>
+</div></body></html>
