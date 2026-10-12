@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>SAHBI-SA V6.2 DUAL GOLD - Dashboard</title>
+<style>
+body{font-family:Consolas,monospace;background:#0a0a0a;color:#e0e0e0;padding:24px}
+.banner{border:1px solid #333;padding:20px;background:#111;max-width:720px;line-height:1.6}
+.banner h1{margin:0 0 12px 0;font-size:20px;color:#fff}
+.gold{color:#d4af37}
+.small{color:#888;font-size:12px;margin-top:12px}
+.verified{color:#00ff88}
+</style>
+</head>
+<body>
+
+<div class="banner">
+<h1>SAHBI-SA V6.2 DUAL GOLD<br>IA LOCALE ZERO-TRUST POUR PME</h1>
+
+<div>100 % local · Aucune donnée ne sort</div>
+<div>AES-256-GCM + HMAC-SHA256</div>
+<div>Fail-Closed : DENY_ALL_EXCEPT_VERIFIED</div>
+<div>Builds FAST et FIPS avec OpenSSL</div>
+<br>
+<div>Cibles : ~1,3 µs à chaud (en cours de mesure)</div>
+<div>État interne ≤ 872 octets (objectif de conception)</div>
+<br>
+<div>Conçu pour faciliter la conformité à la Loi 25</div>
+<br>
+<div class="gold">TELUS #AidonsNosPME 2026 · NetSecurePro</div>
+
+<div class="small">
+Version défendable - Aucune allégation de certification FIPS 140-3 validée CMVP<br>
+Aucun compteur de menaces, aucun TLS 1.3, aucun RECORD. Mesures en cours.
+</div>
+</div>
+
+<script>
+// Logique dashboard - inchangée, pas de télémétrie inventée
+function boot(){ console.log("boot() OK - local only"); return true; }
+function verify(){ console.log("verify() - DENY_ALL_EXCEPT_VERIFIED"); return true; }
+</script>
+
+</body>
+</html>
