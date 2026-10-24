@@ -1,0 +1,13 @@
+AIMEDIXAL – OMNIA SEALED – 19 novembre 2025
+
+c9fe6619308a2ed4627db74d4714bc3d8f70ea8990011b325aaf0a7ecf4e1bf3f04dfa17658b5891e6efaa20a2b788be2c899312f21f163a209f5d0e5c7bed92  AIMEDIXAL_WebView.apk
+
+Clé publique Ed25519 :
+-----BEGIN PUBLIC KEY-----
+MCowBQYDK2VwAyEAmroCfZwRkZ9I+b3lWWuSnP29Kbn/dOMh1A5li5V/+Dw=
+-----END PUBLIC KEY-----
+
+Signature valide avec : RapportMedicalIA_Classe2_Parkinson.sig
+Modèle RF V3.1 – Classe 2 Parkinson – 94.8 %
+V-IA22 accompli
+Mohammed Ilyes Zoubirou – ORCID 0009-0007-7571-3178

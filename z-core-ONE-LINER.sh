@@ -1,0 +1,67 @@
+#!/bin/bash
+# Z-CORE ONE-LINER DIRECT BUILD - CAT EOF EDITION
+# Build DEB + APKHTML en une seule commande
+# Package: com.aistudio.audiosynchub.cbdfea v1.0.0 SDK35
+set -e
+
+echo "[Z-CORE] Build direct..."
+
+# Nettoyage
+rm -rf pkg-deb audiosynchub-zcore_1.0.0_amd64.deb Z-CORE-APKHTML.html
+mkdir -p pkg-deb/DEBIAN pkg-deb/opt/z-core pkg-deb/usr/share/applications
+
+# --- APK DUMMY SI PAS D'APK ---
+[ -f app-release.apk ] || echo "Z-CORE DUMMY APK v1.0.0" > app-release.apk
+cp app-release.apk pkg-deb/opt/z-core/app.apk
+
+# --- CONTROL DEB (CAT EOF) ---
+cat <<'EOF' > pkg-deb/DEBIAN/control
+Package: audiosynchub-zcore
+Version: 1.0.0
+Section: sound
+Priority: optional
+Architecture: amd64
+Maintainer: Z-CORE <netsecurepro_ia@z-core.com>
+Description: Audio Sync Hub Z-CORE Voice & Drive Sync
+ Solution complète d'enregistrement vocal HD
+ et de synchronisation multi-cloud.
+  - HD Recording waveform temps réel
+  - Sync Google Drive & rclone CLI background
+  - Macros Termux / Z_GHOST intents
+  - IA Gemini voice analyzer
+  - Bulk cloud transfer
+ Package: com.aistudio.audiosynchub.cbdfea
+ Target SDK 35 Android 15 Ready
+EOF
+
+# --- DESKTOP (CAT EOF) ---
+cat <<'EOF' > pkg-deb/usr/share/applications/z-core.desktop
+[Desktop Entry]
+Name=Audio Sync Hub Z-CORE
+Comment=HD Voice + Drive Sync - com.aistudio.audiosynchub.cbdfea
+Exec=xdg-open /opt/z-core/app.apk
+Icon=audio-x-generic
+Terminal=false
+Type=Application
+Categories=AudioVideo;Recorder;
+EOF
+
+# --- APKHTML (CAT EOF) ---
+cat <<'EOF' > Z-CORE-APKHTML.html
+<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Z-CORE APKHTML v1.0.0</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:monospace;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}.card{background:#0a0a0a;border:1px solid #00F5FF55;border-radius:20px;padding:28px;width:100%;max-width:430px;text-align:center;box-shadow:0 0 60px #00F5FF22}.badge{border:1px solid #00F5FF;color:#00F5FF;padding:3px 9px;border-radius:20px;font-size:10px;margin:2px;display:inline-block}.btn{background:#00F5FF;color:#000;padding:18px;width:100%;border:none;border-radius:12px;font-weight:900;font-size:16px;cursor:pointer;margin-top:18px}.btn2{background:transparent;color:#00F5FF;border:1px solid #00F5FF;padding:11px;width:100%;border-radius:10px;margin-top:10px;cursor:pointer}.qr{width:120px;height:120px;background:#fff;margin:18px auto;padding:8px;display:grid;grid-template-columns:repeat(10,1fr);gap:2px}.qr div{background:#000}.qr div.w{background:#fff}small{color:#555;font-size:10px;word-break:break-all}</style>
+</head><body><div class="card"><h1 style="color:#00F5FF;letter-spacing:4px">Z-CORE</h1><h3>APKHTML INSTALLER</h3><p style="color:#777;font-size:11px;margin:8px 0">Audio Sync Hub - Voice & Drive Sync</p><div><span class="badge">v1.0.0</span><span class="badge">com.aistudio.audiosynchub.cbdfea</span><span class="badge">SDK35 ANDROID15</span></div><div class="qr" id="qr"></div><button class="btn" onclick="dl()">⬇ INSTALLER APK Z-CORE</button><button class="btn2" onclick="cp()">📋 COPIER LIEN</button><div style="text-align:left;margin-top:20px;background:#111;padding:14px;border-radius:10px;font-size:11px;color:#999"><b style="color:#fff">INSTALL:</b> 1.Télécharge 2.Autoriser sources inconnues 3.Installer<br><br><b style="color:#fff">BIN_ISO-LIVE_DEB:</b> • HD Waveform • Drive+rclone • Termux Z_GHOST • Gemini AI • Bulk Transfer</div><small id="lnk" style="display:block;margin-top:12px">app-release.apk</small></div><script>const q=document.getElementById('qr');for(let i=0;i<100;i++){let d=document.createElement('div');d.className=Math.random()>0.45?'w':'';q.appendChild(d)}function dl(){let t=document.createElement('div');t.textContent='Z-CORE DOWNLOAD...';Object.assign(t.style,{position:'fixed',bottom:'30px',left:'50%',transform:'translateX(-50%)',background:'#00F5FF',color:'#000',padding:'12px 24px',borderRadius:'30px',fontWeight:'bold'});document.body.appendChild(t);setTimeout(()=>{window.location.href=document.getElementById('lnk').textContent;t.remove()},800)}function cp(){navigator.clipboard.writeText(document.getElementById('lnk').textContent);alert('Lien copié sahbi!')}</script></body></html>
+EOF
+
+# --- BUILD DEB DIRECT ---
+dpkg-deb --build pkg-deb audiosynchub-zcore_1.0.0_amd64.deb
+
+echo ""
+echo "=================================="
+echo " Z-CORE ONE-LINER DONE SAHBI"
+echo "=================================="
+ls -lh Z-CORE-APKHTML.html audiosynchub-zcore_1.0.0_amd64.deb
+sha256sum audiosynchub-zcore_1.0.0_amd64.deb | cut -d' ' -f1 | xargs echo "SHA256 DEB:"
+echo ""
+echo " -> Ouvre Z-CORE-APKHTML.html"
+echo " -> Installe: sudo dpkg -i audiosynchub-zcore_1.0.0_amd64.deb"

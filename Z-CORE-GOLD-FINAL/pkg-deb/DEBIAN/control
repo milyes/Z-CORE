@@ -1,0 +1,16 @@
+Package: audiosynchub-zcore
+Version: 1.0.0
+Section: sound
+Priority: optional
+Architecture: amd64
+Maintainer: Z-CORE <netsecurepro_ia@z-core.com>
+Description: Audio Sync Hub Z-CORE Voice & Drive Sync
+ Solution complète d'enregistrement vocal HD
+ et de synchronisation multi-cloud.
+  - HD Recording waveform temps réel
+  - Sync Google Drive & rclone CLI background
+  - Macros Termux / Z_GHOST intents
+  - IA Gemini voice analyzer
+  - Bulk cloud transfer
+ Package: com.aistudio.audiosynchub.cbdfea
+ Target SDK 35 Android 15 Ready

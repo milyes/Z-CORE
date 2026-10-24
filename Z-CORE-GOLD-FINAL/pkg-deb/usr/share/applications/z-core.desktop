@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Audio Sync Hub Z-CORE
+Comment=HD Voice + Drive Sync - com.aistudio.audiosynchub.cbdfea
+Exec=xdg-open /opt/z-core/app.apk
+Icon=audio-x-generic
+Terminal=false
+Type=Application
+Categories=AudioVideo;Recorder;
